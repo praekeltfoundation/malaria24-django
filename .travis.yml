@@ -7,6 +7,7 @@ cache:
   directories:
     - $HOME/.pip-cache/
 install:
+  - pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
   - pip install --upgrade pip --cache-dir $HOME/.pip-cache/
   - pip install coveralls --cache-dir $HOME/.pip-cache/
   - pip install flake8 --cache-dir $HOME/.pip-cache/
