@@ -2,5 +2,4 @@
 
 cp -a $REPO ./build/$NAME
 
-${PIP} install -r $REPO/malaria24/requirements.txt
-
+${PIP} install -r $REPO/requirements.txt
