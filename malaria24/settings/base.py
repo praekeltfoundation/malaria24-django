@@ -64,6 +64,7 @@ INSTALLED_APPS = (
 
     'molo.core',
     'malaria24',
+    'djcelery',
 
     'raven.contrib.django.raven_compat',
 )
@@ -84,6 +85,9 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'malaria24.urls'
 WSGI_APPLICATION = 'malaria24.wsgi.application'
 
+# CELERY stuff
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
