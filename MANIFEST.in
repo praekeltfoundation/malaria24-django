@@ -1,0 +1,6 @@
+include LICENSE
+include README.rst
+include VERSION
+include requirements.txt
+include requirements-dev.txt
+recursive-include malaria24 *.py *.txt *.scss *.js *.html
