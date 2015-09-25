@@ -2,6 +2,8 @@ malaria24
 =========================
 
 This is an application scaffold for Molo_.
+The Molo bits have been ripped out though as this is largely a headless
+application with only a Django CMS.
 
 Getting started
 ---------------
