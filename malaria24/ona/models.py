@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.signals import post_save
 
 
 class ReportedCase(models.Model):
@@ -18,3 +19,9 @@ class ReportedCase(models.Model):
     _id = models.CharField(max_length=255)
     _uuid = models.CharField(max_length=255)
     _xform_id_string = models.CharField(max_length=255)
+
+
+def alert_new_case(sender, instance, created, **kwargs):
+    pass
+
+post_save.connect(alert_new_case, sender=ReportedCase)
