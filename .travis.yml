@@ -13,6 +13,8 @@ install:
   - pip install flake8 --cache-dir $HOME/.pip-cache/
   - pip install -r requirements-dev.txt --cache-dir $HOME/.pip-cache/
   - pip install -e . --cache-dir $HOME/.pip-cache/
+  - echo "ONAPIE_ACCESS_TOKEN = 'foo'" >> malaria24/settings/local.py
+  - echo "ONAPIE_FORM_PK = 79925" >> malaria24/settings/local.py
 script:
   - flake8 malaria24
   - py.test --cov=malaria24 --cov-report=term
