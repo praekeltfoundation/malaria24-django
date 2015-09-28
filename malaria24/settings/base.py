@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 from os.path import abspath, dirname, join
 from django.conf import global_settings
 from django.utils.translation import ugettext_lazy as _
+from datetime import timedelta
 
 # Absolute filesystem path to the Django project directory:
 PROJECT_ROOT = dirname(dirname(dirname(abspath(__file__))))
@@ -89,6 +90,12 @@ WSGI_APPLICATION = 'malaria24.wsgi.application'
 # CELERY stuff
 BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERYBEAT_SCHEDULE = {
+    'poll-ona-every-1-hour': {
+        'task': 'malaria24.ona.tasks.ona_fetch_reported_cases',
+        'schedule': timedelta(hours=1),
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases

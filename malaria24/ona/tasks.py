@@ -8,7 +8,8 @@ from malaria24.ona.models import ReportedCase
 
 
 @celery_app.task
-def ona_fetch_reported_cases(form_pk):
+def ona_fetch_reported_cases(form_pk=None):
+    form_pk = form_pk or settings.ONAPIE_FORM_PK
     client = Client('https://ona.io', api_token=settings.ONAPIE_ACCESS_TOKEN,
                     api_entrypoint='/api/v1/')
     form_data_list = client.data.get(form_pk)
