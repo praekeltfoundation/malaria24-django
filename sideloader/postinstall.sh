@@ -1,5 +1,5 @@
 cd "${INSTALLDIR}/${NAME}/malaria24/"
-manage="${VENV}/bin/python ${INSTALLDIR}/${NAME}/malaria24/manage.py"
+manage="${VENV}/bin/python ${INSTALLDIR}/${NAME}/manage.py"
 
 pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
 
