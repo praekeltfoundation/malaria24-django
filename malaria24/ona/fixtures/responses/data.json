@@ -1,0 +1,70 @@
+[
+    {
+        "_attachments": [
+        ],
+        "_bamboo_dataset_id": "",
+        "_duration": "",
+        "_geolocation": [
+            null,
+            null
+        ],
+        "_id": 3615221,
+        "_notes": [
+        ],
+        "_status": "submitted_via_web",
+        "_submission_time": "2015-09-21T05:19:16",
+        "_submitted_by": "prkmalaria24",
+        "_tags": [
+        ],
+        "_uuid": "03a970b25c2740ea96a6cb517118bbef",
+        "_version": "201509141831",
+        "_xform_id_string": "reported_case",
+        "abroad": "1",
+        "create_date_time": "2015-09-21T05:19:16.159Z",
+        "date_of_birth": "920827",
+        "facility_code": "154342",
+        "first_name": "XXX",
+        "gender": "male",
+        "id_type": "No_SA_ID_Year_Entry",
+        "landmark": "Laundromat",
+        "last_name": "ABC",
+        "locality": "DEF",
+        "msisdn": "none",
+        "reported_by": "+27123456789",
+        "sa_id_number": "0000000000000"
+    },
+    {
+        "_attachments": [
+        ],
+        "_bamboo_dataset_id": "",
+        "_duration": "",
+        "_geolocation": [
+            null,
+            null
+        ],
+        "_id": 3608910,
+        "_notes": [
+        ],
+        "_status": "submitted_via_web",
+        "_submission_time": "2015-09-20T12:14:33",
+        "_submitted_by": "prkmalaria24",
+        "_tags": [
+        ],
+        "_uuid": "4c4799a9212245fcb564aa448444c3e0",
+        "_version": "201509141831",
+        "_xform_id_string": "reported_case",
+        "abroad": "1",
+        "create_date_time": "2015-09-20T12:14:33.669Z",
+        "date_of_birth": "870910",
+        "facility_code": "154342",
+        "first_name": "GHI",
+        "gender": "male",
+        "id_type": "No_SA_ID_Year_Entry",
+        "landmark": "School",
+        "last_name": "KLM",
+        "locality": "NOP",
+        "msisdn": "+27012345678",
+        "reported_by": "+27123456789",
+        "sa_id_number": "0000000000000"
+    }
+]

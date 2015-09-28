@@ -11,6 +11,7 @@ Getting started
 To get started::
 
     $ virtualenv ve
+    $ pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
     $ pip install -e .
     $ ./manage.py migrate
     $ ./manage.py createsuperuser

@@ -64,6 +64,7 @@ INSTALLED_APPS = (
 
     'molo.core',
     'malaria24',
+    'malaria24.ona',
     'djcelery',
 
     'raven.contrib.django.raven_compat',

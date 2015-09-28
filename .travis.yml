@@ -7,14 +7,17 @@ cache:
   directories:
     - $HOME/.pip-cache/
 install:
+  - pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
   - pip install --upgrade pip --cache-dir $HOME/.pip-cache/
   - pip install coveralls --cache-dir $HOME/.pip-cache/
   - pip install flake8 --cache-dir $HOME/.pip-cache/
   - pip install -r requirements-dev.txt --cache-dir $HOME/.pip-cache/
   - pip install -e . --cache-dir $HOME/.pip-cache/
+  - echo "ONAPIE_ACCESS_TOKEN = 'foo'" >> malaria24/settings/local.py
+  - echo "ONAPIE_FORM_PK = 79925" >> malaria24/settings/local.py
 script:
   - flake8 malaria24
-  - py.test --ds=project.settings --verbose --cov malaria24 malaria24
+  - py.test --cov=malaria24 --cov-report=term
 after_success:
   - coveralls
 deploy:
