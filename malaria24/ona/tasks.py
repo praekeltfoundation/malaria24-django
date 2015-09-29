@@ -10,7 +10,7 @@ from onapie.client import Client
 from go_http.send import HttpApiSender
 
 
-@celery_app.task
+@celery_app.task(ignore_result=True)
 def ona_fetch_reported_cases(form_pk=None):
     form_pk = form_pk or settings.ONAPIE_FORM_PK
     client = Client('https://ona.io', api_token=settings.ONAPIE_ACCESS_TOKEN,
@@ -42,7 +42,7 @@ def ona_fetch_reported_cases(form_pk=None):
     return uuids
 
 
-@celery_app.task
+@celery_app.task(ignore_result=True)
 def send_sms(to, content, sender_class=HttpApiSender):
     sender = sender_class(settings.VUMI_GO_ACCOUNT_KEY,
                           settings.VUMI_GO_CONVERSATION_KEY,
@@ -51,7 +51,7 @@ def send_sms(to, content, sender_class=HttpApiSender):
     SMS.objects.create(to=to, content=content, message_id=sms['message_id'])
 
 
-@celery_app.task
+@celery_app.task(ignore_result=True)
 def send_case_email(case_number):
     case = ReportedCase.objects.get(pk=case_number)
     ehps = EHP.objects.filter(facility_code=case.facility_code)
