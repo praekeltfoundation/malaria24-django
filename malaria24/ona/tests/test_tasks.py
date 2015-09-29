@@ -1,10 +1,11 @@
 from django.test import TestCase
+from django.db.models.signals import post_save
 
 import pkg_resources
 import pytest
 import responses
 
-from malaria24.ona.models import ReportedCase
+from malaria24.ona.models import ReportedCase, alert_new_case
 from malaria24.ona.tasks import ona_fetch_reported_cases
 
 
@@ -20,6 +21,10 @@ class OnaTest(TestCase):
                       status=200, content_type='application/json',
                       body=pkg_resources.resource_string(
                           'malaria24', 'ona/fixtures/responses/data.json'))
+        post_save.disconnect(alert_new_case, sender=ReportedCase)
+
+    def tearDown(self):
+        post_save.connect(alert_new_case, sender=ReportedCase)
 
     @responses.activate
     def test_ona_fetch_reported_cases_task(self):
