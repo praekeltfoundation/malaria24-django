@@ -1,10 +1,11 @@
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
 
 from malaria24 import celery_app
+from malaria24.ona.models import ReportedCase, SMS, EHP
 
 from onapie.client import Client
-
-from malaria24.ona.models import ReportedCase, SMS
 
 from go_http.send import HttpApiSender
 
@@ -48,3 +49,21 @@ def send_sms(to, content, sender_class=HttpApiSender):
                           settings.VUMI_GO_API_TOKEN)
     sms = sender.send_text(to, content)
     SMS.objects.create(to=to, content=content, message_id=sms['message_id'])
+
+
+@celery_app.task
+def send_case_email(case_number):
+    case = ReportedCase.objects.get(pk=case_number)
+    ehps = EHP.objects.filter(facility_code=case.facility_code)
+    for ehp in ehps:
+        context = {
+            'case': case,
+            'ehp': ehp,
+        }
+        text_content = render_to_string('ona/text_email.txt', context)
+        html_content = render_to_string('ona/html_email.html', context)
+        send_mail(subject='Malaria case number %s' % (case_number,),
+                  message=text_content,
+                  from_email=settings.DEFAULT_FROM_EMAIL,
+                  recipient_list=[ehp.email_address],
+                  html_message=html_content)

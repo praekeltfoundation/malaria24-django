@@ -2,6 +2,7 @@ import pkg_resources
 
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from django.core import mail
 
 from testfixtures import LogCapture
 
@@ -76,6 +77,16 @@ class ReportedCaseTest(TestCase):
                         'Missing phone_number.') % (case.pk,)))
 
     @responses.activate
+    def test_capture_no_ehp_email_address(self):
+        with LogCapture() as log:
+            ehp = self.mk_ehp(email_address='')
+            case = self.mk_case(facility_code=ehp.facility_code)
+            log.check(('root',
+                       'WARNING',
+                       ('Unable to Email report for case %s. '
+                        'Missing email_address.') % (case.pk,)))
+
+    @responses.activate
     def test_capture_no_reported_by(self):
         with LogCapture() as log:
             ehp = self.mk_ehp()
@@ -109,3 +120,17 @@ class ReportedCaseTest(TestCase):
         case = self.mk_case(facility_code=ehp.facility_code)
         case.save()
         self.assertEqual(SMS.objects.count(), 2)
+
+    @responses.activate
+    def test_email_sending(self):
+        ehp = self.mk_ehp()
+        case = self.mk_case(facility_code=ehp.facility_code)
+        [message] = mail.outbox
+        self.assertEqual(message.subject,
+                         'Malaria case number %s' % (case.pk,))
+        self.assertEqual(message.to, [ehp.email_address])
+        self.assertTrue(ehp.email_address in message.body)
+        [alternative] = message.alternatives
+        content, content_type = alternative
+        self.assertTrue(ehp.email_address in content)
+        self.assertEqual('text/html', content_type)

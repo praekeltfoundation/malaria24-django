@@ -53,7 +53,7 @@ class SMS(models.Model):
 
 
 def alert_new_case(sender, instance, created, **kwargs):
-    from malaria24.ona.tasks import send_sms
+    from malaria24.ona.tasks import send_sms, send_case_email
     if not created:
         return
 
@@ -63,11 +63,17 @@ def alert_new_case(sender, instance, created, **kwargs):
             instance.facility_code,))
 
     for ehp in ehps:
-        if ehp.phone_number:
+        if ehp.phone_number and ehp.email_address:
             send_sms.delay(to=ehp.phone_number,
                            content=('A new case has been reported, the full '
                                     'report will be sent to you via email.'))
-        else:
+            send_case_email.delay(instance.pk)
+        elif ehp.phone_number:
+            logging.warning(
+                ('Unable to Email report for case %s. '
+                 'Missing email_address.') % (instance.pk))
+
+        elif ehp.email_address:
             logging.warning(
                 ('Unable to SMS report for case %s. '
                  'Missing phone_number.') % (instance.pk))
