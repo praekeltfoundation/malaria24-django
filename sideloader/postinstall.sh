@@ -3,7 +3,7 @@ manage="${VENV}/bin/python ${INSTALLDIR}/${NAME}/manage.py"
 
 pip install git+git://github.com/onaio/onapie.git#egg=onapie
 
-$manage migrate --settings=malaria24.settings.production
+$manage migrate --noinput --settings=malaria24.settings.production
 
 # process static files
 $manage compress --settings=malaria24.settings.production
