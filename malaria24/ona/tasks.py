@@ -4,7 +4,9 @@ from malaria24 import celery_app
 
 from onapie.client import Client
 
-from malaria24.ona.models import ReportedCase
+from malaria24.ona.models import ReportedCase, SMS
+
+from go_http.send import HttpApiSender
 
 
 @celery_app.task
@@ -37,3 +39,12 @@ def ona_fetch_reported_cases(form_pk=None):
             _xform_id_string=data['_xform_id_string'])
         uuids.append(case._uuid)
     return uuids
+
+
+@celery_app.task
+def send_sms(to, content, sender_class=HttpApiSender):
+    sender = sender_class(settings.VUMI_GO_ACCOUNT_KEY,
+                          settings.VUMI_GO_CONVERSATION_KEY,
+                          settings.VUMI_GO_API_TOKEN)
+    sms = sender.send_text(to, content)
+    SMS.objects.create(to=to, content=content, message_id=sms['message_id'])
