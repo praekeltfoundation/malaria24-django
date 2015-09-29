@@ -101,3 +101,11 @@ class ReportedCaseTest(TestCase):
         self.assertEqual(reporter_sms.content,
                          'Your reported case has been assigned case number 1.')
         self.assertEqual(reporter_sms.message_id, 'the-message-id')
+
+    @responses.activate
+    def test_idempotency(self):
+        self.assertEqual(SMS.objects.count(), 0)
+        ehp = self.mk_ehp()
+        case = self.mk_case(facility_code=ehp.facility_code)
+        case.save()
+        self.assertEqual(SMS.objects.count(), 2)
