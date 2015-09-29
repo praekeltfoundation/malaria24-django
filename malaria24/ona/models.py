@@ -29,14 +29,26 @@ class ReportedCase(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class EHP(models.Model):
+EHP = 'EHP'
+MANAGER_DISTRICT = 'MANAGER_DISTRICT'
+MANAGER_PROVINCIAL = 'MANAGER_PROVINCIAL'
+MANAGER_NATIONAL = 'MANAGER_NATIONAL'
+
+
+class Actor(models.Model):
     """
     An EHP is an Environmental Health Practitioner
     """
     name = models.CharField(max_length=255)
     email_address = models.EmailField(null=True)
-    phone_number = models.CharField(max_length=255)
-    facility_code = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=255, null=True)
+    facility_code = models.CharField(max_length=255, null=True)
+    role = models.ChoiceField(choices=[
+        (EHP, 'EHP'),
+        (MANAGER_DISTRICT, 'District Manager'),
+        (MANAGER_PROVINCIAL, 'Provincial Manager'),
+        (MANAGER_NATIONAL, 'National Manager'),
+    ], null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
