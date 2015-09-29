@@ -1,7 +1,7 @@
 cd "${INSTALLDIR}/${NAME}/malaria24/"
 manage="${VENV}/bin/python ${INSTALLDIR}/${NAME}/manage.py"
 
-pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
+pip install git+git://github.com/onaio/onapie.git#egg=onapie
 
 $manage migrate --settings=malaria24.settings.production
 
