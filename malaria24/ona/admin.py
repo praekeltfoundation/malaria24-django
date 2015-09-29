@@ -26,4 +26,4 @@ class SMSAdmin(admin.ModelAdmin):
 
 admin.site.register(ReportedCase, ReportedCaseAdmin)
 admin.site.register(EHP)
-admin.site.register(SMS)
+admin.site.register(SMS, SMSAdmin)
