@@ -43,10 +43,12 @@ def ona_fetch_reported_cases(form_pk=None):
 
 
 @celery_app.task(ignore_result=True)
-def send_sms(to, content, sender_class=HttpApiSender):
-    sender = sender_class(settings.VUMI_GO_ACCOUNT_KEY,
-                          settings.VUMI_GO_CONVERSATION_KEY,
-                          settings.VUMI_GO_API_TOKEN)
+def send_sms(to, content):
+    sender = HttpApiSender(
+        settings.VUMI_GO_ACCOUNT_KEY,
+        settings.VUMI_GO_CONVERSATION_KEY,
+        settings.VUMI_GO_API_TOKEN,
+        api_url='http://go.vumi.org/api/v1/go/http_api_nostream')
     sms = sender.send_text(to, content)
     SMS.objects.create(to=to, content=content, message_id=sms['message_id'])
 

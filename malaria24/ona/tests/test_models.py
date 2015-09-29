@@ -17,7 +17,7 @@ class ReportedCaseTest(TestCase):
     def setUp(self):
         responses.add(
             responses.PUT,
-            ('https://go.vumi.org/api/v1/go/http_api_nostream/'
+            ('http://go.vumi.org/api/v1/go/http_api_nostream/'
              'VUMI_GO_CONVERSATION_KEY/messages.json'),
             status=200, content_type='application/json',
             body=pkg_resources.resource_string(
