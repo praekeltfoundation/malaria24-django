@@ -8,7 +8,7 @@ from testfixtures import LogCapture
 
 import responses
 
-from malaria24.ona.models import ReportedCase, EHP, SMS
+from malaria24.ona.models import ReportedCase, Actor, SMS, EHP
 
 
 @override_settings(CELERY_ALWAYS_EAGER=True)
@@ -32,9 +32,10 @@ class ReportedCaseTest(TestCase):
             'email_address': 'email@example.org',
             'phone_number': 'phone_number',
             'facility_code': 'facility_code',
+            'role': EHP
         }
         defaults.update(kwargs)
-        return EHP.objects.create(**defaults)
+        return Actor.objects.create(**defaults)
 
     def mk_case(self, **kwargs):
         defaults = {

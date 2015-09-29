@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ReportedCase, EHP, SMS
+from .models import ReportedCase, Actor, SMS
 
 
 class ReportedCaseAdmin(admin.ModelAdmin):
@@ -24,6 +24,15 @@ class SMSAdmin(admin.ModelAdmin):
     list_filter = ('created_at',)
 
 
+class ActorAdmin(admin.ModelAdmin):
+    date_hierarchy = 'created_at'
+    list_display = ('name',
+                    'email_address',
+                    'phone_number',
+                    'get_role_display')
+    list_filter = ('role', 'created_at')
+
+
 admin.site.register(ReportedCase, ReportedCaseAdmin)
-admin.site.register(EHP)
+admin.site.register(Actor, ActorAdmin)
 admin.site.register(SMS, SMSAdmin)

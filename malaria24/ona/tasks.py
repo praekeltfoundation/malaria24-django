@@ -3,7 +3,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 
 from malaria24 import celery_app
-from malaria24.ona.models import ReportedCase, SMS, EHP
+from malaria24.ona.models import ReportedCase, SMS, Actor
 
 from onapie.client import Client
 
@@ -54,7 +54,7 @@ def send_sms(to, content, sender_class=HttpApiSender):
 @celery_app.task(ignore_result=True)
 def send_case_email(case_number):
     case = ReportedCase.objects.get(pk=case_number)
-    ehps = EHP.objects.filter(facility_code=case.facility_code)
+    ehps = Actor.objects.ehps().filter(facility_code=case.facility_code)
     for ehp in ehps:
         context = {
             'case': case,
