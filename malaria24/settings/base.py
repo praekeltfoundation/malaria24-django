@@ -93,7 +93,7 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERYBEAT_SCHEDULE = {
     'poll-ona-every-1-hour': {
         'task': 'malaria24.ona.tasks.ona_fetch_reported_cases',
-        'schedule': timedelta(hours=1),
+        'schedule': timedelta(minutes=10),
     },
 }
 
