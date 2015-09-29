@@ -35,22 +35,42 @@ MANAGER_PROVINCIAL = 'MANAGER_PROVINCIAL'
 MANAGER_NATIONAL = 'MANAGER_NATIONAL'
 
 
+class ActorManager(models.Manager):
+
+    def ehps(self):
+        return super(ActorManager, self).get_queryset().filter(role=EHP)
+
+    def district(self):
+        return super(
+            ActorManager, self).get_queryset().filter(role=MANAGER_DISTRICT)
+
+    def provincial(self):
+        return super(
+            ActorManager, self).get_queryset().filter(role=MANAGER_PROVINCIAL)
+
+    def national(self):
+        return super(
+            ActorManager, self).get_queryset().filter(role=MANAGER_NATIONAL)
+
+
 class Actor(models.Model):
     """
-    An EHP is an Environmental Health Practitioner
+    An Actor within the system with a defined role.
     """
     name = models.CharField(max_length=255)
     email_address = models.EmailField(null=True)
     phone_number = models.CharField(max_length=255, null=True)
     facility_code = models.CharField(max_length=255, null=True)
-    role = models.ChoiceField(choices=[
+    role = models.CharField(choices=[
         (EHP, 'EHP'),
         (MANAGER_DISTRICT, 'District Manager'),
         (MANAGER_PROVINCIAL, 'Provincial Manager'),
         (MANAGER_NATIONAL, 'National Manager'),
-    ], null=True)
+    ], null=True, max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ActorManager()
 
 
 class SMS(models.Model):
@@ -69,7 +89,7 @@ def alert_new_case(sender, instance, created, **kwargs):
     if not created:
         return
 
-    ehps = EHP.objects.filter(facility_code=instance.facility_code)
+    ehps = Actor.objects.ehps().filter(facility_code=instance.facility_code)
     if not ehps.exists():
         logging.warning('No EHPs found for facility code %s.' % (
             instance.facility_code,))
