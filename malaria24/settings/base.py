@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'malaria24.wsgi.application'
 BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERYBEAT_SCHEDULE = {
-    'poll-ona-every-1-hour': {
+    'poll-ona-reported-cases': {
         'task': 'malaria24.ona.tasks.ona_fetch_reported_cases',
         'schedule': timedelta(minutes=10),
     },
