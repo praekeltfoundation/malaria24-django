@@ -42,6 +42,9 @@ class EHP(models.Model):
 
 
 class SMS(models.Model):
+    """
+    An SMS sent from the system, for audit trail purposes.
+    """
     to = models.CharField(max_length=255)
     content = models.CharField(max_length=255)
     message_id = models.CharField(max_length=255)
