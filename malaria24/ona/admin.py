@@ -18,6 +18,12 @@ class ReportedCaseAdmin(admin.ModelAdmin):
     list_filter = ('facility_code', 'gender', 'created_at')
 
 
+class SMSAdmin(admin.ModelAdmin):
+    date_hierarchy = 'created_at'
+    list_display = ('to', 'content', 'created_at')
+    list_filter = ('created_at',)
+
+
 admin.site.register(ReportedCase, ReportedCaseAdmin)
 admin.site.register(EHP)
 admin.site.register(SMS)
