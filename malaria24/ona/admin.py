@@ -14,8 +14,8 @@ class ReportedCaseAdmin(admin.ModelAdmin):
                     'gender',
                     'facility_code',
                     'landmark',
-                    'created_at')
-    list_filter = ('facility_code', 'gender', 'created_at')
+                    'create_date_time')
+    list_filter = ('facility_code', 'gender', 'create_date_time')
 
 
 class SMSAdmin(admin.ModelAdmin):
