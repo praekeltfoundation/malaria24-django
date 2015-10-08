@@ -32,13 +32,12 @@ class ReportedCase(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def _calculate_age(self):
+    @property
+    def age(self):
         "Returns the age of the patient"
         today = date.today()
-        e = parse_date(self.date)
-        return (today - e).days / 365
-
-    age = property(_calculate_age)
+        dob = parse_date(self.date_of_birth)
+        return int((dob - today).days / 365)
 
 EHP = 'EHP'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'
