@@ -3,10 +3,7 @@ import logging
 from django.db import models
 from django.db.models.signals import post_save
 
-from datetime import date
-
-from django.utils.dateparse import parse_date
-
+from datetime import datetime
 
 class ReportedCase(models.Model):
     """
@@ -35,8 +32,8 @@ class ReportedCase(models.Model):
     @property
     def age(self):
         "Returns the age of the patient"
-        today = date.today()
-        dob = parse_date(self.date_of_birth)
+        today = datetime.today()
+        dob = datetime.strptime(self.date_of_birth, '%y%m%d')
         return int((today - dob).days / 365)
 
 EHP = 'EHP'
