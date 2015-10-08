@@ -148,5 +148,5 @@ class ReportedCaseTest(TestCase):
 
     @responses.activate
     def test_age(self):
-        case = self.mk_case(date_of_birth = "820101")
+        case = self.mk_case(date_of_birth="820101")
         self.assertEqual(33, case.age)

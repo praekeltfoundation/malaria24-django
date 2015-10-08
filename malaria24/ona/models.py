@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 
 from datetime import datetime
 
+
 class ReportedCase(models.Model):
     """
     This is a ReportedCase as captured in Ona.io and synced
