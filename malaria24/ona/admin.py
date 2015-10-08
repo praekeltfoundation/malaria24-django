@@ -31,30 +31,26 @@ class DateReportedListFilter(admin.SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
-        now = timezone.now().date()
-
-
-        some_day_last_week = now - timedelta(days=int(self.value()))
-        monday_of_last_week = some_day_last_week - timedelta(days=(some_day_last_week.isocalendar()[2] - 1))
-        monday_of_this_week = monday_of_last_week + timedelta(days=int(self.value()))
-
-        logger = logging.getLogger(__name__)
-
-
-        logger.error('Start date: %s' % monday_of_last_week)
-
         """
         Returns the filtered queryset based on the value
         provided in the query string and retrievable via
         `self.value()`.
         """
+        if self.value() is None:
+            return queryset
 
+        now = timezone.now().date()
+        some_day_last_week = now - timedelta(days=int(self.value()))
+        monday_of_last_week = some_day_last_week - timedelta(
+            days=(some_day_last_week.isocalendar()[2] - 1))
+        monday_of_this_week = monday_of_last_week + timedelta(
+            days=int(self.value()))
 
-        # Compare the requested value (either '80s' or '90s')
-        # to decide how to filter the queryset.
+        logger = logging.getLogger(__name__)
+        logger.error('Start date: %s' % monday_of_last_week)
+
         return queryset.filter(create_date_time__gte=monday_of_last_week,
-                                create_date_time__lte=monday_of_this_week)
-
+                               create_date_time__lte=monday_of_this_week)
 
 
 class ReportedCaseAdmin(admin.ModelAdmin):
