@@ -37,7 +37,7 @@ class ReportedCase(models.Model):
         "Returns the age of the patient"
         today = date.today()
         dob = parse_date(self.date_of_birth)
-        return int((dob - today).days / 365)
+        return int((today - dob).days / 365)
 
 EHP = 'EHP'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'
