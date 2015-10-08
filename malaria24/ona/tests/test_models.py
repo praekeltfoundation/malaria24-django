@@ -133,5 +133,5 @@ class ReportedCaseTest(TestCase):
         self.assertTrue(ehp.email_address in message.body)
         [alternative] = message.alternatives
         content, content_type = alternative
-        self.assertTrue(ehp.email_address in content)
+        self.assertTrue(case.facility_code in content)
         self.assertEqual('text/html', content_type)
