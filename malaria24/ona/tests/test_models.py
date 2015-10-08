@@ -135,7 +135,7 @@ class ReportedCaseTest(TestCase):
     @responses.activate
     def test_email_sending(self):
         ehp = self.mk_ehp()
-        case = self.mk_case(facility_code=ehp.facility_code)
+        case = self.mk_case(facility_code=ehp.facility_code, date_of_birth="820101")
         [message] = mail.outbox
         self.assertEqual(message.subject,
                          'Malaria case number %s' % (case.pk,))
