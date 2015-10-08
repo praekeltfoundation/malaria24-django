@@ -28,7 +28,6 @@ class ReportedCase(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
 EHP = 'EHP'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'
 MANAGER_PROVINCIAL = 'MANAGER_PROVINCIAL'
