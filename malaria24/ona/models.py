@@ -3,7 +3,6 @@ import logging
 from django.db import models
 from django.db.models.signals import post_save
 
-
 class ReportedCase(models.Model):
     """
     This is a ReportedCase as captured in Ona.io and synced
@@ -27,6 +26,7 @@ class ReportedCase(models.Model):
     _xform_id_string = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
 
 EHP = 'EHP'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'
