@@ -1,1 +1,113 @@
-This is the HTML email to {{ehp.email_address}} for {{case.pk}}.
+<html>
+<style type="text/css">
+    .variable {
+      color: red;
+      font-weight: strong;
+      font-family: courier;
+    }
+    .section_heading {
+      background-color: #DEDFDE;
+      text-transform: uppercase;
+      font-weight: bold;
+      text-align: center;
+    }
+</style>
+<body>
+  <table border="1" style="width: 100%; border: 1px #DEDFDE solid;" cellspacing="0" cellpadding="2">
+    <tr>
+      <td colspan="12" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
+    </tr>
+    <tr>
+      <td colspan="12" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
+    </tr>
+    <tr>
+      <td colspan="4" style="width: 33%">Case Number: <span class="variable">{{case.pk}}</span></td>
+      <td colspan="4" style="width: 33%; text-align: center;"><img style="width: 10em;margin-left: auto; margin-right:auto;" src="logo.png"/></td>
+      <td colspan="4" style="width: 33%">Date Form Received for data capturing: <span class="variable">{{case.create_date_time}}</span</td>
+    </tr>
+    <tr>
+      <td colspan="12" class="section_heading">Section A: General information on case to be investigated</td>
+    </tr>
+    <tr>
+      <td colspan="12">1. Diagnosis Date: <span class="variable">{{case.create_date_time}}</span></td>
+    </tr>
+    <tr>
+      <td colspan="6">2a. Patient's Name: <span class="variable">{{case.first_name}}</span></td>
+      <td colspan="6">2b. Surname: <span class="variable">{{case.last_name}}</span></td>
+    </tr>
+    <tr>
+      <td colspan="4">3. Age: <span class="variable">{{case.}}</span></td>
+      <td colspan="4">4. Date of birth: <span class="variable">{{case.date_of_birth}}</span></td>
+      <td colspan="4">5. Gender: <span class="variable">{{case.gender}}</span></td>
+    </tr>
+    <tr>
+      <td colspan="6">6. Reporting Health Facility: <span class="variable">{{case.last_name}}</span></td>
+      <td colspan="6">7. Province: <span class="variable">{{case.last_name}}</span></td>
+    </tr>
+    <tr>
+      <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable">{{case.last_name}}</span></td>
+      <td colspan="6">9. Date notification form captured in MIS: <span class="variable">{{case.last_name}}</span></td>
+    </tr>
+    <tr>
+      <td colspan="6">10. Treatment given to patient: </td>
+      <td colspan="6">11. South African ID: <span class="variable">{{case.last_name}}</span></td>
+    </tr>
+    <tr>
+      <td colspan="12" class="section_heading">Section B: Case Investigator Detail & Investigation Address</td>
+    </tr>
+    <tr>
+      <td colspan="12">4a. Exact residential address (include name of area / section / zone / homestead number) where the patient was visited by the case investigator</td>
+    </tr>
+    <tr>
+      <td colspan="12">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6">4b. Locality / village: <span class="variable">{{case.locality}}</span></td>
+      <td colspan="6">4c. Municipality: <span class="variable">{{case.municipality}}</span></td>
+    </tr>
+    <tr>
+      <td colspan="6">4d. District: <span class="variable">{{case.}}</span></td>
+      <td colspan="6">5. Patient's contact number: <span class="variable">{{case.msisdn}}</span></td>
+    </tr>
+    <tr>
+      <td colspan="12">6. GPS coordinates:</td>
+    </tr>
+    <tr>
+      <td colspan="12">7. Source of case investigation information: <span class="variable">MalariaConnect</span></td>
+    </tr>
+    <tr>
+      <td colspan="12">8. Where did the person travel to? <span class="variable">{{case.abroad}}</span></td>
+    </tr>
+    <tr>
+      <td colspan="12"><table border="1" cellspacing="0" style="width: 100%; border-color: #DEDFDE;">
+        <tr>
+          <th>Country / Province visited</th>
+          <th>0-7 days before falling ill</th>
+          <th>8-21 days before falling ill</th>
+          <th>22-365 days before falling ill</th>
+
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+      </table></td>
+    </tr>
+
+  </table>
+</body>
+</html>
