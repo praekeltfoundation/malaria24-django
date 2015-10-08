@@ -34,7 +34,8 @@ class ReportedCaseTest(TestCase):
         random_year = random.choice(range(1950, timezone.now().year))
         random_month = random.choice(range(1, 13))
         random_day = random.choice(range(1, 29))
-        return datetime(random_year, random_month, random_day)
+        return datetime(random_year,
+                        random_month, random_day).strftime("%y%m%d")
 
     def mk_ehp(self, **kwargs):
         defaults = {
@@ -135,8 +136,7 @@ class ReportedCaseTest(TestCase):
     @responses.activate
     def test_email_sending(self):
         ehp = self.mk_ehp()
-        case = self.mk_case(facility_code=ehp.facility_code,
-                            date_of_birth="820101")
+        case = self.mk_case(facility_code=ehp.facility_code)
         [message] = mail.outbox
         self.assertEqual(message.subject,
                          'Malaria case number %s' % (case.pk,))
