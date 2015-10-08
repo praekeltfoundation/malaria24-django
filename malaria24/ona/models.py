@@ -3,6 +3,8 @@ import logging
 from django.db import models
 from django.db.models.signals import post_save
 
+from datetime import datetime
+
 
 class ReportedCase(models.Model):
     """
@@ -27,6 +29,13 @@ class ReportedCase(models.Model):
     _xform_id_string = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def age(self):
+        "Returns the age of the patient"
+        today = datetime.today()
+        dob = datetime.strptime(self.date_of_birth, '%y%m%d')
+        return int((today - dob).days / 365)
 
 EHP = 'EHP'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'
