@@ -30,13 +30,11 @@ class ReportedCaseTest(TestCase):
     def tearDown(self):
         pass
 
-
     def mk_random_date(self):
         random_year = random.choice(range(1950, timezone.now().year))
         random_month = random.choice(range(1, 13))
         random_day = random.choice(range(1, 29))
         return datetime(random_year, random_month, random_day)
-
 
     def mk_ehp(self, **kwargs):
         defaults = {

@@ -7,6 +7,7 @@ from datetime import date
 
 from django.utils.dateparse import parse_date
 
+
 class ReportedCase(models.Model):
     """
     This is a ReportedCase as captured in Ona.io and synced
@@ -38,8 +39,6 @@ class ReportedCase(models.Model):
         return (today - e).days / 365
 
     age = property(_calculate_age)
-
-
 
 EHP = 'EHP'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'
