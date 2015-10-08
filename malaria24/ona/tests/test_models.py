@@ -2,7 +2,12 @@ import pkg_resources
 
 from django.test import TestCase, override_settings
 from django.utils import timezone
+
 from django.core import mail
+
+from datetime import datetime
+
+import random
 
 from testfixtures import LogCapture
 
@@ -26,6 +31,13 @@ class ReportedCaseTest(TestCase):
     def tearDown(self):
         pass
 
+
+    def mk_random_date(self):
+        random_year = random.choice(range(1950, timezone.now().year))
+        random_month = random.choice(range(1, 13))
+        random_day = random.choice(range(1, 29))
+        return datetime(random_year, random_month, random_day)
+
     def mk_ehp(self, **kwargs):
         defaults = {
             'name': 'name',
@@ -42,7 +54,7 @@ class ReportedCaseTest(TestCase):
             'first_name': 'first_name',
             'last_name': 'last_name',
             'locality': 'locality',
-            'date_of_birth': 'date_of_birth',
+            'date_of_birth': self.mk_random_date(),
             'create_date_time': timezone.now(),
             'sa_id_number': 'sa_id_number',
             'msisdn': 'msisdn',

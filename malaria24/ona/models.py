@@ -1,8 +1,9 @@
 import logging
 
+from datetime import date
+
 from django.db import models
 from django.db.models.signals import post_save
-
 
 class ReportedCase(models.Model):
     """
@@ -27,6 +28,11 @@ class ReportedCase(models.Model):
     _xform_id_string = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def age(self):
+        today = date.today()
+        return today.year - self.date_of_birth - ((today.month, today.day) < (self.date_of_birth, self.date_of_birth.day))
+
 
 
 EHP = 'EHP'
