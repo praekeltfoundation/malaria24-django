@@ -131,6 +131,9 @@ class Actor(models.Model):
 
     objects = ActorManager()
 
+    def __unicode__(self):
+        return u'%s (%s)' % (self.name, self.role)
+
 
 class SMS(models.Model):
     """

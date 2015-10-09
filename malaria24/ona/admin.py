@@ -73,10 +73,17 @@ class ActorAdmin(admin.ModelAdmin):
     list_filter = ('role', 'created_at')
 
 
+class ReportedCaseInline(admin.TabularInline):
+    model = ReportedCase
+
+
 class DigestAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     list_display = ('created_at', 'get_recipient_list')
     list_filter = ('created_at',)
+    inlines = [
+        ReportedCaseInline,
+    ]
 
     def get_recipient_list(self, digest):
         return ', '.join([r.email_address for r in digest.recipients.all()])
