@@ -1,5 +1,6 @@
 import json
 from StringIO import StringIO
+from urllib import urlencode
 
 from django.core import mail
 from django.test.client import Client
@@ -97,3 +98,18 @@ class FacilityTest(MalariaTestCase):
             'facility_code': 'foo',
         }))
         self.assertEqual(response.status_code, 404)
+
+    def test_district(self):
+        facility1 = Facility.objects.create(facility_code='123456',
+                                            district='District')
+        facility2 = Facility.objects.create(facility_code='654321',
+                                            district='District')
+        response = self.client.get('%s?%s' % (
+            reverse('api_v1:district'),
+            urlencode({'district': 'District'})))
+        data = json.loads(response.content)
+        self.assertEqual(data, [facility1.to_dict(), facility2.to_dict()])
+
+    def test_district_400(self):
+        response = self.client.get(reverse('api_v1:district'))
+        self.assertEqual(response.status_code, 400)
