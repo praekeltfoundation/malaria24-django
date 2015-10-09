@@ -79,4 +79,4 @@ def compile_and_send_digest_email():
 
     digest = Digest.compile_digest()
     if digest:
-        digest.send_digest_email()
+        return digest.send_digest_email()
