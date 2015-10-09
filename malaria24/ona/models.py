@@ -64,7 +64,7 @@ class ReportedCase(models.Model):
     abroad = models.CharField(max_length=255)
     reported_by = models.CharField(max_length=255)
     gender = models.CharField(max_length=255)
-    facility_code = models.CharField(max_length=255, blank=True)
+    facility_code = models.CharField(max_length=255)
     landmark = models.CharField(max_length=255, null=True)
     _id = models.CharField(max_length=255)
     _uuid = models.CharField(max_length=255)
@@ -117,9 +117,9 @@ class Actor(models.Model):
     An Actor within the system with a defined role.
     """
     name = models.CharField(max_length=255)
-    email_address = models.EmailField(null=True)
-    phone_number = models.CharField(max_length=255, null=True)
-    facility_code = models.CharField(max_length=255, null=True)
+    email_address = models.EmailField(null=True, blank=True)
+    phone_number = models.CharField(max_length=255, null=True, blank=True)
+    facility_code = models.CharField(max_length=255, null=True, blank=True)
     role = models.CharField(choices=[
         (EHP, 'EHP'),
         (MANAGER_DISTRICT, 'District Manager'),
