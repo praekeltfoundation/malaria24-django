@@ -23,7 +23,7 @@ urlpatterns = patterns(
 )
 
 
-if settings.DEBUG:
+if settings.DEBUG:  # pragma: no cover
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
     urlpatterns += staticfiles_urlpatterns()

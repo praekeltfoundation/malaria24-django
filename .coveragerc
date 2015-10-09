@@ -1,2 +1,2 @@
 [run]
-omit = **/migrations/*,malaria24/settings/*
+omit = **/migrations/*,malaria24/settings/*,malaria24/wsgi.py
