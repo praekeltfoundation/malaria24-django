@@ -1,6 +1,5 @@
 import json
 from StringIO import StringIO
-from urllib import urlencode
 
 from django.core import mail
 from django.test.client import Client
