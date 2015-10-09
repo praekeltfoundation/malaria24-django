@@ -167,6 +167,16 @@ class Facility(models.Model):
     def __unicode__(self):
         return u'%s - %s' % (self.facility_code, self.facility_name)
 
+    def to_dict(self):
+        return {
+            'facility_code': self.facility_code,
+            'facility_name': self.facility_name,
+            'province': self.province,
+            'district': self.district,
+            'subdistrict': self.subdistrict,
+            'phase': self.phase,
+        }
+
 
 def alert_new_case(sender, instance, created, **kwargs):
     from malaria24.ona.tasks import send_sms, send_case_email

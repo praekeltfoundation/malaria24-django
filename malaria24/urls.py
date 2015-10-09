@@ -17,6 +17,7 @@ urlpatterns = patterns(
     url(r'^admin/', include(wagtailadmin_urls)),
     url(r'^search/', include(wagtailsearch_urls)),
     url(r'^documents/', include(wagtaildocs_urls)),
+    url(r'^api/v1/', include('malaria24.ona.urls', namespace='api_v1')),
     url(r'', include('molo.core.urls')),
     url(r'', include(wagtail_urls)),
 )
