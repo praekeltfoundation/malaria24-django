@@ -1,5 +1,5 @@
 from .models import Facility
-from django.http import JsonResponse, Http404, HttpResponseBadRequest
+from django.http import JsonResponse, Http404
 
 
 def facilities(request, facility_code):
@@ -10,10 +10,11 @@ def facilities(request, facility_code):
         raise Http404()
 
 
-def district(request):
-    district_name = request.GET.get('district')
-    if not district_name:
-        return HttpResponseBadRequest()
-
-    facilities = Facility.objects.filter(district=district_name)
-    return JsonResponse([f.to_dict() for f in facilities], safe=False)
+def localities(request, facility_code):
+    try:
+        facility = Facility.objects.get(facility_code=facility_code)
+        localities = Facility.objects.filter(
+            district=facility.district).values_list('subdistrict', flat=True)
+        return JsonResponse(list(localities), safe=False)
+    except Facility.DoesNotExist:
+        raise Http404()
