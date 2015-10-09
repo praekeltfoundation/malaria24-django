@@ -1,9 +1,11 @@
+import json
+
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 
 from malaria24 import celery_app
-from malaria24.ona.models import ReportedCase, SMS, Actor, Digest
+from malaria24.ona.models import ReportedCase, SMS, Actor, Digest, Facility
 
 from onapie.client import Client
 
@@ -80,3 +82,36 @@ def compile_and_send_digest_email():
     digest = Digest.compile_digest()
     if digest:
         return digest.send_digest_email()
+
+
+@celery_app.task(ignore_result=True)
+def import_facilities(json_data, wipe, email_address):
+    data = json.loads(json_data)
+    if wipe:
+        Facility.objects.all().delete()
+
+    for row in data:
+        facility, _ = Facility.objects.get_or_create(
+            facility_code=row['FacCode'])
+        facility.facility_name = row['Facility']
+        facility.province = row['Province']
+        facility.district = row['District']
+        facility.subdistrict = row['Sub-District (Locality)']
+        facility.phase = row['Phase']
+        facility.save()
+
+    if email_address:
+        context = {
+            'facilities': Facility.objects.all(),
+            'data': data,
+        }
+        text_content = render_to_string(
+            'ona/import_complete_email.txt', context)
+        html_content = render_to_string(
+            'ona/import_complete_email.html', context)
+
+        send_mail(subject='Facilities import complete.',
+                  message=text_content,
+                  from_email=settings.DEFAULT_FROM_EMAIL,
+                  recipient_list=[email_address],
+                  html_message=html_content)

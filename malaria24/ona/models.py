@@ -149,10 +149,16 @@ class SMS(models.Model):
 class Facility(models.Model):
     facility_code = models.CharField(max_length=255)
     facility_name = models.CharField(max_length=255, null=True, blank=True)
+    province = models.CharField(max_length=255, null=True, blank=True)
     district = models.CharField(max_length=255, null=True, blank=True)
     subdistrict = models.CharField(max_length=255, null=True, blank=True)
     phase = models.CharField(max_length=255, null=True, blank=True)
-    province = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Facility'
+        verbose_name_plural = 'Facilities'
 
     def __unicode__(self):
         return u'%s - %s' % (self.facility_code, self.facility_name)

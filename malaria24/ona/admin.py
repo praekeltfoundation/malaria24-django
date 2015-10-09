@@ -1,11 +1,15 @@
-
 from datetime import timedelta
-from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
 
+from django import forms
+from django.contrib import admin, messages
+from django.conf.urls import url
+from django.shortcuts import redirect
+from django.template.response import TemplateResponse
+from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
-from .models import ReportedCase, Actor, SMS, Digest
+from .models import ReportedCase, Actor, SMS, Digest, Facility
+from .tasks import import_facilities
 
 
 class DateReportedListFilter(admin.SimpleListFilter):
@@ -119,7 +123,60 @@ class DigestAdmin(admin.ModelAdmin):
         return False
 
 
+class FacilityUploadForm(forms.Form):
+    upload = forms.FileField(label='File to import', required=True)
+    wipe = forms.BooleanField(
+        help_text=('Check if you want to wipe the existing database before '
+                   'importing new data.'), required=False)
+
+
+class FacilityAdmin(admin.ModelAdmin):
+    date_hierarchy = 'created_at'
+    list_display = ('facility_code',
+                    'facility_name',
+                    'province',
+                    'district',
+                    'subdistrict',
+                    'created_at',
+                    'updated_at',
+                    )
+    list_filter = ('province', 'district', 'subdistrict', 'phase')
+    search_fields = ('facility_code', 'facility_name')
+
+    def get_urls(self):
+        urls = super(FacilityAdmin, self).get_urls()
+        my_urls = [
+            url(r'^upload/$', self.admin_site.admin_view(
+                self.upload_facility_codes_view), name='ona_facility_upload'),
+        ]
+        return my_urls + urls
+
+    def upload_facility_codes_view(self, request):
+        if request.method == 'POST':
+            form = FacilityUploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                import_facilities.delay(
+                    form.cleaned_data['upload'].read(),
+                    form.cleaned_data['wipe'],
+                    request.user.email)
+                messages.info(
+                    request,
+                    ('Importing facilities, you will receive an email '
+                     'when completed.'))
+                return redirect('admin:ona_facility_changelist')
+        else:
+            form = FacilityUploadForm()
+        context = dict(
+            self.admin_site.each_context(request),
+            title='Upload Facility Codes',
+            form=form,
+        )
+        return TemplateResponse(
+            request, 'ona/upload_facility_codes.html', context)
+
+
 admin.site.register(ReportedCase, ReportedCaseAdmin)
 admin.site.register(Actor, ActorAdmin)
 admin.site.register(SMS, SMSAdmin)
 admin.site.register(Digest, DigestAdmin)
+admin.site.register(Facility, FacilityAdmin)
