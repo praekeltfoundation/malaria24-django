@@ -1,0 +1,4 @@
+Import complete
+===============
+
+{{facilities.count}} have been imported.
