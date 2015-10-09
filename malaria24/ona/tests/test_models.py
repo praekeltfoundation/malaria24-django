@@ -1,8 +1,9 @@
 import pkg_resources
 
+from django.core import mail
+from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
 from django.utils import timezone
-from django.core import mail
 
 import random
 
@@ -12,11 +13,12 @@ from testfixtures import LogCapture
 
 import responses
 
-from malaria24.ona.models import ReportedCase, Actor, SMS, EHP
+from malaria24.ona.models import (
+    ReportedCase, Actor, SMS, EHP, Digest, alert_new_case, MANAGER_DISTRICT)
 
 
 @override_settings(CELERY_ALWAYS_EAGER=True)
-class ReportedCaseTest(TestCase):
+class MalariaTestCase(TestCase):
 
     def setUp(self):
         responses.add(
@@ -27,9 +29,6 @@ class ReportedCaseTest(TestCase):
             body=pkg_resources.resource_string(
                 'malaria24', 'ona/fixtures/responses/send_sms.json'))
 
-    def tearDown(self):
-        pass
-
     def mk_random_date(self):
         random_year = random.choice(range(1950, timezone.now().year))
         random_month = random.choice(range(1, 13))
@@ -37,16 +36,18 @@ class ReportedCaseTest(TestCase):
         return datetime(random_year,
                         random_month, random_day).strftime("%y%m%d")
 
-    def mk_ehp(self, **kwargs):
+    def mk_actor(self, **kwargs):
         defaults = {
             'name': 'name',
             'email_address': 'email@example.org',
             'phone_number': 'phone_number',
             'facility_code': 'facility_code',
-            'role': EHP
         }
         defaults.update(kwargs)
         return Actor.objects.create(**defaults)
+
+    def mk_ehp(self, **kwargs):
+        return self.mk_actor(role=EHP, **kwargs)
 
     def mk_case(self, **kwargs):
         defaults = {
@@ -65,10 +66,14 @@ class ReportedCaseTest(TestCase):
             'landmark': 'landmark',
             '_id': '_id',
             '_uuid': '_uuid',
-            '_xform_id_string': '_xform_id_string'
+            '_xform_id_string': '_xform_id_string',
+            'digest': None,
         }
         defaults.update(kwargs)
         return ReportedCase.objects.create(**defaults)
+
+
+class ReportedCaseTest(MalariaTestCase):
 
     @responses.activate
     def test_capture_no_ehps(self):
@@ -151,3 +156,47 @@ class ReportedCaseTest(TestCase):
     def test_age(self):
         case = self.mk_case(date_of_birth="820101")
         self.assertEqual(33, case.age)
+
+
+class DigestTest(MalariaTestCase):
+
+    def setUp(self):
+        super(DigestTest, self).setUp()
+        post_save.disconnect(alert_new_case, sender=ReportedCase)
+
+    def tearDown(self):
+        super(DigestTest, self).tearDown()
+        post_save.connect(alert_new_case, sender=ReportedCase)
+
+    @responses.activate
+    def test_compile_digest(self):
+        manager1 = self.mk_actor(role='MANAGER_DISTRICT')
+        manager2 = self.mk_actor(role='MANAGER_DISTRICT')
+        cases = [self.mk_case() for i in range(10)]
+        digest = Digest.compile_digest()
+        self.assertEqual([manager1, manager2],
+                         list(digest.recipients.all().order_by('pk')))
+        self.assertEqual([c.pk for c in cases],
+                         [c.pk for c in digest.reportedcase_set.all()])
+
+    @responses.activate
+    def test_send_digest_email(self):
+        manager1 = self.mk_actor(role=MANAGER_DISTRICT,
+                                 email_address='manager@example.org')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for i in range(10):
+            case = self.mk_case()
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+
+        digest = Digest.compile_digest()
+        digest.send_digest_email()
+        [message] = mail.outbox
+        [alternative] = message.alternatives
+        html_content, content_type = alternative
+        self.assertEqual(message.body.count('EHP1, EHP2'), 10)
+        self.assertEqual(html_content.count('EHP1, EHP2'), 10)
+        self.assertEqual(message.to, [manager1.email_address])

@@ -9,6 +9,7 @@ from .models import ReportedCase, Actor, SMS
 
 import logging
 
+
 class DateReportedListFilter(admin.SimpleListFilter):
     # Human-readable title which will be displayed in the
     # right admin sidebar just above the filter options.
@@ -26,8 +27,8 @@ class DateReportedListFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
         return (
-            (7, _('Last week')),
-            (14, _('2 weeks ago')),
+            (0, _('Last week')),
+            (-1, _('2 weeks ago')),
         )
 
     def queryset(self, request, queryset):
@@ -39,18 +40,8 @@ class DateReportedListFilter(admin.SimpleListFilter):
         if self.value() is None:
             return queryset
 
-        now = timezone.now().date()
-        some_day_last_week = now - timedelta(days=int(self.value()))
-        monday_of_last_week = some_day_last_week - timedelta(
-            days=(some_day_last_week.isocalendar()[2] - 1))
-        monday_of_this_week = monday_of_last_week + timedelta(
-            days=int(self.value()))
-
-        logger = logging.getLogger(__name__)
-        logger.error('Start date: %s' % monday_of_last_week)
-
-        return queryset.filter(create_date_time__gte=monday_of_last_week,
-                               create_date_time__lte=monday_of_this_week)
+        return queryset.last_week(
+            timezone.now() - timedelta(weeks=int(self.value())))
 
 
 class ReportedCaseAdmin(admin.ModelAdmin):
@@ -65,7 +56,8 @@ class ReportedCaseAdmin(admin.ModelAdmin):
                     'facility_code',
                     'landmark',
                     'create_date_time')
-    list_filter = ('facility_code', 'gender', 'create_date_time', DateReportedListFilter)
+    list_filter = ('facility_code', 'gender', 'create_date_time',
+                   DateReportedListFilter)
 
 
 class SMSAdmin(admin.ModelAdmin):
