@@ -13,8 +13,9 @@ def facilities(request, facility_code):
 def localities(request, facility_code):
     try:
         facility = Facility.objects.get(facility_code=facility_code)
-        localities = Facility.objects.filter(
-            district=facility.district).values_list('subdistrict', flat=True)
+        facilities = Facility.objects.filter(district=facility.district)
+        localities = facilities.values_list(
+            'subdistrict', flat=True).distinct()
         return JsonResponse(list(localities), safe=False)
     except Facility.DoesNotExist:
         raise Http404()

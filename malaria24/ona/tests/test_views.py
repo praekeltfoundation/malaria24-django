@@ -106,6 +106,9 @@ class FacilityTest(MalariaTestCase):
         Facility.objects.create(facility_code='654321',
                                 district='District',
                                 subdistrict='Subdistrict 2')
+        Facility.objects.create(facility_code='000000',
+                                district='District',
+                                subdistrict='Subdistrict 2')
         response = self.client.get(reverse('api_v1:localities', kwargs={
             'facility_code': '123456',
         }))
