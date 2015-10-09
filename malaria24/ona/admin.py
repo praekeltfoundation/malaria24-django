@@ -112,6 +112,12 @@ class DigestAdmin(admin.ModelAdmin):
         return ', '.join([r.email_address for r in digest.recipients.all()])
     get_recipient_list.short_description = 'Recipients'
 
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 admin.site.register(ReportedCase, ReportedCaseAdmin)
 admin.site.register(Actor, ActorAdmin)
