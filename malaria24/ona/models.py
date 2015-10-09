@@ -146,6 +146,18 @@ class SMS(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class Facility(models.Model):
+    facility_code = models.CharField(max_length=255)
+    facility_name = models.CharField(max_length=255, null=True, blank=True)
+    district = models.CharField(max_length=255, null=True, blank=True)
+    subdistrict = models.CharField(max_length=255, null=True, blank=True)
+    phase = models.CharField(max_length=255, null=True, blank=True)
+    province = models.CharField(max_length=255, null=True, blank=True)
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.facility_code, self.facility_name)
+
+
 def alert_new_case(sender, instance, created, **kwargs):
     from malaria24.ona.tasks import send_sms, send_case_email
     if not created:
