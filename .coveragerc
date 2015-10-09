@@ -1,0 +1,2 @@
+[run]
+omit = **/migrations/*,malaria24/settings/*
