@@ -76,6 +76,10 @@ class ReportedCase(models.Model):
 
     @property
     def facility_name(self):
+        facilities = Facility.objects.filter(facility_code=self.facility_code)
+        if facilities.exists():
+            return ', '.join([f.facility_name for f in facilities])
+
         return "Unknown"
 
     @property

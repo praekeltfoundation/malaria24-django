@@ -6,7 +6,7 @@ from testfixtures import LogCapture
 import responses
 
 from malaria24.ona.models import (
-    ReportedCase, SMS, Digest, alert_new_case, MANAGER_DISTRICT)
+    ReportedCase, SMS, Digest, alert_new_case, MANAGER_DISTRICT, Facility)
 
 from .base import MalariaTestCase
 
@@ -94,6 +94,15 @@ class ReportedCaseTest(MalariaTestCase):
     def test_age(self):
         case = self.mk_case(date_of_birth="820101")
         self.assertEqual(33, case.age)
+
+    @responses.activate
+    def test_facility_name(self):
+        Facility.objects.create(facility_code='0001',
+                                facility_name='Facility 1')
+        case1 = self.mk_case(facility_code='0001')
+        case2 = self.mk_case(facility_code='0002')
+        self.assertEqual(case1.facility_name, 'Facility 1')
+        self.assertEqual(case2.facility_name, 'Unknown')
 
 
 class DigestTest(MalariaTestCase):
