@@ -7,8 +7,6 @@ from django.utils import timezone
 
 from .models import ReportedCase, Actor, SMS
 
-import logging
-
 
 class DateReportedListFilter(admin.SimpleListFilter):
     # Human-readable title which will be displayed in the
