@@ -13,6 +13,9 @@ from django.conf import global_settings
 from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta
 
+from celery.schedules import crontab
+
+
 # Absolute filesystem path to the Django project directory:
 PROJECT_ROOT = dirname(dirname(dirname(abspath(__file__))))
 
@@ -94,6 +97,10 @@ CELERYBEAT_SCHEDULE = {
     'poll-ona-reported-cases': {
         'task': 'malaria24.ona.tasks.ona_fetch_reported_cases',
         'schedule': timedelta(minutes=10),
+    },
+    'send-weekly-digest': {
+        'task': 'malaria24.ona.tasks.compile_and_send_digest_email',
+        'schedule': crontab(hour=8, minute=15, day_of_week='fri'),
     },
 }
 

@@ -1,9 +1,51 @@
 import logging
 
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db import models
 from django.db.models.signals import post_save
+from django.template.loader import render_to_string
+from django.utils import timezone
 
 from datetime import datetime
+
+
+class Digest(models.Model):
+    """
+    A Digest of reported cases.
+    """
+    created_at = models.DateTimeField(auto_now_add=True)
+    recipients = models.ManyToManyField('Actor')
+
+    @classmethod
+    def compile_digest(cls):
+        new_cases = ReportedCase.objects.filter(digest__isnull=True)
+        if not new_cases.exists():
+            return
+
+        managers = Actor.objects.managers().filter(
+            email_address__isnull=False)
+        digest = cls.objects.create()
+        digest.recipients = managers
+        digest.save()
+        new_cases.update(digest=digest)
+        return digest
+
+    def send_digest_email(self):
+        context = {
+            'digest': self,
+        }
+        text_content = render_to_string('ona/text_digest.txt', context)
+        html_content = render_to_string('ona/html_digest.html', context)
+        return send_mail(
+            subject='Digest of reported Malaria cases %s' % (
+                timezone.now().strftime('%x'),),
+            message=text_content,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[actor.email_address
+                            for actor
+                            in self.recipients.all()],
+            html_message=html_content)
 
 
 class ReportedCase(models.Model):
@@ -29,6 +71,12 @@ class ReportedCase(models.Model):
     _xform_id_string = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    digest = models.ForeignKey('Digest', null=True)
+    ehps = models.ManyToManyField('Actor')
+
+    @property
+    def facility_name(self):
+        return "Unknown"
 
     @property
     def age(self):
@@ -47,6 +95,9 @@ class ActorManager(models.Manager):
 
     def ehps(self):
         return super(ActorManager, self).get_queryset().filter(role=EHP)
+
+    def managers(self):
+        return super(ActorManager, self).get_queryset().exclude(role=EHP)
 
     def district(self):
         return super(
@@ -103,6 +154,7 @@ def alert_new_case(sender, instance, created, **kwargs):
             instance.facility_code,))
 
     for ehp in ehps:
+        instance.ehps.add(ehp)
         if ehp.phone_number and ehp.email_address:
             send_sms.delay(to=ehp.phone_number,
                            content=('A new case has been reported, the full '
