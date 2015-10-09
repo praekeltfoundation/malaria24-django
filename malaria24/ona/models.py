@@ -64,7 +64,7 @@ class ReportedCase(models.Model):
     abroad = models.CharField(max_length=255)
     reported_by = models.CharField(max_length=255)
     gender = models.CharField(max_length=255)
-    facility_code = models.CharField(max_length=255)
+    facility_code = models.CharField(max_length=255, blank=True)
     landmark = models.CharField(max_length=255, null=True)
     _id = models.CharField(max_length=255)
     _uuid = models.CharField(max_length=255)
