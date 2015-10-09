@@ -71,8 +71,8 @@ class ReportedCase(models.Model):
     _xform_id_string = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    digest = models.ForeignKey('Digest', null=True)
-    ehps = models.ManyToManyField('Actor')
+    digest = models.ForeignKey('Digest', null=True, blank=True)
+    ehps = models.ManyToManyField('Actor', blank=True)
 
     @property
     def facility_name(self):

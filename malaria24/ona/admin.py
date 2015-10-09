@@ -76,11 +76,34 @@ class ActorAdmin(admin.ModelAdmin):
 class ReportedCaseInline(admin.TabularInline):
     model = ReportedCase
 
+    list_display = fields = readonly_fields = (
+        'first_name',
+        'last_name',
+        'locality',
+        'date_of_birth',
+        'create_date_time',
+        'sa_id_number',
+        'msisdn',
+        'id_type',
+        'abroad',
+        'reported_by',
+        'gender',
+        'facility_code',
+        'landmark',
+        'ehps')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class DigestAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     list_display = ('created_at', 'get_recipient_list')
     list_filter = ('created_at',)
+    readonly_fields = ('recipients', 'created_at')
     inlines = [
         ReportedCaseInline,
     ]
