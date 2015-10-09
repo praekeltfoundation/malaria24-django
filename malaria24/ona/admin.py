@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.utils import timezone
 
-from .models import ReportedCase, Actor, SMS
+from .models import ReportedCase, Actor, SMS, Digest
 
 
 class DateReportedListFilter(admin.SimpleListFilter):
@@ -73,6 +73,17 @@ class ActorAdmin(admin.ModelAdmin):
     list_filter = ('role', 'created_at')
 
 
+class DigestAdmin(admin.ModelAdmin):
+    date_hierarchy = 'created_at'
+    list_display = ('created_at', 'get_recipient_list')
+    list_filter = ('created_at',)
+
+    def get_recipient_list(self, digest):
+        return ', '.join([r.email_address for r in digest.recipients.all()])
+    get_recipient_list.short_description = 'Recipients'
+
+
 admin.site.register(ReportedCase, ReportedCaseAdmin)
 admin.site.register(Actor, ActorAdmin)
 admin.site.register(SMS, SMSAdmin)
+admin.site.register(Digest, DigestAdmin)
