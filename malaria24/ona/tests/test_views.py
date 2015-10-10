@@ -81,3 +81,41 @@ class FacilityTest(MalariaTestCase):
         self.assertEqual(facility.facility_code, '123456')
         self.assertEqual(facility.facility_name, 'Facility Name')
         self.assertNotEqual(facility.pk, original_facility.pk)
+
+    def test_api(self):
+        original_facility = Facility.objects.create(
+            facility_code='123456',
+            facility_name='The Old Name')
+        response = self.client.get(reverse('api_v1:facility', kwargs={
+            'facility_code': original_facility.facility_code,
+        }))
+        data = json.loads(response.content)
+        self.assertEqual(data, original_facility.to_dict())
+
+    def test_api_404(self):
+        response = self.client.get(reverse('api_v1:facility', kwargs={
+            'facility_code': 'foo',
+        }))
+        self.assertEqual(response.status_code, 404)
+
+    def test_localities(self):
+        Facility.objects.create(facility_code='123456',
+                                district='District',
+                                subdistrict='Subdistrict 1')
+        Facility.objects.create(facility_code='654321',
+                                district='District',
+                                subdistrict='Subdistrict 2')
+        Facility.objects.create(facility_code='000000',
+                                district='District',
+                                subdistrict='Subdistrict 2')
+        response = self.client.get(reverse('api_v1:localities', kwargs={
+            'facility_code': '123456',
+        }))
+        data = json.loads(response.content)
+        self.assertEqual(data, ['Subdistrict 1', 'Subdistrict 2'])
+
+    def test_localities_404(self):
+        response = self.client.get(reverse('api_v1:localities', kwargs={
+            'facility_code': 'foo',
+        }))
+        self.assertEqual(response.status_code, 404)
