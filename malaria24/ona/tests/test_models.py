@@ -56,7 +56,7 @@ class ReportedCaseTest(MalariaTestCase):
     def test_capture_all_ok(self):
         self.assertEqual(SMS.objects.count(), 0)
         ehp = self.mk_ehp()
-        self.mk_case(facility_code=ehp.facility_code)
+        case = self.mk_case(facility_code=ehp.facility_code)
         [ehp_sms, reporter_sms] = SMS.objects.all()
         self.assertEqual(ehp_sms.to, 'phone_number')
         self.assertEqual(ehp_sms.content,
@@ -64,8 +64,11 @@ class ReportedCaseTest(MalariaTestCase):
                          'be sent to you via email.')
         self.assertEqual(ehp_sms.message_id, 'the-message-id')
         self.assertEqual(reporter_sms.to, 'reported_by')
-        self.assertEqual(reporter_sms.content,
-                         'Your reported case has been assigned case number 1.')
+        self.assertEqual(
+            reporter_sms.content,
+            ('Your reported case for %s %s has been '
+             'assigned case number %s.') % (
+                case.first_name, case.last_name, case.pk))
         self.assertEqual(reporter_sms.message_id, 'the-message-id')
 
     @responses.activate
