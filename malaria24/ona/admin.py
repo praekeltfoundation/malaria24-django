@@ -59,7 +59,7 @@ class ReportedCaseAdmin(admin.ModelAdmin):
                     'facility_code',
                     'landmark',
                     'create_date_time',
-                    'ehp_report')
+                    'ehp_report_link')
     list_filter = ('facility_code', 'gender', 'create_date_time',
                    DateReportedListFilter)
 
