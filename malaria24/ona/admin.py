@@ -67,7 +67,7 @@ class ReportedCaseAdmin(admin.ModelAdmin):
         urls = super(ReportedCaseAdmin, self).get_urls()
         my_urls = [
             url(r'^ehp_report/(?P<pk>\d+)/$', self.admin_site.admin_view(
-                self.ehp_report_view), name='ehp_report'),
+                self.ehp_report_view), name='ehp_report_view'),
         ]
         return my_urls + urls
 
