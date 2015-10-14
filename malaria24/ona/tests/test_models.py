@@ -99,6 +99,8 @@ class ReportedCaseTest(MalariaTestCase):
         self.assertTrue('The Province' in content)
         self.assertTrue('landmark' in content)
         self.assertTrue('landmark_description' in content)
+        self.assertTrue(
+            'http://example.com/static/ona/img/logo.png' in content)
         self.assertEqual('text/html', content_type)
 
     @responses.activate
