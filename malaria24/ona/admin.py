@@ -72,7 +72,7 @@ class ReportedCaseAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def ehp_report_link(self, reported_case):
-        return '<a href="./ehp_report/%s">View EHP Email</a>' % (
+        return '<a href="./ehp_report/%s/">View EHP Email</a>' % (
             reported_case.pk,)
     ehp_report_link.short_description = 'EHP Email'
     ehp_report_link.allow_tags = True
