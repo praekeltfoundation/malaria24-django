@@ -59,10 +59,12 @@ def send_sms(to, content):
 def send_case_email(case_number):
     case = ReportedCase.objects.get(pk=case_number)
     ehps = Actor.objects.ehps().filter(facility_code=case.facility_code)
+    facility = Facility.objects.get(facility_code=case.facility_code)
     for ehp in ehps:
         context = {
             'case': case,
             'ehp': ehp,
+            'facility': facility
         }
         text_content = render_to_string('ona/text_email.txt', context)
         html_content = render_to_string('ona/html_email.html', context)
