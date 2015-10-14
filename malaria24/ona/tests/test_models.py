@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.core import mail
 from django.db.models.signals import post_save
 
@@ -114,6 +116,17 @@ class ReportedCaseTest(MalariaTestCase):
         case2 = self.mk_case(facility_code='0002')
         self.assertEqual(case1.facility_names, 'Facility 1')
         self.assertEqual(case2.facility_names, 'Unknown')
+
+    @responses.activate
+    def test_case_number(self):
+        Facility.objects.create(facility_code='0001',
+                                facility_name='Facility 1')
+        case1 = self.mk_case(facility_code='0001',
+                             create_date_time=datetime(2015, 10, 14))
+        case2 = self.mk_case(facility_code='0001',
+                             create_date_time=datetime(2015, 10, 14))
+        self.assertEqual(case1.case_number, '0001-20151014-1')
+        self.assertEqual(case2.case_number, '0001-20151014-2')
 
 
 class DigestTest(MalariaTestCase):
