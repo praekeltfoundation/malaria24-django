@@ -78,8 +78,13 @@ class ReportedCaseTest(MalariaTestCase):
 
     @responses.activate
     def test_email_sending(self):
-        ehp = self.mk_ehp()
-        case = self.mk_case(facility_code=ehp.facility_code)
+        facility = Facility.objects.create(facility_code='0001',
+                                           facility_name='Facility 1',
+                                           district='The District',
+                                           subdistrict='The Subdistrict',
+                                           province='The Province')
+        ehp = self.mk_ehp(facility_code=facility.facility_code)
+        case = self.mk_case(facility_code=facility.facility_code)
         [message] = mail.outbox
         self.assertEqual(message.subject,
                          'Malaria case number %s' % (case.pk,))
@@ -89,6 +94,9 @@ class ReportedCaseTest(MalariaTestCase):
         content, content_type = alternative
         self.assertTrue(case.facility_code in content)
         self.assertTrue(case.sa_id_number in content)
+        self.assertTrue('The District' in content)
+        self.assertTrue('The Subdistrict' in content)
+        self.assertTrue('The Province' in content)
         self.assertEqual('text/html', content_type)
 
     @responses.activate
@@ -102,8 +110,8 @@ class ReportedCaseTest(MalariaTestCase):
                                 facility_name='Facility 1')
         case1 = self.mk_case(facility_code='0001')
         case2 = self.mk_case(facility_code='0002')
-        self.assertEqual(case1.facility_name, 'Facility 1')
-        self.assertEqual(case2.facility_name, 'Unknown')
+        self.assertEqual(case1.facility_names, 'Facility 1')
+        self.assertEqual(case2.facility_names, 'Unknown')
 
 
 class DigestTest(MalariaTestCase):
