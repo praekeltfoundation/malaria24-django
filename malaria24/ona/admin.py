@@ -3,6 +3,7 @@ from datetime import timedelta
 from django import forms
 from django.contrib import admin, messages
 from django.conf.urls import url
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext_lazy as _
@@ -57,9 +58,28 @@ class ReportedCaseAdmin(admin.ModelAdmin):
                     'gender',
                     'facility_code',
                     'landmark',
-                    'create_date_time')
+                    'create_date_time',
+                    'ehp_report')
     list_filter = ('facility_code', 'gender', 'create_date_time',
                    DateReportedListFilter)
+
+    def get_urls(self):
+        urls = super(ReportedCaseAdmin, self).get_urls()
+        my_urls = [
+            url(r'^ehp_report/(?P<pk>\d+)/$', self.admin_site.admin_view(
+                self.ehp_report_view), name='ehp_report'),
+        ]
+        return my_urls + urls
+
+    def ehp_report_link(self, reported_case):
+        return '<a href="./ehp_report/%s">View EHP Email</a>' % (
+            reported_case.pk,)
+    ehp_report_link.short_description = 'EHP Email'
+    ehp_report_link.allow_tags = True
+
+    def ehp_report_view(self, request, pk):
+        reported_case = ReportedCase.objects.get(pk=pk)
+        return HttpResponse(reported_case.get_html_email_content())
 
 
 class SMSAdmin(admin.ModelAdmin):

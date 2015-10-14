@@ -41,19 +41,19 @@
       <td colspan="4">5. Gender: <span class="variable">{{case.gender}}</span></td>
     </tr>
     <tr>
-      <td colspan="6">6. Reporting Health Facility: <span class="variable">{{case.last_name}}</span></td>
-      <td colspan="6">7. Province: <span class="variable">{{case.last_name}}</span></td>
+      <td colspan="6">6. Reporting Health Facility: <span class="variable">{{case.facility_name}}</span></td>
+      <td colspan="6">7. Province: <span class="variable">{{case.province}}</span></td>
     </tr>
     <tr>
-      <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable">{{case.last_name}}</span></td>
-      <td colspan="6">9. Date notification form captured in MIS: <span class="variable">{{case.last_name}}</span></td>
+      <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable">{{case.create_date_time|date:"D d M Y" }} {{case.create_date_time|date:"H:i"}}</span></td>
+      <td colspan="6">9. Date notification form captured in MIS: <span class="variable">{{case.created_at|date:"D d M Y" }} {{case.created_at|date:"H:i"}}</span></td>
     </tr>
     <tr>
       <td colspan="6">10. Treatment given to patient: </td>
-      <td colspan="6">11. South African ID: <span class="variable">{{case.last_name}}</span></td>
+      <td colspan="6">11. South African ID: <span class="variable">{{case.sa_id_number}}</span></td>
     </tr>
     <tr>
-      <td colspan="12" class="section_heading">Section B: Case Investigator Detail & Investigation Address</td>
+      <td colspan="12" class="section_heading">Section B: Case Investigator Detail &amp; Investigation Address</td>
     </tr>
     <tr>
       <td colspan="12">4a. Exact residential address (include name of area / section / zone / homestead number) where the patient was visited by the case investigator</td>
