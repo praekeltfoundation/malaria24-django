@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models.signals import post_save
@@ -114,6 +115,7 @@ class ReportedCase(models.Model):
         return {
             'case': self,
             'ehps': self.get_ehps(),
+            'site': Site.objects.get_current(),
         }
 
     def get_text_email_content(self):
