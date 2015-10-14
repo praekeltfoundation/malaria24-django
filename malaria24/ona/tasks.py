@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 
 from malaria24 import celery_app
-from malaria24.ona.models import ReportedCase, SMS, Actor, Digest, Facility
+from malaria24.ona.models import ReportedCase, SMS, Digest, Facility
 
 from onapie.client import Client
 
