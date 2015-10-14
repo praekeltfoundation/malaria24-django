@@ -67,6 +67,7 @@ class ReportedCase(models.Model):
     facility_code = models.CharField(max_length=255)
     landmark = models.CharField(max_length=255, null=True)
     landmark_description = models.CharField(max_length=255, null=True)
+    case_number = models.CharField(max_length=255, null=True)
     _id = models.CharField(max_length=255)
     _uuid = models.CharField(max_length=255)
     _xform_id_string = models.CharField(max_length=255)
