@@ -75,13 +75,22 @@ class ReportedCase(models.Model):
     digest = models.ForeignKey('Digest', null=True, blank=True)
     ehps = models.ManyToManyField('Actor', blank=True)
 
+    def get_facilities(self):
+        return Facility.objects.filter(facility_code=self.facility_code)
+
     @property
     def facility_name(self):
-        facilities = Facility.objects.filter(facility_code=self.facility_code)
-        if facilities.exists():
-            return ', '.join([f.facility_name for f in facilities])
+        facilities = self.get_facilities()
+        if not facilities.exists():
+            return "Unknown"
+        return ', '.join([f.facility_name for f in facilities])
 
-        return "Unknown"
+    @property
+    def province(self):
+        facilities = self.get_facilities()
+        if not facilities.exists():
+            return "Unknown"
+        return ', '.join([f.province for f in facilities])
 
     @property
     def age(self):
@@ -89,6 +98,23 @@ class ReportedCase(models.Model):
         today = datetime.today()
         dob = datetime.strptime(self.date_of_birth, '%y%m%d')
         return int((today - dob).days / 365)
+
+    def get_ehps(self):
+        return Actor.objects.ehps().filter(facility_code=self.facility_code)
+
+    def get_email_context(self):
+        return {
+            'case': self,
+            'ehps': self.get_ehps(),
+        }
+
+    def get_text_email_content(self):
+        return render_to_string(
+            'ona/text_email.txt', self.get_email_context())
+
+    def get_html_email_content(self):
+        return render_to_string(
+            'ona/html_email.html', self.get_email_context())
 
 EHP = 'EHP'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'

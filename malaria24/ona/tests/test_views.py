@@ -9,6 +9,8 @@ from django.contrib.auth.models import User
 from malaria24.ona.models import Facility
 from .base import MalariaTestCase
 
+import responses
+
 
 class FacilityTest(MalariaTestCase):
 
@@ -81,6 +83,18 @@ class FacilityTest(MalariaTestCase):
         self.assertEqual(facility.facility_code, '123456')
         self.assertEqual(facility.facility_name, 'Facility Name')
         self.assertNotEqual(facility.pk, original_facility.pk)
+
+    @responses.activate
+    def test_admin_ehp_email(self):
+        facility = Facility.objects.create(
+            facility_code='123456',
+            facility_name='The Old Name')
+        self.mk_ehp(facility_code=facility.facility_code)
+        case = self.mk_case(facility_code=facility.facility_code)
+        response = self.client.get(reverse('admin:ehp_report_view', kwargs={
+            'pk': case.pk,
+        }))
+        self.assertTemplateUsed(response, 'ona/html_email.html')
 
     def test_api(self):
         original_facility = Facility.objects.create(
