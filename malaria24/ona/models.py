@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models.signals import post_save
@@ -66,6 +67,8 @@ class ReportedCase(models.Model):
     gender = models.CharField(max_length=255)
     facility_code = models.CharField(max_length=255)
     landmark = models.CharField(max_length=255, null=True)
+    landmark_description = models.CharField(max_length=255, null=True)
+    case_number = models.CharField(max_length=255, null=True)
     _id = models.CharField(max_length=255)
     _uuid = models.CharField(max_length=255)
     _xform_id_string = models.CharField(max_length=255)
@@ -74,13 +77,30 @@ class ReportedCase(models.Model):
     digest = models.ForeignKey('Digest', null=True, blank=True)
     ehps = models.ManyToManyField('Actor', blank=True)
 
-    @property
-    def facility_name(self):
-        facilities = Facility.objects.filter(facility_code=self.facility_code)
-        if facilities.exists():
-            return ', '.join([f.facility_name for f in facilities])
+    def get_facilities(self):
+        return Facility.objects.filter(facility_code=self.facility_code)
 
-        return "Unknown"
+    def get_facility_attributes(self, attname):
+        return ', '.join([
+            getattr(f, attname)
+            for f in self.get_facilities() if getattr(f, attname)
+        ]) or "Unknown"
+
+    @property
+    def facility_names(self):
+        return self.get_facility_attributes('facility_name')
+
+    @property
+    def provinces(self):
+        return self.get_facility_attributes('province')
+
+    @property
+    def subdistricts(self):
+        return self.get_facility_attributes('subdistrict')
+
+    @property
+    def districts(self):
+        return self.get_facility_attributes('district')
 
     @property
     def age(self):
@@ -88,6 +108,24 @@ class ReportedCase(models.Model):
         today = datetime.today()
         dob = datetime.strptime(self.date_of_birth, '%y%m%d')
         return int((today - dob).days / 365)
+
+    def get_ehps(self):
+        return Actor.objects.ehps().filter(facility_code=self.facility_code)
+
+    def get_email_context(self):
+        return {
+            'case': self,
+            'ehps': self.get_ehps(),
+            'site': Site.objects.get_current(),
+        }
+
+    def get_text_email_content(self):
+        return render_to_string(
+            'ona/text_email.txt', self.get_email_context())
+
+    def get_html_email_content(self):
+        return render_to_string(
+            'ona/html_email.html', self.get_email_context())
 
 EHP = 'EHP'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'
@@ -198,12 +236,12 @@ def alert_new_case(sender, instance, created, **kwargs):
         elif ehp.phone_number:
             logging.warning(
                 ('Unable to Email report for case %s. '
-                 'Missing email_address.') % (instance.pk))
+                 'Missing email_address.') % (instance.case_number))
 
         elif ehp.email_address:
             logging.warning(
                 ('Unable to SMS report for case %s. '
-                 'Missing phone_number.') % (instance.pk))
+                 'Missing phone_number.') % (instance.case_number))
 
         if instance.reported_by:
             send_sms.delay(to=instance.reported_by,
@@ -211,11 +249,11 @@ def alert_new_case(sender, instance, created, **kwargs):
                                     'assigned case number %s.' % (
                                         instance.first_name,
                                         instance.last_name,
-                                        instance.pk,)))
+                                        instance.case_number,)))
         else:
             logging.warning(
                 ('Unable to SMS case number for case %s. '
-                 'Missing reported_by.') % (instance.pk,))
+                 'Missing reported_by.') % (instance.case_number,))
 
 
 post_save.connect(alert_new_case, sender=ReportedCase)

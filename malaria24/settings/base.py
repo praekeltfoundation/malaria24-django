@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
 
     'compressor',
@@ -89,6 +90,9 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'malaria24.urls'
 WSGI_APPLICATION = 'malaria24.wsgi.application'
+
+# SITE stuff
+SITE_ID = 1
 
 # CELERY stuff
 BROKER_URL = 'redis://localhost:6379/0'

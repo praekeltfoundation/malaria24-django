@@ -1,4 +1,4 @@
-<html>
+{% load staticfiles %}<html>
 <style type="text/css">
     .variable {
       color: red;
@@ -21,8 +21,8 @@
       <td colspan="12" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
     </tr>
     <tr>
-      <td colspan="4" style="width: 33%">Case Number: <span class="variable">{{case.pk}}</span><br/>Reporting facility: <span class="variable">{{case.facility_code}}</span></td>
-      <td colspan="4" style="width: 33%; text-align: center;"><img style="width: 10em;margin-left: auto; margin-right:auto;" src="logo.png"/></td>
+      <td colspan="4" style="width: 33%">Case Number: <span class="variable">{{case.case_number}}</span><br/>Reporting facility: <span class="variable">{{case.facility_code}}</span></td>
+      <td colspan="4" style="width: 33%; text-align: center;"><img style="width: 10em;margin-left: auto; margin-right:auto;" src="http://{{site.domain}}{% static "ona/img/logo.png" %}"/></td>
       <td colspan="4" style="width: 33%">Date Form Received for data capturing: <span class="variable">{{case.create_date_time}}</span</td>
     </tr>
     <tr>
@@ -41,32 +41,32 @@
       <td colspan="4">5. Gender: <span class="variable">{{case.gender}}</span></td>
     </tr>
     <tr>
-      <td colspan="6">6. Reporting Health Facility: <span class="variable">{{case.last_name}}</span></td>
-      <td colspan="6">7. Province: <span class="variable">{{case.last_name}}</span></td>
+      <td colspan="6">6. Reporting Health Facility: <span class="variable">{{case.facility_names}}</span></td>
+      <td colspan="6">7. Province: <span class="variable">{{case.provinces}}</span></td>
     </tr>
     <tr>
-      <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable">{{case.last_name}}</span></td>
-      <td colspan="6">9. Date notification form captured in MIS: <span class="variable">{{case.last_name}}</span></td>
+      <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable">{{case.create_date_time|date:"D d M Y" }} {{case.create_date_time|date:"H:i"}}</span></td>
+      <td colspan="6">9. Date notification form captured in MIS: <span class="variable"></span></td>
     </tr>
     <tr>
       <td colspan="6">10. Treatment given to patient: </td>
-      <td colspan="6">11. South African ID: <span class="variable">{{case.last_name}}</span></td>
+      <td colspan="6">11. South African ID: <span class="variable">{{case.sa_id_number}}</span></td>
     </tr>
     <tr>
-      <td colspan="12" class="section_heading">Section B: Case Investigator Detail & Investigation Address</td>
+      <td colspan="12" class="section_heading">Section B: Case Investigator Detail &amp; Investigation Address</td>
     </tr>
     <tr>
       <td colspan="12">4a. Exact residential address (include name of area / section / zone / homestead number) where the patient was visited by the case investigator</td>
     </tr>
     <tr>
-      <td colspan="12">&nbsp;</td>
+      <td colspan="12">{{case.landmark}} / {{case.landmark_description}}</td>
     </tr>
     <tr>
       <td colspan="6">4b. Locality / village: <span class="variable">{{case.locality}}</span></td>
-      <td colspan="6">4c. Municipality: <span class="variable">{{case.municipality}}</span></td>
+      <td colspan="6">4c. Municipality: <span class="variable">{{case.subdistricts}}</span></td>
     </tr>
     <tr>
-      <td colspan="6">4d. District: <span class="variable">{{case.}}</span></td>
+      <td colspan="6">4d. District: <span class="variable">{{case.districts}}</span></td>
       <td colspan="6">5. Patient's contact number: <span class="variable">{{case.msisdn}}</span></td>
     </tr>
     <tr>

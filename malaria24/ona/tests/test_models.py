@@ -29,7 +29,7 @@ class ReportedCaseTest(MalariaTestCase):
             log.check(('root',
                        'WARNING',
                        ('Unable to SMS report for case %s. '
-                        'Missing phone_number.') % (case.pk,)))
+                        'Missing phone_number.') % (case.case_number,)))
 
     @responses.activate
     def test_capture_no_ehp_email_address(self):
@@ -39,7 +39,7 @@ class ReportedCaseTest(MalariaTestCase):
             log.check(('root',
                        'WARNING',
                        ('Unable to Email report for case %s. '
-                        'Missing email_address.') % (case.pk,)))
+                        'Missing email_address.') % (case.case_number,)))
 
     @responses.activate
     def test_capture_no_reported_by(self):
@@ -50,7 +50,7 @@ class ReportedCaseTest(MalariaTestCase):
             log.check(('root',
                        'WARNING',
                        ('Unable to SMS case number for case %s. '
-                        'Missing reported_by.') % (case.pk,)))
+                        'Missing reported_by.') % (case.case_number,)))
 
     @responses.activate
     def test_capture_all_ok(self):
@@ -68,7 +68,7 @@ class ReportedCaseTest(MalariaTestCase):
             reporter_sms.content,
             ('Your reported case for %s %s has been '
              'assigned case number %s.') % (
-                case.first_name, case.last_name, case.pk))
+                case.first_name, case.last_name, case.case_number))
         self.assertEqual(reporter_sms.message_id, 'the-message-id')
 
     @responses.activate
@@ -81,16 +81,29 @@ class ReportedCaseTest(MalariaTestCase):
 
     @responses.activate
     def test_email_sending(self):
-        ehp = self.mk_ehp()
-        case = self.mk_case(facility_code=ehp.facility_code)
+        facility = Facility.objects.create(facility_code='0001',
+                                           facility_name='Facility 1',
+                                           district='The District',
+                                           subdistrict='The Subdistrict',
+                                           province='The Province')
+        ehp = self.mk_ehp(facility_code=facility.facility_code)
+        case = self.mk_case(facility_code=facility.facility_code)
         [message] = mail.outbox
         self.assertEqual(message.subject,
-                         'Malaria case number %s' % (case.pk,))
+                         'Malaria case number %s' % (case.case_number,))
         self.assertEqual(message.to, [ehp.email_address])
-        self.assertTrue(ehp.email_address in message.body)
+        self.assertTrue('does not support HTML' in message.body)
         [alternative] = message.alternatives
         content, content_type = alternative
         self.assertTrue(case.facility_code in content)
+        self.assertTrue(case.sa_id_number in content)
+        self.assertTrue('The District' in content)
+        self.assertTrue('The Subdistrict' in content)
+        self.assertTrue('The Province' in content)
+        self.assertTrue('landmark' in content)
+        self.assertTrue('landmark_description' in content)
+        self.assertTrue(
+            'http://example.com/static/ona/img/logo.png' in content)
         self.assertEqual('text/html', content_type)
 
     @responses.activate
@@ -104,8 +117,8 @@ class ReportedCaseTest(MalariaTestCase):
                                 facility_name='Facility 1')
         case1 = self.mk_case(facility_code='0001')
         case2 = self.mk_case(facility_code='0002')
-        self.assertEqual(case1.facility_name, 'Facility 1')
-        self.assertEqual(case2.facility_name, 'Unknown')
+        self.assertEqual(case1.facility_names, 'Facility 1')
+        self.assertEqual(case2.facility_names, 'Unknown')
 
 
 class DigestTest(MalariaTestCase):
