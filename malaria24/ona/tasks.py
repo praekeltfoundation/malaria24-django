@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 
 from malaria24 import celery_app
-from malaria24.ona.models import ReportedCase, SMS, Actor, Digest, Facility
+from malaria24.ona.models import ReportedCase, SMS, Digest, Facility
 
 from onapie.client import Client
 
@@ -58,19 +58,11 @@ def send_sms(to, content):
 @celery_app.task(ignore_result=True)
 def send_case_email(case_number):
     case = ReportedCase.objects.get(pk=case_number)
-    ehps = Actor.objects.ehps().filter(facility_code=case.facility_code)
-    for ehp in ehps:
-        context = {
-            'case': case,
-            'ehp': ehp,
-        }
-        text_content = render_to_string('ona/text_email.txt', context)
-        html_content = render_to_string('ona/html_email.html', context)
-        send_mail(subject='Malaria case number %s' % (case_number,),
-                  message=text_content,
-                  from_email=settings.DEFAULT_FROM_EMAIL,
-                  recipient_list=[ehp.email_address],
-                  html_message=html_content)
+    send_mail(subject='Malaria case number %s' % (case_number,),
+              message=case.get_text_email_content(),
+              from_email=settings.DEFAULT_FROM_EMAIL,
+              recipient_list=[ehp.email_address for ehp in case.get_ehps()],
+              html_message=case.get_html_email_content())
 
 
 @celery_app.task(ignore_result=True)

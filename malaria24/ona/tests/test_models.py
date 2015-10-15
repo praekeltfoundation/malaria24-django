@@ -84,10 +84,11 @@ class ReportedCaseTest(MalariaTestCase):
         self.assertEqual(message.subject,
                          'Malaria case number %s' % (case.pk,))
         self.assertEqual(message.to, [ehp.email_address])
-        self.assertTrue(ehp.email_address in message.body)
+        self.assertTrue('does not support HTML' in message.body)
         [alternative] = message.alternatives
         content, content_type = alternative
         self.assertTrue(case.facility_code in content)
+        self.assertTrue(case.sa_id_number in content)
         self.assertEqual('text/html', content_type)
 
     @responses.activate

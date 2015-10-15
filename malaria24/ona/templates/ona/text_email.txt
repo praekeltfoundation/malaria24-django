@@ -1,1 +1,2 @@
-This is the text email to {{ehp.email_address}} for {{case.pk}}.
+Your client does not support HTML emails and is unable to view
+the HTML table with the reported case.
