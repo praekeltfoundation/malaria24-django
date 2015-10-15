@@ -245,8 +245,10 @@ def alert_new_case(sender, instance, created, **kwargs):
 
         if instance.reported_by:
             send_sms.delay(to=instance.reported_by,
-                           content=('Your reported case has been assigned '
-                                    'case number %s.' % (
+                           content=('Your reported case for %s %s has been '
+                                    'assigned case number %s.' % (
+                                        instance.first_name,
+                                        instance.last_name,
                                         instance.case_number,)))
         else:
             logging.warning(

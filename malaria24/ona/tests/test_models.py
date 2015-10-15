@@ -66,8 +66,9 @@ class ReportedCaseTest(MalariaTestCase):
         self.assertEqual(reporter_sms.to, 'reported_by')
         self.assertEqual(
             reporter_sms.content,
-            'Your reported case has been assigned case number %s.' % (
-                case.case_number,))
+            ('Your reported case for %s %s has been '
+             'assigned case number %s.') % (
+                case.first_name, case.last_name, case.case_number))
         self.assertEqual(reporter_sms.message_id, 'the-message-id')
 
     @responses.activate
