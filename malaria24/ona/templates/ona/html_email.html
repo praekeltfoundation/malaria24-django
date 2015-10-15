@@ -1,4 +1,4 @@
-<html>
+{% load staticfiles %}<html>
 <style type="text/css">
     .variable {
       color: red;
@@ -22,7 +22,7 @@
     </tr>
     <tr>
       <td colspan="4" style="width: 33%">Case Number: <span class="variable">{{case.pk}}</span><br/>Reporting facility: <span class="variable">{{case.facility_code}}</span></td>
-      <td colspan="4" style="width: 33%; text-align: center;"><img style="width: 10em;margin-left: auto; margin-right:auto;" src="logo.png"/></td>
+      <td colspan="4" style="width: 33%; text-align: center;"><img style="width: 10em;margin-left: auto; margin-right:auto;" src="http://{{site.domain}}{% static "ona/img/logo.png" %}"/></td>
       <td colspan="4" style="width: 33%">Date Form Received for data capturing: <span class="variable">{{case.create_date_time}}</span</td>
     </tr>
     <tr>
