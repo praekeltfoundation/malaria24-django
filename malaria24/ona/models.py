@@ -86,18 +86,6 @@ class ReportedCase(models.Model):
         ]) or "Unknown"
 
     @property
-    def case_number(self):
-        facilities = self.get_facilities()
-        if facilities.count() > 0:
-            logging.warning('Multiple facilities found for case %s' % (
-                self.pk,))
-        facility = facilities.first()  # Seems most reasonable?
-        return '%s-%s-%s' % (
-            (facility.facility_code if facility else 'UNKNOWN'),
-            self.create_date_time.strftime('%Y%m%d'),
-            self.pk)
-
-    @property
     def facility_names(self):
         return self.get_facility_attributes('facility_name')
 
