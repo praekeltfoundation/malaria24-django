@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.core import mail
 from django.db.models.signals import post_save
 
