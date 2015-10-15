@@ -38,6 +38,7 @@ def ona_fetch_reported_cases(form_pk=None):
             facility_code=data['facility_code'],
             landmark=data.get('landmark'),
             landmark_description=data.get('landmark_description'),
+            case_number=data.get('case_number'),
             _id=data['_id'],
             _uuid=data['_uuid'],
             _xform_id_string=data['_xform_id_string'])
@@ -57,9 +58,9 @@ def send_sms(to, content):
 
 
 @celery_app.task(ignore_result=True)
-def send_case_email(case_number):
-    case = ReportedCase.objects.get(pk=case_number)
-    send_mail(subject='Malaria case number %s' % (case_number,),
+def send_case_email(case_pk):
+    case = ReportedCase.objects.get(pk=case_pk)
+    send_mail(subject='Malaria case number %s' % (case.case_number,),
               message=case.get_text_email_content(),
               from_email=settings.DEFAULT_FROM_EMAIL,
               recipient_list=[ehp.email_address for ehp in case.get_ehps()],

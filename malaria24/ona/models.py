@@ -68,6 +68,7 @@ class ReportedCase(models.Model):
     facility_code = models.CharField(max_length=255)
     landmark = models.CharField(max_length=255, null=True)
     landmark_description = models.CharField(max_length=255, null=True)
+    case_number = models.CharField(max_length=255, null=True)
     _id = models.CharField(max_length=255)
     _uuid = models.CharField(max_length=255)
     _xform_id_string = models.CharField(max_length=255)
@@ -235,22 +236,22 @@ def alert_new_case(sender, instance, created, **kwargs):
         elif ehp.phone_number:
             logging.warning(
                 ('Unable to Email report for case %s. '
-                 'Missing email_address.') % (instance.pk))
+                 'Missing email_address.') % (instance.case_number))
 
         elif ehp.email_address:
             logging.warning(
                 ('Unable to SMS report for case %s. '
-                 'Missing phone_number.') % (instance.pk))
+                 'Missing phone_number.') % (instance.case_number))
 
         if instance.reported_by:
             send_sms.delay(to=instance.reported_by,
                            content=('Your reported case has been assigned '
                                     'case number %s.' % (
-                                        instance.pk,)))
+                                        instance.case_number,)))
         else:
             logging.warning(
                 ('Unable to SMS case number for case %s. '
-                 'Missing reported_by.') % (instance.pk,))
+                 'Missing reported_by.') % (instance.case_number,))
 
 
 post_save.connect(alert_new_case, sender=ReportedCase)

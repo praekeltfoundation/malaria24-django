@@ -29,7 +29,7 @@
     </tr>
     {% for case in digest.reportedcase_set.all %}
         <tr>
-          <td>{{case.pk}}</td>
+          <td>{{case.case_number}}</td>
           <td>{{case.facility_code}}</td>
           <td>{{case.facility_name}}</td>
           <td>{{ case.create_date_time|date:"D d M Y" }} {{ case.create_date_time|time:"H:i" }}</td>

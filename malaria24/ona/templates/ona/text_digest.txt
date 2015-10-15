@@ -4,5 +4,5 @@ National Department of Health: Malaria Elimination Programme
 Case Number, Facility Code, Facility Name, Date & Time, EHP
 
 {% for case in digest.reportedcase_set.all %}
-{{case.pk}}, {{case.facility_code}}, {{case.facility_name}}, {{ case.create_date_time|date:"D d M Y" }} {{ case.create_date_time|time:"H:i" }}, {% for ehp in case.ehps.all %}{{ehp.name}}{% if not forloop.last %}, {% endif %}{% endfor %}
+{{case.case_number}}, {{case.facility_code}}, {{case.facility_name}}, {{ case.create_date_time|date:"D d M Y" }} {{ case.create_date_time|time:"H:i" }}, {% for ehp in case.ehps.all %}{{ehp.name}}{% if not forloop.last %}, {% endif %}{% endfor %}
 {% endfor %}
