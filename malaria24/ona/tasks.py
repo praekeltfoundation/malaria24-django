@@ -37,6 +37,7 @@ def ona_fetch_reported_cases(form_pk=None):
             gender=data['gender'],
             facility_code=data['facility_code'],
             landmark=data.get('landmark'),
+            landmark_description=data.get('landmark_description'),
             _id=data['_id'],
             _uuid=data['_uuid'],
             _xform_id_string=data['_xform_id_string'])

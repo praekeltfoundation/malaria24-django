@@ -57,6 +57,7 @@ class MalariaTestCase(TestCase):
             'gender': 'gender',
             'facility_code': 'facility_code',
             'landmark': 'landmark',
+            'landmark_description': 'landmark_description',
             '_id': '_id',
             '_uuid': '_uuid',
             '_xform_id_string': '_xform_id_string',

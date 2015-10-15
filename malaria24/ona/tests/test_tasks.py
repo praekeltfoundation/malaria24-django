@@ -63,6 +63,7 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(case.gender, 'male')
         self.assertEqual(case.facility_code, '154342')
         self.assertEqual(case.landmark, 'Laundromat')
+        self.assertEqual(case.landmark_description, 'Quite pretty')
         self.assertEqual(case._id, '3615221')
         self.assertEqual(case._uuid, '03a970b25c2740ea96a6cb517118bbef')
         self.assertEqual(case._xform_id_string, 'reported_case')
