@@ -77,19 +77,27 @@ class ReportedCase(models.Model):
     def get_facilities(self):
         return Facility.objects.filter(facility_code=self.facility_code)
 
-    @property
-    def facility_name(self):
-        facilities = self.get_facilities()
-        if not facilities.exists():
-            return "Unknown"
-        return ', '.join([f.facility_name for f in facilities])
+    def get_facility_attributes(self, attname):
+        return ', '.join([
+            getattr(f, attname)
+            for f in self.get_facilities() if getattr(f, attname)
+        ]) or "Unknown"
 
     @property
-    def province(self):
-        facilities = self.get_facilities()
-        if not facilities.exists():
-            return "Unknown"
-        return ', '.join([f.province for f in facilities])
+    def facility_names(self):
+        return self.get_facility_attributes('facility_name')
+
+    @property
+    def provinces(self):
+        return self.get_facility_attributes('province')
+
+    @property
+    def subdistricts(self):
+        return self.get_facility_attributes('subdistrict')
+
+    @property
+    def districts(self):
+        return self.get_facility_attributes('district')
 
     @property
     def age(self):
