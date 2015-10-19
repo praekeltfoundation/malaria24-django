@@ -49,6 +49,16 @@ class Digest(models.Model):
             html_message=html_content)
 
 
+class OnaForm(models.Model):
+    uuid = models.CharField(max_length=255)
+    form_id = models.CharField(max_length=255, null=True)
+    id_string = models.CharField(max_length=255, null=True)
+    title = models.CharField(max_length=255, null=True)
+    active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class ReportedCase(models.Model):
     """
     This is a ReportedCase as captured in Ona.io and synced
@@ -76,6 +86,7 @@ class ReportedCase(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     digest = models.ForeignKey('Digest', null=True, blank=True)
     ehps = models.ManyToManyField('Actor', blank=True)
+    form = models.ForeignKey('OnaForm', null=True, blank=True)
 
     def get_facilities(self):
         return Facility.objects.filter(facility_code=self.facility_code)
