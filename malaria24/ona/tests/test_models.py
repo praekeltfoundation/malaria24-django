@@ -108,7 +108,7 @@ class ReportedCaseTest(MalariaTestCase):
 
     @responses.activate
     def test_age(self):
-        case = self.mk_case(date_of_birth="820101")
+        case = self.mk_case(date_of_birth="1982-01-01")
         self.assertEqual(33, case.age)
 
     @responses.activate

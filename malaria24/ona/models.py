@@ -106,7 +106,14 @@ class ReportedCase(models.Model):
     def age(self):
         "Returns the age of the patient"
         today = datetime.today()
-        dob = datetime.strptime(self.date_of_birth, '%y%m%d')
+        try:
+            dob = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
+        except ValueError:
+            # NOTE: This is an unfortunate side-effect of changing how
+            #       date of birth is stored mid-way the data.
+            #       There is historical data in Ona that has this
+            #       old format.
+            dob = datetime.strptime(self.date_of_birth, '%y%m%d')
         return int((today - dob).days / 365)
 
     def get_ehps(self):
