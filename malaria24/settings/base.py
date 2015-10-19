@@ -98,6 +98,10 @@ SITE_ID = 1
 BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERYBEAT_SCHEDULE = {
+    'poll-ona-fetch-forms': {
+        'task': 'malaria24.ona.tasks.ona_fetch_forms',
+        'schedule': timedelta(hours=1),
+    },
     'poll-ona-reported-cases': {
         'task': 'malaria24.ona.tasks.ona_fetch_reported_cases',
         'schedule': timedelta(minutes=10),
