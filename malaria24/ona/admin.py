@@ -9,7 +9,7 @@ from django.template.response import TemplateResponse
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
-from .models import ReportedCase, Actor, SMS, Digest, Facility
+from .models import ReportedCase, Actor, SMS, Digest, Facility, OnaForm
 from .tasks import import_facilities
 
 
@@ -195,8 +195,19 @@ class FacilityAdmin(admin.ModelAdmin):
             request, 'ona/upload_facility_codes.html', context)
 
 
+class OnaFormAdmin(admin.ModelAdmin):
+    date_hierarchy = 'created_at'
+    list_display = ('title',
+                    'id_string',
+                    'form_id',
+                    'active',
+                    'created_at',
+                    )
+
+
 admin.site.register(ReportedCase, ReportedCaseAdmin)
 admin.site.register(Actor, ActorAdmin)
 admin.site.register(SMS, SMSAdmin)
 admin.site.register(Digest, DigestAdmin)
 admin.site.register(Facility, FacilityAdmin)
+admin.site.register(OnaForm, OnaFormAdmin)
