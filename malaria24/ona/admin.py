@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
 from .models import ReportedCase, Actor, SMS, Digest, Facility, OnaForm
-from .tasks import import_facilities
+from .tasks import import_facilities, ona_fetch_reported_case_for_form
 
 
 class ReportedCaseAdmin(admin.ModelAdmin):
@@ -167,6 +167,16 @@ class OnaFormAdmin(admin.ModelAdmin):
                     'active',
                     'created_at',
                     )
+    actions = ['pull_reported_cases']
+
+    def pull_reported_cases(self, request, queryset):
+        forms = queryset.filter(active=True)
+        for form in forms:
+            ona_fetch_reported_case_for_form.delay(form.form_id)
+        self.message_user(
+            request, 'Scheduling manual pull for %s active forms.' % (
+                form.count(),))
+    pull_reported_cases.short_description = 'Manually pull reported cases.'
 
 
 admin.site.register(ReportedCase, ReportedCaseAdmin)

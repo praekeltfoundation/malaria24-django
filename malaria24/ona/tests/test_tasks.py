@@ -41,7 +41,7 @@ class OnaTest(MalariaTestCase):
         form = OnaForm.objects.create(uuid='uuuid', form_id='79925',
                                       active=True)
         uuids = ona_fetch_reported_cases()
-        self.assertEqual(len(uuids), 2)
+        self.assertEqual(len(uuids[form.form_id]), 2)
         self.assertEqual(ReportedCase.objects.count(), 2)
         self.assertEqual(form.reportedcase_set.count(), 2)
 
@@ -50,8 +50,8 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(ReportedCase.objects.count(), 0)
         form = OnaForm.objects.create(uuid='uuuid', form_id='79925',
                                       active=True)
-        self.assertEqual(len(ona_fetch_reported_cases()), 2)
-        self.assertEqual(len(ona_fetch_reported_cases()), 0)
+        self.assertEqual(len(ona_fetch_reported_cases()[form.form_id]), 2)
+        self.assertEqual(len(ona_fetch_reported_cases()[form.form_id]), 0)
         self.assertEqual(ReportedCase.objects.count(), 2)
         self.assertEqual(form.reportedcase_set.count(), 2)
 
@@ -59,7 +59,7 @@ class OnaTest(MalariaTestCase):
     def test_ona_fetch_reported_cases_task_data_capture(self):
         form = OnaForm.objects.create(uuid='uuuid', form_id='79925',
                                       active=True)
-        self.assertEqual(len(ona_fetch_reported_cases()), 2)
+        self.assertEqual(len(ona_fetch_reported_cases()[form.form_id]), 2)
         case = ReportedCase.objects.get(
             _uuid='03a970b25c2740ea96a6cb517118bbef')
         self.assertEqual(case.first_name, 'XXX')
