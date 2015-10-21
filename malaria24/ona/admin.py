@@ -6,45 +6,9 @@ from django.conf.urls import url
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
-from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
 
 from .models import ReportedCase, Actor, SMS, Digest, Facility, OnaForm
 from .tasks import import_facilities
-
-
-class DateReportedListFilter(admin.SimpleListFilter):
-    # Human-readable title which will be displayed in the
-    # right admin sidebar just above the filter options.
-    title = _('week logged')
-
-    # Parameter for the filter that will be used in the URL query.
-    parameter_name = 'datereported'
-
-    def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
-        return (
-            (0, _('Last week')),
-            (-1, _('2 weeks ago')),
-        )
-
-    def queryset(self, request, queryset):
-        """
-        Returns the filtered queryset based on the value
-        provided in the query string and retrievable via
-        `self.value()`.
-        """
-        if self.value() is None:
-            return queryset
-
-        return queryset.last_week(
-            timezone.now() - timedelta(weeks=int(self.value())))
 
 
 class ReportedCaseAdmin(admin.ModelAdmin):
@@ -59,9 +23,9 @@ class ReportedCaseAdmin(admin.ModelAdmin):
                     'facility_code',
                     'landmark',
                     'create_date_time',
+                    'form',
                     'ehp_report_link')
-    list_filter = ('facility_code', 'gender', 'create_date_time',
-                   DateReportedListFilter)
+    list_filter = ('facility_code', 'gender', 'create_date_time', 'form')
     search_fields = ('case_number', 'first_name', 'last_name', 'sa_id_number')
 
     def get_urls(self):
