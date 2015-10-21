@@ -47,8 +47,9 @@ class ReportedCaseAdmin(admin.ModelAdmin):
 
 class SMSAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
-    list_display = ('to', 'content', 'created_at')
+    list_display = ('to', 'content', 'created_at', 'message_id')
     list_filter = ('created_at',)
+    search_fields = ('to', 'content')
 
 
 class ActorAdmin(admin.ModelAdmin):
