@@ -62,6 +62,7 @@ class ReportedCaseAdmin(admin.ModelAdmin):
                     'ehp_report_link')
     list_filter = ('facility_code', 'gender', 'create_date_time',
                    DateReportedListFilter)
+    search_fields = ('case_number', 'first_name', 'last_name', 'sa_id_number')
 
     def get_urls(self):
         urls = super(ReportedCaseAdmin, self).get_urls()
