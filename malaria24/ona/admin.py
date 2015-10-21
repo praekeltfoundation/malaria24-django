@@ -175,7 +175,7 @@ class OnaFormAdmin(admin.ModelAdmin):
             ona_fetch_reported_case_for_form.delay(form.form_id)
         self.message_user(
             request, 'Scheduling manual pull for %s active forms.' % (
-                form.count(),))
+                forms.count(),))
     pull_reported_cases.short_description = 'Manually pull reported cases.'
 
 
