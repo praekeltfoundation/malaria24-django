@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django import forms
 from django.contrib import admin, messages
 from django.conf.urls import url
