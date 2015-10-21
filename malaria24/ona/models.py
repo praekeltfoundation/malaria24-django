@@ -264,17 +264,17 @@ def alert_new_case(sender, instance, created, **kwargs):
                 ('Unable to SMS report for case %s. '
                  'Missing phone_number.') % (instance.case_number))
 
-        if instance.reported_by:
-            send_sms.delay(to=instance.reported_by,
-                           content=('Your reported case for %s %s has been '
-                                    'assigned case number %s.' % (
-                                        instance.first_name,
-                                        instance.last_name,
-                                        instance.case_number,)))
-        else:
-            logging.warning(
-                ('Unable to SMS case number for case %s. '
-                 'Missing reported_by.') % (instance.case_number,))
+    if instance.reported_by:
+        send_sms.delay(to=instance.reported_by,
+                       content=('Your reported case for %s %s has been '
+                                'assigned case number %s.' % (
+                                    instance.first_name,
+                                    instance.last_name,
+                                    instance.case_number,)))
+    else:
+        logging.warning(
+            ('Unable to SMS case number for case %s. '
+             'Missing reported_by.') % (instance.case_number,))
 
 
 post_save.connect(alert_new_case, sender=ReportedCase)
