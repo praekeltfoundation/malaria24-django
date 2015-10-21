@@ -21,36 +21,36 @@
       <td colspan="12" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
     </tr>
     <tr>
-      <td colspan="4" style="width: 33%">Case Number: <span class="variable">{{case.case_number}}</span><br/>Reporting facility: <span class="variable">{{case.facility_code}}</span></td>
+      <td colspan="4" style="width: 33%">Case Number: <span class="variable"><strong>{{case.case_number}}</strong></span><br/>Reporting facility: <span class="variable"><strong>{{case.facility_code}}</strong></span></td>
       <td colspan="4" style="width: 33%; text-align: center;"><img style="width: 10em;margin-left: auto; margin-right:auto;" src="http://{{site.domain}}{% static "ona/img/logo.png" %}"/></td>
-      <td colspan="4" style="width: 33%">Date Form Received for data capturing: <span class="variable">{{case.create_date_time}}</span</td>
+      <td colspan="4" style="width: 33%">Date Form Received for data capturing: <span class="variable"><strong>{{case.create_date_time}}</strong></span</td>
     </tr>
     <tr>
       <td colspan="12" class="section_heading">Section A: General information on case to be investigated</td>
     </tr>
     <tr>
-      <td colspan="12">1. Diagnosis Date: <span class="variable">{{case.create_date_time|date:"Y-m-d"}}</span></td>
+      <td colspan="12">1. Diagnosis Date: <span class="variable"><strong>{{case.create_date_tim</strong>e|date:"Y-m-d"}}</span></td>
     </tr>
     <tr>
-      <td colspan="6">2a. Patient's Name: <span class="variable">{{case.first_name}}</span></td>
-      <td colspan="6">2b. Surname: <span class="variable">{{case.last_name}}</span></td>
+      <td colspan="6">2a. Patient's Name: <span class="variable"><strong>{{case.first_name}}</strong></span></td>
+      <td colspan="6">2b. Surname: <span class="variable"><strong>{{case.last_name}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="4">3. Age: <span class="variable">{{case.age}}</span></td>
-      <td colspan="4">4. Date of birth: <span class="variable">{{case.date_of_birth}}</span></td>
-      <td colspan="4">5. Gender: <span class="variable">{{case.gender}}</span></td>
+      <td colspan="4">3. Age: <span class="variable"><strong>{{case.age}}</strong></span></td>
+      <td colspan="4">4. Date of birth: <span class="variable"><strong>{{case.date_of_birth}}</strong></span></td>
+      <td colspan="4">5. Gender: <span class="variable"><strong>{{case.gender}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="6">6. Reporting Health Facility: <span class="variable">{{case.facility_names}}</span></td>
-      <td colspan="6">7. Province: <span class="variable">{{case.provinces}}</span></td>
+      <td colspan="6">6. Reporting Health Facility: <span class="variable"><strong>{{case.facility_names}}</strong></span></td>
+      <td colspan="6">7. Province: <span class="variable"><strong>{{case.provinces}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable">{{case.create_date_time|date:"D d M Y" }} {{case.create_date_time|date:"H:i"}}</span></td>
-      <td colspan="6">9. Date notification form captured in MIS: <span class="variable"></span></td>
+      <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable"><strong>{{case.create_date_tim</strong>e|date:"D d M Y" }} {{case.create_date_time|date:"H:i"}}</span></td>
+      <td colspan="6">9. Date notification form captured in MIS: <span class="variable"><strong></span></t</strong>d>
     </tr>
     <tr>
       <td colspan="6">10. Treatment given to patient: </td>
-      <td colspan="6">11. South African ID: <span class="variable">{{case.sa_id_number}}</span></td>
+      <td colspan="6">11. South African ID: <span class="variable"><strong>{{case.sa_id_number}}</strong></span></td>
     </tr>
     <tr>
       <td colspan="12" class="section_heading">Section B: Case Investigator Detail &amp; Investigation Address</td>
@@ -59,24 +59,24 @@
       <td colspan="12">4a. Exact residential address (include name of area / section / zone / homestead number) where the patient was visited by the case investigator</td>
     </tr>
     <tr>
-      <td colspan="12">{{case.landmark}} / {{case.landmark_description}}</td>
+      <td colspan="12"><span class="variable"><strong>{{case.landmark}} / {{case.landmark_description}}</strong><span></td>
     </tr>
     <tr>
-      <td colspan="6">4b. Locality / village: <span class="variable">{{case.locality}}</span></td>
-      <td colspan="6">4c. Municipality: <span class="variable">{{case.subdistricts}}</span></td>
+      <td colspan="6">4b. Locality / village: <span class="variable"><strong>{{case.locality}}</strong></span></td>
+      <td colspan="6">4c. Municipality: <span class="variable"><strong>{{case.subdistricts}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="6">4d. District: <span class="variable">{{case.districts}}</span></td>
-      <td colspan="6">5. Patient's contact number: <span class="variable">{{case.msisdn}}</span></td>
+      <td colspan="6">4d. District: <span class="variable"><strong>{{case.districts}}</strong></span></td>
+      <td colspan="6">5. Patient's contact number: <span class="variable"><strong>{{case.msisdn}}</strong></span></td>
     </tr>
     <tr>
       <td colspan="12">6. GPS coordinates:</td>
     </tr>
     <tr>
-      <td colspan="12">7. Source of case investigation information: <span class="variable">MalariaConnect</span></td>
+      <td colspan="12">7. Source of case investigation information: <span class="variable"><strong>MalariaConnect</span></</strong>td>
     </tr>
     <tr>
-      <td colspan="12">8. Where did the person travel to? <span class="variable">{{case.abroad}}</span></td>
+      <td colspan="12">8. Where did the person travel to? <span class="variable"><strong>{{case.abroad}}</strong></span></td>
     </tr>
     <tr>
       <td colspan="12"><table border="1" cellspacing="0" style="width: 100%; border-color: #DEDFDE;">
