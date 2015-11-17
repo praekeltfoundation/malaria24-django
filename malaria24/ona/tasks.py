@@ -78,12 +78,17 @@ def send_sms(to, content):
 
 @celery_app.task(ignore_result=True)
 def send_case_email(case_pk):
+    from django.core.mail import EmailMultiAlternatives
+
     case = ReportedCase.objects.get(pk=case_pk)
-    send_mail(subject='Malaria case number %s' % (case.case_number,),
-              message=case.get_text_email_content(),
-              from_email=settings.DEFAULT_FROM_EMAIL,
-              recipient_list=[ehp.email_address for ehp in case.get_ehps()],
-              html_message=case.get_html_email_content())
+    subject = 'Malaria case number %s' % (case.case_number,)
+    text_content = case.get_text_email_content()
+    html_content = case.get_html_email_content()
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipients = [ehp.email_address for ehp in case.get_ehps()]
+    msg = EmailMultiAlternatives(subject, text_content, from_email, recipients)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
 
 
 @celery_app.task(ignore_result=True)
