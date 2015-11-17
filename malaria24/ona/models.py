@@ -149,6 +149,7 @@ class ReportedCase(models.Model):
             'ona/html_email.html', self.get_email_context())
 
 EHP = 'EHP'
+CASE_INVESTIGATOR = 'CASE_INVESTIGATOR'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'
 MANAGER_PROVINCIAL = 'MANAGER_PROVINCIAL'
 MANAGER_NATIONAL = 'MANAGER_NATIONAL'
@@ -185,6 +186,7 @@ class Actor(models.Model):
     facility_code = models.CharField(max_length=255, null=True, blank=True)
     role = models.CharField(choices=[
         (EHP, 'EHP'),
+        (CASE_INVESTIGATOR, 'Case Investigator'),
         (MANAGER_DISTRICT, 'District Manager'),
         (MANAGER_PROVINCIAL, 'Provincial Manager'),
         (MANAGER_NATIONAL, 'National Manager'),
