@@ -49,19 +49,6 @@ class CaseInvestigatorTest(MalariaTestCase):
                             case.case_number, ci)))
 
     @responses.activate
-    def test_capture_no_case_investigator_email_address(self):
-        with LogCapture() as log:
-            ci = self.mk_ci(email_address='', province='The Province')
-            facility = self.mk_facility(
-                facility_code='code', province=ci.province)
-            case = self.mk_case(facility_code=facility.facility_code)
-            log.check(('root',
-                       'WARNING',
-                       ('Unable to Email report for case %s to %s. '
-                        'Missing email_address.') % (
-                            case.case_number, ci)))
-
-    @responses.activate
     def test_capture_all_ok(self):
         self.assertEqual(SMS.objects.count(), 0)
         ci = self.mk_ci(province='The Province')
@@ -74,33 +61,6 @@ class CaseInvestigatorTest(MalariaTestCase):
                          'A new case has been reported, the full report will '
                          'be sent to you via email.')
         self.assertEqual(ci_sms.message_id, 'the-message-id')
-
-    @responses.activate
-    def test_email_sending(self):
-        facility = Facility.objects.create(facility_code='0001',
-                                           facility_name='Facility 1',
-                                           district='The District',
-                                           subdistrict='The Subdistrict',
-                                           province='The Province')
-        ci = self.mk_ci(province='The Province')
-        case = self.mk_case(facility_code=facility.facility_code)
-        [message] = mail.outbox
-        self.assertEqual(message.subject,
-                         'Malaria case number %s' % (case.case_number,))
-        self.assertEqual(message.to, [ci.email_address])
-        self.assertTrue('does not support HTML' in message.body)
-        [alternative] = message.alternatives
-        content, content_type = alternative
-        self.assertTrue(case.facility_code in content)
-        self.assertTrue(case.sa_id_number in content)
-        self.assertTrue('The District' in content)
-        self.assertTrue('The Subdistrict' in content)
-        self.assertTrue('The Province' in content)
-        self.assertTrue('landmark' in content)
-        self.assertTrue('landmark_description' in content)
-        self.assertTrue(
-            'http://example.com/static/ona/img/logo.png' in content)
-        self.assertEqual('text/html', content_type)
 
 
 class EhpReportedCaseTest(MalariaTestCase):

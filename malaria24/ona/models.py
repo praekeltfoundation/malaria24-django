@@ -327,20 +327,14 @@ def alert_case_investigators(reported_case):
                 reported_case.facility_code,))
 
     for case_investigator in case_investigators:
-        if case_investigator.phone_number and case_investigator.email_address:
+        if case_investigator.phone_number:
             send_sms.delay(to=case_investigator.phone_number,
                            content=('A new case has been reported, the full '
                                     'report will be sent to you via email.'))
             send_case_email.delay(
                 reported_case.pk, [case_investigator.email_address])
-        elif case_investigator.phone_number:
-            logging.warning(
-                ('Unable to Email report for case %s to %s. '
-                 'Missing email_address.') % (
-                    reported_case.case_number,
-                    case_investigator))
 
-        elif case_investigator.email_address:
+        else:
             logging.warning(
                 ('Unable to SMS report for case %s to %s. '
                  'Missing phone_number.') % (
