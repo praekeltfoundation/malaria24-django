@@ -28,7 +28,8 @@ class Digest(models.Model):
             role__in=[EHP,
                       MANAGER_DISTRICT,
                       MANAGER_PROVINCIAL,
-                      MANAGER_NATIONAL],
+                      MANAGER_NATIONAL,
+                      MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
         digest.recipients = recipients

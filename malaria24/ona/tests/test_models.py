@@ -293,6 +293,7 @@ class DigestTest(MalariaTestCase):
                                  email_address='manager@example.org')
         ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
         ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+        mis = self.mk_mis(name='MIS', email_address='mis@example.org')
 
         for i in range(10):
             case = self.mk_case()
@@ -308,4 +309,7 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(message.body.count('EHP1, EHP2'), 10)
         self.assertEqual(html_content.count('EHP1, EHP2'), 10)
         self.assertEqual(message.to, [
-            manager1.email_address, ehp1.email_address, ehp2.email_address])
+            manager1.email_address,
+            ehp1.email_address,
+            ehp2.email_address,
+            mis.email_address])
