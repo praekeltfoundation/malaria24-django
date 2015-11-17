@@ -1,4 +1,5 @@
 import json
+import os
 
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -88,7 +89,21 @@ def send_case_email(case_pk):
     recipients = [ehp.email_address for ehp in case.get_ehps()]
     msg = EmailMultiAlternatives(subject, text_content, from_email, recipients)
     msg.attach_alternative(html_content, "text/html")
+    msg.attach_alternative(make_pdf(html_content), "application/pdf")
     msg.send()
+
+
+def make_pdf(html_content):
+    print 'making PDF!!'
+    import pdfkit
+    import tempfile
+    fd, output_file = tempfile.mkstemp()
+    pdfkit.from_string(html_content, output_file)
+    with open(output_file, 'rb') as fp:
+        value = fp.read()
+    os.close(fd)
+    os.unlink(output_file)
+    return value
 
 
 @celery_app.task(ignore_result=True)
