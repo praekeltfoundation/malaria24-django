@@ -157,6 +157,7 @@ CASE_INVESTIGATOR = 'CASE_INVESTIGATOR'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'
 MANAGER_PROVINCIAL = 'MANAGER_PROVINCIAL'
 MANAGER_NATIONAL = 'MANAGER_NATIONAL'
+MIS = 'MIS'
 
 PROVINCES = [
     ('The Eastern Cape', 'The Eastern Cape'),
@@ -179,6 +180,10 @@ class ActorManager(models.Manager):
     def case_investigators(self):
         return super(ActorManager, self).get_queryset().filter(
             role=CASE_INVESTIGATOR)
+
+    def mis(self):
+        return super(ActorManager, self).get_queryset().filter(
+            role=MIS)
 
     def managers(self):
         return super(ActorManager, self).get_queryset().exclude(role=EHP)
@@ -210,6 +215,7 @@ class Actor(models.Model):
         (MANAGER_DISTRICT, 'District Manager'),
         (MANAGER_PROVINCIAL, 'Provincial Manager'),
         (MANAGER_NATIONAL, 'National Manager'),
+        (MIS, 'MIS'),
     ], null=True, max_length=255)
     province = models.CharField(
         max_length=255, null=True, blank=True, choices=PROVINCES)
@@ -276,6 +282,13 @@ def new_case_alert_case_investigators(sender, instance, created, **kwargs):
     alert_case_investigators(instance)
 
 
+def new_case_alert_mis(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    alert_case_mis(instance)
+
+
 def alert_ehps(reported_case):
     from malaria24.ona.tasks import send_sms, send_case_email
     ehps = Actor.objects.ehps().filter(
@@ -319,7 +332,7 @@ def alert_ehps(reported_case):
 
 
 def alert_case_investigators(reported_case):
-    from malaria24.ona.tasks import send_sms, send_case_email
+    from malaria24.ona.tasks import send_sms
     facilities = reported_case.get_facilities()
     provinces = set([facility.province for facility in facilities])
     case_investigators = Actor.objects.case_investigators().filter(
@@ -335,9 +348,6 @@ def alert_case_investigators(reported_case):
             send_sms.delay(to=case_investigator.phone_number,
                            content=('A new case has been reported, the full '
                                     'report will be sent to you via email.'))
-            send_case_email.delay(
-                reported_case.pk, [case_investigator.email_address])
-
         else:
             logging.warning(
                 ('Unable to SMS report for case %s to %s. '
@@ -346,5 +356,32 @@ def alert_case_investigators(reported_case):
                     case_investigator))
 
 
+def alert_case_mis(reported_case):
+    from malaria24.ona.tasks import send_case_email
+    facilities = reported_case.get_facilities()
+    provinces = set([facility.province for facility in facilities])
+    mis_set = Actor.objects.mis().filter(
+        province__in=provinces)
+
+    if not mis_set.exists():
+        logging.warning(
+            'No MIS found for facility code %s.' % (
+                reported_case.facility_code,))
+
+    for mis in mis_set:
+        if mis.email_address:
+            print 'emailing!'
+            send_case_email.delay(
+                reported_case.pk, [mis.email_address])
+
+        else:
+            logging.warning(
+                ('Unable to Email report for case %s to %s. '
+                 'Missing email_address.') % (
+                    reported_case.case_number,
+                    mis))
+
+
 post_save.connect(new_case_alert_ehps, sender=ReportedCase)
 post_save.connect(new_case_alert_case_investigators, sender=ReportedCase)
+post_save.connect(new_case_alert_mis, sender=ReportedCase)
