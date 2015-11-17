@@ -154,11 +154,27 @@ MANAGER_DISTRICT = 'MANAGER_DISTRICT'
 MANAGER_PROVINCIAL = 'MANAGER_PROVINCIAL'
 MANAGER_NATIONAL = 'MANAGER_NATIONAL'
 
+PROVINCES = [
+    ('The Eastern Cape', 'The Eastern Cape'),
+    ('The Free State', 'The Free State'),
+    ('Gauteng', 'Gauteng'),
+    ('KwaZulu-Natal', 'KwaZulu-Natal'),
+    ('Limpopo', 'Limpopo'),
+    ('Mpumalanga', 'Mpumalanga'),
+    ('The Northern Cape', 'The Northern Cape'),
+    ('North West', 'North West'),
+    ('The Western Cape', 'The Western Cape'),
+]
+
 
 class ActorManager(models.Manager):
 
     def ehps(self):
         return super(ActorManager, self).get_queryset().filter(role=EHP)
+
+    def case_investigators(self):
+        return super(ActorManager, self).get_queryset().filter(
+            role=CASE_INVESTIGATOR)
 
     def managers(self):
         return super(ActorManager, self).get_queryset().exclude(role=EHP)
@@ -192,17 +208,7 @@ class Actor(models.Model):
         (MANAGER_NATIONAL, 'National Manager'),
     ], null=True, max_length=255)
     province = models.CharField(
-        max_length=255, null=True, blank=True, choices=[
-            ('EC', 'The Eastern Cape'),
-            ('FS', 'The Free State'),
-            ('GP', 'Gauteng'),
-            ('KZN', 'KwaZulu-Natal'),
-            ('LP', 'Limpopo'),
-            ('MP', 'Mpumalanga'),
-            ('NC', 'The Northern Cape'),
-            ('NW', 'North West'),
-            ('WC)', 'The Western Cape'),
-        ])
+        max_length=255, null=True, blank=True, choices=PROVINCES)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -226,7 +232,8 @@ class SMS(models.Model):
 class Facility(models.Model):
     facility_code = models.CharField(max_length=255)
     facility_name = models.CharField(max_length=255, null=True, blank=True)
-    province = models.CharField(max_length=255, null=True, blank=True)
+    province = models.CharField(
+        max_length=255, null=True, blank=True, choices=PROVINCES)
     district = models.CharField(max_length=255, null=True, blank=True)
     subdistrict = models.CharField(max_length=255, null=True, blank=True)
     phase = models.CharField(max_length=255, null=True, blank=True)
@@ -251,44 +258,95 @@ class Facility(models.Model):
         }
 
 
-def alert_new_case(sender, instance, created, **kwargs):
-    from malaria24.ona.tasks import send_sms, send_case_email
+def new_case_alert_ehps(sender, instance, created, **kwargs):
     if not created:
         return
 
-    ehps = Actor.objects.ehps().filter(facility_code=instance.facility_code)
+    alert_ehps(instance)
+
+
+def new_case_alert_case_investigators(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    alert_case_investigators(instance)
+
+
+def alert_ehps(reported_case):
+    from malaria24.ona.tasks import send_sms, send_case_email
+    ehps = Actor.objects.ehps().filter(
+        facility_code=reported_case.facility_code)
     if not ehps.exists():
         logging.warning('No EHPs found for facility code %s.' % (
-            instance.facility_code,))
+            reported_case.facility_code,))
 
     for ehp in ehps:
-        instance.ehps.add(ehp)
+        reported_case.ehps.add(ehp)
         if ehp.phone_number and ehp.email_address:
             send_sms.delay(to=ehp.phone_number,
                            content=('A new case has been reported, the full '
                                     'report will be sent to you via email.'))
-            send_case_email.delay(instance.pk)
+            send_case_email.delay(reported_case.pk, [ehp.email_address])
         elif ehp.phone_number:
             logging.warning(
-                ('Unable to Email report for case %s. '
-                 'Missing email_address.') % (instance.case_number))
+                ('Unable to Email report for case %s to %s. '
+                 'Missing email_address.') % (
+                    reported_case.case_number,
+                    ehp))
 
         elif ehp.email_address:
             logging.warning(
-                ('Unable to SMS report for case %s. '
-                 'Missing phone_number.') % (instance.case_number))
+                ('Unable to SMS report for case %s to %s. '
+                 'Missing phone_number.') % (
+                    reported_case.case_number,
+                    ehp))
 
-    if instance.reported_by:
-        send_sms.delay(to=instance.reported_by,
+    if reported_case.reported_by:
+        send_sms.delay(to=reported_case.reported_by,
                        content=('Your reported case for %s %s has been '
                                 'assigned case number %s.' % (
-                                    instance.first_name,
-                                    instance.last_name,
-                                    instance.case_number,)))
+                                    reported_case.first_name,
+                                    reported_case.last_name,
+                                    reported_case.case_number,)))
     else:
         logging.warning(
             ('Unable to SMS case number for case %s. '
-             'Missing reported_by.') % (instance.case_number,))
+             'Missing reported_by.') % (reported_case.case_number,))
 
 
-post_save.connect(alert_new_case, sender=ReportedCase)
+def alert_case_investigators(reported_case):
+    from malaria24.ona.tasks import send_sms, send_case_email
+    facilities = reported_case.get_facilities()
+    provinces = set([facility.province for facility in facilities])
+    case_investigators = Actor.objects.case_investigators().filter(
+        province__in=provinces)
+
+    if not case_investigators.exists():
+        logging.warning(
+            'No Case Investigators found for facility code %s.' % (
+                reported_case.facility_code,))
+
+    for case_investigator in case_investigators:
+        if case_investigator.phone_number and case_investigator.email_address:
+            send_sms.delay(to=case_investigator.phone_number,
+                           content=('A new case has been reported, the full '
+                                    'report will be sent to you via email.'))
+            send_case_email.delay(
+                reported_case.pk, [case_investigator.email_address])
+        elif case_investigator.phone_number:
+            logging.warning(
+                ('Unable to Email report for case %s to %s. '
+                 'Missing email_address.') % (
+                    reported_case.case_number,
+                    case_investigator))
+
+        elif case_investigator.email_address:
+            logging.warning(
+                ('Unable to SMS report for case %s to %s. '
+                 'Missing phone_number.') % (
+                    reported_case.case_number,
+                    case_investigator))
+
+
+post_save.connect(new_case_alert_ehps, sender=ReportedCase)
+post_save.connect(new_case_alert_case_investigators, sender=ReportedCase)
