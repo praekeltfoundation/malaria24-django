@@ -93,8 +93,7 @@ def send_case_email(case_pk):
     msg.send()
 
 
-def make_pdf(html_content):
-    print 'making PDF!!'
+def make_pdf(html_content):  # pragma: no cover
     import pdfkit
     import tempfile
     fd, output_file = tempfile.mkstemp()
