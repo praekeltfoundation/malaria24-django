@@ -24,10 +24,14 @@ class Digest(models.Model):
         if not new_cases.exists():
             return
 
-        managers = Actor.objects.managers().filter(
+        recipients = Actor.objects.filter(
+            role__in=[EHP,
+                      MANAGER_DISTRICT,
+                      MANAGER_PROVINCIAL,
+                      MANAGER_NATIONAL],
             email_address__isnull=False)
         digest = cls.objects.create()
-        digest.recipients = managers
+        digest.recipients = recipients
         digest.save()
         new_cases.update(digest=digest)
         return digest

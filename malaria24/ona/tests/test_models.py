@@ -231,4 +231,5 @@ class DigestTest(MalariaTestCase):
         html_content, content_type = alternative
         self.assertEqual(message.body.count('EHP1, EHP2'), 10)
         self.assertEqual(html_content.count('EHP1, EHP2'), 10)
-        self.assertEqual(message.to, [manager1.email_address])
+        self.assertEqual(message.to, [
+            manager1.email_address, ehp1.email_address, ehp2.email_address])
