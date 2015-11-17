@@ -191,6 +191,18 @@ class Actor(models.Model):
         (MANAGER_PROVINCIAL, 'Provincial Manager'),
         (MANAGER_NATIONAL, 'National Manager'),
     ], null=True, max_length=255)
+    province = models.CharField(
+        max_length=255, null=True, blank=True, choices=[
+            ('EC', 'The Eastern Cape'),
+            ('FS', 'The Free State'),
+            ('GP', 'Gauteng'),
+            ('KZN', 'KwaZulu-Natal'),
+            ('LP', 'Limpopo'),
+            ('MP', 'Mpumalanga'),
+            ('NC', 'The Northern Cape'),
+            ('NW', 'North West'),
+            ('WC)', 'The Western Cape'),
+        ])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
