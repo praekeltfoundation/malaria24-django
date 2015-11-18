@@ -6,7 +6,10 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
+from mock import patch
+
 from malaria24.ona.models import Facility
+from malaria24.ona import tasks
 from .base import MalariaTestCase
 
 import responses
@@ -90,7 +93,9 @@ class FacilityTest(MalariaTestCase):
             facility_code='123456',
             facility_name='The Old Name')
         self.mk_ehp(facility_code=facility.facility_code)
-        case = self.mk_case(facility_code=facility.facility_code)
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            case = self.mk_case(facility_code=facility.facility_code)
         response = self.client.get(reverse('admin:ehp_report_view', kwargs={
             'pk': case.pk,
         }))

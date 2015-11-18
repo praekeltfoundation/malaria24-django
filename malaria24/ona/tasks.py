@@ -1,4 +1,5 @@
 import json
+import os
 
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -78,12 +79,30 @@ def send_sms(to, content):
 
 @celery_app.task(ignore_result=True)
 def send_case_email(case_pk):
+    from django.core.mail import EmailMultiAlternatives
+
     case = ReportedCase.objects.get(pk=case_pk)
-    send_mail(subject='Malaria case number %s' % (case.case_number,),
-              message=case.get_text_email_content(),
-              from_email=settings.DEFAULT_FROM_EMAIL,
-              recipient_list=[ehp.email_address for ehp in case.get_ehps()],
-              html_message=case.get_html_email_content())
+    subject = 'Malaria case number %s' % (case.case_number,)
+    text_content = case.get_text_email_content()
+    html_content = case.get_html_email_content()
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipients = [ehp.email_address for ehp in case.get_ehps()]
+    msg = EmailMultiAlternatives(subject, text_content, from_email, recipients)
+    msg.attach_alternative(html_content, "text/html")
+    msg.attach_alternative(make_pdf(html_content), "application/pdf")
+    msg.send()
+
+
+def make_pdf(html_content):  # pragma: no cover
+    import pdfkit
+    import tempfile
+    fd, output_file = tempfile.mkstemp()
+    pdfkit.from_string(html_content, output_file)
+    with open(output_file, 'rb') as fp:
+        value = fp.read()
+    os.close(fd)
+    os.unlink(output_file)
+    return value
 
 
 @celery_app.task(ignore_result=True)

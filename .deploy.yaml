@@ -13,3 +13,4 @@ dependencies:
   - libjpeg-dev
   - zlib1g-dev
   - gettext
+  - wkhtmltopdf
