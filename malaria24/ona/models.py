@@ -371,7 +371,6 @@ def alert_case_mis(reported_case):
 
     for mis in mis_set:
         if mis.email_address:
-            print 'emailing!'
             send_case_email.delay(
                 reported_case.pk, [mis.email_address])
 
