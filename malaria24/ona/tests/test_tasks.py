@@ -5,7 +5,7 @@ import pkg_resources
 import responses
 
 from malaria24.ona.models import (
-    ReportedCase, alert_new_case, MANAGER_DISTRICT, OnaForm)
+    ReportedCase, new_case_alert_ehps, MANAGER_DISTRICT, OnaForm)
 from malaria24.ona.tasks import (
     ona_fetch_reported_cases, compile_and_send_digest_email,
     ona_fetch_forms)
@@ -29,11 +29,12 @@ class OnaTest(MalariaTestCase):
                       status=200, content_type='application/json',
                       body=pkg_resources.resource_string(
                           'malaria24', 'ona/fixtures/responses/forms.json'))
-        post_save.disconnect(alert_new_case, sender=ReportedCase)
+        post_save.disconnect(new_case_alert_ehps, sender=ReportedCase)
 
     def tearDown(self):
         super(OnaTest, self).tearDown()
-        post_save.connect(alert_new_case, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_ehps, sender=ReportedCase)
 
     @responses.activate
     def test_ona_fetch_reported_cases_task(self):

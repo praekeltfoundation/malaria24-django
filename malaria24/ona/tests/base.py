@@ -7,7 +7,8 @@ import responses
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from malaria24.ona.models import ReportedCase, Actor, EHP
+from malaria24.ona.models import (
+    ReportedCase, Actor, EHP, CASE_INVESTIGATOR, MIS, Facility)
 
 
 @override_settings(CELERY_ALWAYS_EAGER=True)
@@ -41,6 +42,15 @@ class MalariaTestCase(TestCase):
 
     def mk_ehp(self, **kwargs):
         return self.mk_actor(role=EHP, **kwargs)
+
+    def mk_ci(self, **kwargs):
+        return self.mk_actor(role=CASE_INVESTIGATOR, **kwargs)
+
+    def mk_mis(self, **kwargs):
+        return self.mk_actor(role=MIS, **kwargs)
+
+    def mk_facility(self, **kwargs):
+        return Facility.objects.create(**kwargs)
 
     def mk_case(self, **kwargs):
         defaults = {

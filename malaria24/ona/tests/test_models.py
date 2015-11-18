@@ -7,13 +7,160 @@ from mock import patch
 import responses
 
 from malaria24.ona.models import (
-    ReportedCase, SMS, Digest, alert_new_case, MANAGER_DISTRICT, Facility)
+    ReportedCase, SMS, Digest,
+    new_case_alert_ehps, new_case_alert_case_investigators,
+    new_case_alert_mis,
+    MANAGER_DISTRICT, Facility)
 from malaria24.ona import tasks
 
 from .base import MalariaTestCase
 
 
-class ReportedCaseTest(MalariaTestCase):
+class CaseInvestigatorTest(MalariaTestCase):
+
+    def setUp(self):
+        super(CaseInvestigatorTest, self).setUp()
+        post_save.disconnect(
+            new_case_alert_ehps, sender=ReportedCase)
+        post_save.disconnect(
+            new_case_alert_mis, sender=ReportedCase)
+
+    def tearDown(self):
+        super(CaseInvestigatorTest, self).tearDown()
+        post_save.connect(
+            new_case_alert_ehps, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_mis, sender=ReportedCase)
+
+    @responses.activate
+    def test_capture_no_case_investigators(self):
+        with LogCapture() as log:
+            self.mk_case()
+            log.check(
+                ('root',
+                 'WARNING',
+                 'No Case Investigators found for facility code '
+                 'facility_code.'))
+
+    @responses.activate
+    def test_capture_no_case_investigator_phonenumber(self):
+        with LogCapture() as log:
+            facility = self.mk_facility(facility_code='code')
+            ci = self.mk_ci(
+                phone_number='',
+                facility_code=facility.facility_code)
+            case = self.mk_case(facility_code=facility.facility_code)
+            log.check(('root',
+                       'WARNING',
+                       ('Unable to SMS report for case %s to %s. '
+                        'Missing phone_number.') % (
+                            case.case_number, ci)))
+
+    @responses.activate
+    def test_capture_all_ok(self):
+        self.assertEqual(SMS.objects.count(), 0)
+        facility = self.mk_facility(
+            facility_name='facility_name',
+            facility_code='facility_code')
+        ci = self.mk_ci(facility_code=facility.facility_code)
+        self.mk_case(facility_code=facility.facility_code,
+                     case_number='case_number')
+        [ci_sms] = SMS.objects.all()
+        self.assertEqual(ci_sms.to, ci.phone_number)
+        self.assertEqual(
+            ci_sms.content,
+            'Hello. A new malaria case has been reported at facility_name '
+            'with Case no: case_number. Contact your EHP for more details. '
+            'Thank you')
+        self.assertEqual(ci_sms.message_id, 'the-message-id')
+
+
+class MISTest(MalariaTestCase):
+
+    def setUp(self):
+        super(MISTest, self).setUp()
+        post_save.disconnect(
+            new_case_alert_ehps, sender=ReportedCase)
+        post_save.disconnect(
+            new_case_alert_case_investigators, sender=ReportedCase)
+
+    def tearDown(self):
+        super(MISTest, self).tearDown()
+        post_save.connect(
+            new_case_alert_ehps, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_case_investigators, sender=ReportedCase)
+
+    @responses.activate
+    def test_capture_no_mis(self):
+        with LogCapture() as log:
+            self.mk_case()
+            log.check(
+                ('root',
+                 'WARNING',
+                 'No MIS found for facility code '
+                 'facility_code.'))
+
+    @responses.activate
+    def test_capture_no_mis_email_address(self):
+        with LogCapture() as log:
+            mis = self.mk_mis(email_address='', province='The Province')
+            facility = self.mk_facility(
+                facility_code='code', province=mis.province)
+            case = self.mk_case(facility_code=facility.facility_code)
+            log.check(('root',
+                       'WARNING',
+                       ('Unable to Email report for case %s to %s. '
+                        'Missing email_address.') % (
+                            case.case_number, mis)))
+
+    @responses.activate
+    def test_email_sending(self):
+        facility = Facility.objects.create(facility_code='0001',
+                                           facility_name='Facility 1',
+                                           district='The District',
+                                           subdistrict='The Subdistrict',
+                                           province='The Province')
+        mis = self.mk_mis(province=facility.province)
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            case = self.mk_case(facility_code=facility.facility_code)
+        [message] = mail.outbox
+        self.assertEqual(message.subject,
+                         'Malaria case number %s' % (case.case_number,))
+        self.assertEqual(message.to, [mis.email_address])
+        self.assertTrue('does not support HTML' in message.body)
+        [html_alternative, pdf_alternative] = message.alternatives
+        content, content_type = html_alternative
+        self.assertTrue(case.facility_code in content)
+        self.assertTrue(case.sa_id_number in content)
+        self.assertTrue('The District' in content)
+        self.assertTrue('The Subdistrict' in content)
+        self.assertTrue('The Province' in content)
+        self.assertTrue('landmark' in content)
+        self.assertTrue('landmark_description' in content)
+        self.assertTrue(
+            'http://example.com/static/ona/img/logo.png' in content)
+        self.assertEqual('text/html', content_type)
+        self.assertEqual(('garbage for testing', 'application/pdf'),
+                         pdf_alternative)
+
+
+class EhpReportedCaseTest(MalariaTestCase):
+
+    def setUp(self):
+        super(EhpReportedCaseTest, self).setUp()
+        post_save.disconnect(
+            new_case_alert_case_investigators, sender=ReportedCase)
+        post_save.disconnect(
+            new_case_alert_mis, sender=ReportedCase)
+
+    def tearDown(self):
+        super(EhpReportedCaseTest, self).tearDown()
+        post_save.connect(
+            new_case_alert_case_investigators, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_mis, sender=ReportedCase)
 
     @responses.activate
     def test_capture_no_ehps(self):
@@ -30,8 +177,9 @@ class ReportedCaseTest(MalariaTestCase):
             case = self.mk_case(facility_code=ehp.facility_code)
             log.check(('root',
                        'WARNING',
-                       ('Unable to SMS report for case %s. '
-                        'Missing phone_number.') % (case.case_number,)))
+                       ('Unable to SMS report for case %s to %s. '
+                        'Missing phone_number.') % (
+                            case.case_number, ehp)))
 
     @responses.activate
     def test_capture_no_ehp_email_address(self):
@@ -40,8 +188,9 @@ class ReportedCaseTest(MalariaTestCase):
             case = self.mk_case(facility_code=ehp.facility_code)
             log.check(('root',
                        'WARNING',
-                       ('Unable to Email report for case %s. '
-                        'Missing email_address.') % (case.case_number,)))
+                       ('Unable to Email report for case %s to %s. '
+                        'Missing email_address.') % (
+                            case.case_number, ehp)))
 
     @responses.activate
     def test_capture_no_reported_by(self):
@@ -54,7 +203,8 @@ class ReportedCaseTest(MalariaTestCase):
             log.check(('root',
                        'WARNING',
                        ('Unable to SMS case number for case %s. '
-                        'Missing reported_by.') % (case.case_number,)))
+                        'Missing reported_by.') % (
+                            case.case_number)))
 
     @responses.activate
     def test_capture_all_ok(self):
@@ -138,11 +288,15 @@ class DigestTest(MalariaTestCase):
 
     def setUp(self):
         super(DigestTest, self).setUp()
-        post_save.disconnect(alert_new_case, sender=ReportedCase)
+        post_save.disconnect(new_case_alert_ehps, sender=ReportedCase)
+        post_save.disconnect(
+            new_case_alert_case_investigators, sender=ReportedCase)
 
     def tearDown(self):
         super(DigestTest, self).tearDown()
-        post_save.connect(alert_new_case, sender=ReportedCase)
+        post_save.connect(new_case_alert_ehps, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_case_investigators, sender=ReportedCase)
 
     @responses.activate
     def test_compile_digest(self):
@@ -161,6 +315,7 @@ class DigestTest(MalariaTestCase):
                                  email_address='manager@example.org')
         ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
         ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+        mis = self.mk_mis(name='MIS', email_address='mis@example.org')
 
         for i in range(10):
             case = self.mk_case()
@@ -175,4 +330,8 @@ class DigestTest(MalariaTestCase):
         html_content, content_type = alternative
         self.assertEqual(message.body.count('EHP1, EHP2'), 10)
         self.assertEqual(html_content.count('EHP1, EHP2'), 10)
-        self.assertEqual(message.to, [manager1.email_address])
+        self.assertEqual(message.to, [
+            manager1.email_address,
+            ehp1.email_address,
+            ehp2.email_address,
+            mis.email_address])

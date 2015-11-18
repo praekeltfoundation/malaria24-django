@@ -78,7 +78,7 @@ def send_sms(to, content):
 
 
 @celery_app.task(ignore_result=True)
-def send_case_email(case_pk):
+def send_case_email(case_pk, recipients):
     from django.core.mail import EmailMultiAlternatives
 
     case = ReportedCase.objects.get(pk=case_pk)
@@ -86,7 +86,6 @@ def send_case_email(case_pk):
     text_content = case.get_text_email_content()
     html_content = case.get_html_email_content()
     from_email = settings.DEFAULT_FROM_EMAIL
-    recipients = [ehp.email_address for ehp in case.get_ehps()]
     msg = EmailMultiAlternatives(subject, text_content, from_email, recipients)
     msg.attach_alternative(html_content, "text/html")
     msg.attach_alternative(make_pdf(html_content), "application/pdf")
