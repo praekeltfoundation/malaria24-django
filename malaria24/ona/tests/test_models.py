@@ -43,9 +43,10 @@ class CaseInvestigatorTest(MalariaTestCase):
     @responses.activate
     def test_capture_no_case_investigator_phonenumber(self):
         with LogCapture() as log:
-            ci = self.mk_ci(phone_number='', province='The Province')
-            facility = self.mk_facility(
-                facility_code='code', province=ci.province)
+            facility = self.mk_facility(facility_code='code')
+            ci = self.mk_ci(
+                phone_number='',
+                facility_code=facility.facility_code)
             case = self.mk_case(facility_code=facility.facility_code)
             log.check(('root',
                        'WARNING',
@@ -56,15 +57,19 @@ class CaseInvestigatorTest(MalariaTestCase):
     @responses.activate
     def test_capture_all_ok(self):
         self.assertEqual(SMS.objects.count(), 0)
-        ci = self.mk_ci(province='The Province')
         facility = self.mk_facility(
-            facility_code='code', province=ci.province)
-        self.mk_case(facility_code=facility.facility_code)
+            facility_name='facility_name',
+            facility_code='facility_code')
+        ci = self.mk_ci(facility_code=facility.facility_code)
+        self.mk_case(facility_code=facility.facility_code,
+                     case_number='case_number')
         [ci_sms] = SMS.objects.all()
-        self.assertEqual(ci_sms.to, 'phone_number')
-        self.assertEqual(ci_sms.content,
-                         'A new case has been reported, the full report will '
-                         'be sent to you via email.')
+        self.assertEqual(ci_sms.to, ci.phone_number)
+        self.assertEqual(
+            ci_sms.content,
+            'Hello. A new malaria case has been reported at facility_name '
+            'with Case no: case_number. Contact your EHP for more details. '
+            'Thank you')
         self.assertEqual(ci_sms.message_id, 'the-message-id')
 
 
