@@ -23,7 +23,12 @@
     <tr>
       <td colspan="4" style="width: 33%">Case Number: <span class="variable"><strong>{{case.case_number}}</strong></span><br/>Reporting facility: <span class="variable"><strong>{{case.facility_code}}</strong></span></td>
       <td colspan="4" style="width: 33%; text-align: center;"><img style="width: 10em;margin-left: auto; margin-right:auto;" src="http://{{site.domain}}{% static "ona/img/logo.png" %}"/></td>
-      <td colspan="4" style="width: 33%">Date Form Received for data capturing: <span class="variable"><strong>{{case.create_date_time}}</strong></span</td>
+      <td colspan="4" style="width: 33%">Date Form Received for data capturing:</td>
+    </tr>
+    <tr>
+      <td colspan="4"></td>
+      <td colspan="4"></td>
+      <td colspan="4" style="width: 33%">Date MalariaConnect Report received: <span class="variable"><strong>{{case.create_date_time}}</strong></span</td>
     </tr>
     <tr>
       <td colspan="12" class="section_heading">Section A: General information on case to be investigated</td>
