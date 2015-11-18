@@ -122,14 +122,16 @@ class MISTest(MalariaTestCase):
                                            subdistrict='The Subdistrict',
                                            province='The Province')
         mis = self.mk_mis(province=facility.province)
-        case = self.mk_case(facility_code=facility.facility_code)
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            case = self.mk_case(facility_code=facility.facility_code)
         [message] = mail.outbox
         self.assertEqual(message.subject,
                          'Malaria case number %s' % (case.case_number,))
         self.assertEqual(message.to, [mis.email_address])
         self.assertTrue('does not support HTML' in message.body)
-        [alternative] = message.alternatives
-        content, content_type = alternative
+        [html_alternative, pdf_alternative] = message.alternatives
+        content, content_type = html_alternative
         self.assertTrue(case.facility_code in content)
         self.assertTrue(case.sa_id_number in content)
         self.assertTrue('The District' in content)
@@ -140,6 +142,8 @@ class MISTest(MalariaTestCase):
         self.assertTrue(
             'http://example.com/static/ona/img/logo.png' in content)
         self.assertEqual('text/html', content_type)
+        self.assertEqual(('garbage for testing', 'application/pdf'),
+                         pdf_alternative)
 
 
 class EhpReportedCaseTest(MalariaTestCase):
