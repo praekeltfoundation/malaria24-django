@@ -2,6 +2,7 @@ from django.core import mail
 from django.db.models.signals import post_save
 
 from testfixtures import LogCapture
+from mock import patch
 
 import responses
 
@@ -10,6 +11,7 @@ from malaria24.ona.models import (
     new_case_alert_ehps, new_case_alert_case_investigators,
     new_case_alert_mis,
     MANAGER_DISTRICT, Facility)
+from malaria24.ona import tasks
 
 from .base import MalariaTestCase
 
@@ -190,8 +192,10 @@ class EhpReportedCaseTest(MalariaTestCase):
     def test_capture_no_reported_by(self):
         with LogCapture() as log:
             ehp = self.mk_ehp()
-            case = self.mk_case(facility_code=ehp.facility_code,
-                                reported_by='')
+            with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+                mock_make_pdf.return_value = 'garbage for testing'
+                case = self.mk_case(facility_code=ehp.facility_code,
+                                    reported_by='')
             log.check(('root',
                        'WARNING',
                        ('Unable to SMS case number for case %s. '
@@ -202,7 +206,10 @@ class EhpReportedCaseTest(MalariaTestCase):
     def test_capture_all_ok(self):
         self.assertEqual(SMS.objects.count(), 0)
         ehp = self.mk_ehp()
-        case = self.mk_case(facility_code=ehp.facility_code)
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            case = self.mk_case(facility_code=ehp.facility_code)
+
         [ehp_sms, reporter_sms] = SMS.objects.all()
         self.assertEqual(ehp_sms.to, 'phone_number')
         self.assertEqual(ehp_sms.content,
@@ -221,8 +228,10 @@ class EhpReportedCaseTest(MalariaTestCase):
     def test_idempotency(self):
         self.assertEqual(SMS.objects.count(), 0)
         ehp = self.mk_ehp()
-        case = self.mk_case(facility_code=ehp.facility_code)
-        case.save()
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            case = self.mk_case(facility_code=ehp.facility_code)
+            case.save()
         self.assertEqual(SMS.objects.count(), 2)
 
     @responses.activate
@@ -233,14 +242,16 @@ class EhpReportedCaseTest(MalariaTestCase):
                                            subdistrict='The Subdistrict',
                                            province='The Province')
         ehp = self.mk_ehp(facility_code=facility.facility_code)
-        case = self.mk_case(facility_code=facility.facility_code)
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            case = self.mk_case(facility_code=facility.facility_code)
         [message] = mail.outbox
         self.assertEqual(message.subject,
                          'Malaria case number %s' % (case.case_number,))
         self.assertEqual(message.to, [ehp.email_address])
         self.assertTrue('does not support HTML' in message.body)
-        [alternative] = message.alternatives
-        content, content_type = alternative
+        [html_alternative, pdf_alternative] = message.alternatives
+        content, content_type = html_alternative
         self.assertTrue(case.facility_code in content)
         self.assertTrue(case.sa_id_number in content)
         self.assertTrue('The District' in content)
@@ -251,6 +262,8 @@ class EhpReportedCaseTest(MalariaTestCase):
         self.assertTrue(
             'http://example.com/static/ona/img/logo.png' in content)
         self.assertEqual('text/html', content_type)
+        self.assertEqual(('garbage for testing', 'application/pdf'),
+                         pdf_alternative)
 
     @responses.activate
     def test_age(self):
