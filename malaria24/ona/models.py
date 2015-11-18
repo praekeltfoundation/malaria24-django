@@ -334,10 +334,8 @@ def alert_ehps(reported_case):
 
 def alert_case_investigators(reported_case):
     from malaria24.ona.tasks import send_sms
-    facilities = reported_case.get_facilities()
-    provinces = set([facility.province for facility in facilities])
     case_investigators = Actor.objects.case_investigators().filter(
-        province__in=provinces)
+        facility_code=reported_case.facility_code)
 
     if not case_investigators.exists():
         logging.warning(
@@ -346,9 +344,13 @@ def alert_case_investigators(reported_case):
 
     for case_investigator in case_investigators:
         if case_investigator.phone_number:
-            send_sms.delay(to=case_investigator.phone_number,
-                           content=('A new case has been reported, the full '
-                                    'report will be sent to you via email.'))
+            send_sms.delay(
+                to=case_investigator.phone_number,
+                content=('Hello. A new malaria case has been reported at '
+                         '%s with Case no: %s. Contact your EHP for '
+                         'more details. Thank you') % (
+                             reported_case.facility_names,
+                             reported_case.case_number,))
         else:
             logging.warning(
                 ('Unable to SMS report for case %s to %s. '
