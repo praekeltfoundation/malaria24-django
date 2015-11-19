@@ -26,7 +26,7 @@
       <td colspan="4" style="width: 33%">Date Form Received for data capturing:</td>
     </tr>
     <tr>
-      <td colspan="4" style="width: 33%">MalariaConnect Case Number: <span class="variable"><strong>{{case.case_number}}</strong></span><br/>Reporting facility: <span class="variable"><strong>{{case.facility_code}}</strong></span></td>
+      <td colspan="4" style="width: 33%">MalariaConnect Case Number: <span class="variable"><strong>{{case.case_number}}</strong></span></td>
       <td colspan="4"></td>
       <td colspan="4" style="width: 33%">Date MalariaConnect Report received: <span class="variable"><strong>{{case.create_date_time}}</strong></span</td>
     </tr>
@@ -57,7 +57,11 @@
       <td colspan="12" class="section_heading">Section B: Case Investigator Detail &amp; Investigation Address</td>
     </tr>
     <tr>
-      <td colspan="12">4a. Exact residential address (include name of area / section / zone / homestead number) where the patient was visited by the case investigator</td>
+      <td colspan="6">Name of EHP:</td>
+      <td colspan="6">Name of Case Investigator:</td>
+    </tr>
+    <tr>
+      <td colspan="12">Landmark nearby patient's residential address:</td>
     </tr>
     <tr>
       <td colspan="12"><span class="variable"><strong>{{case.landmark}} / {{case.landmark_description}}</strong><span></td>
@@ -71,42 +75,10 @@
       <td colspan="6">5. Patient's contact number: <span class="variable"><strong>{{case.msisdn}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="12">6. GPS coordinates:</td>
-    </tr>
-    <tr>
       <td colspan="12">7. Source of case investigation information: <span class="variable"><strong>MalariaConnect</strong></span></td>
     </tr>
     <tr>
-      <td colspan="12">8. Where did the person travel to? <span class="variable"><strong>{{case.abroad}}</strong></span></td>
-    </tr>
-    <tr>
-      <td colspan="12"><table border="1" cellspacing="0" style="width: 100%; border-color: #DEDFDE;">
-        <tr>
-          <th>Country / Province visited</th>
-          <th>0-7 days before falling ill</th>
-          <th>8-21 days before falling ill</th>
-          <th>22-365 days before falling ill</th>
-
-        </tr>
-        <tr>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>
-      </table></td>
+      <td colspan="12">Where did the patient travel 21 days before falling ill? <span class="variable"><strong>{{case.abroad}}</strong></span></td>
     </tr>
 
   </table>
