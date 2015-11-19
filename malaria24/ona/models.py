@@ -138,11 +138,27 @@ class ReportedCase(models.Model):
     def get_ehps(self):
         return Actor.objects.ehps().filter(facility_code=self.facility_code)
 
+    def get_case_investigator(self):
+        investigators = Actor.objects.case_investigators().filter(
+            facility_code=self.facility_code)
+
+        # there should only be one CI per facility
+        if len(investigators) == 1:
+            return investigators[0]
+        elif len(investigators) == 0:
+            logging.warning('No CIs found for facility code %s.' % (
+                self.facility_code,))
+        else:
+            logging.warning(
+                'Multiple CIs found for facility code %s.' % (
+                    self.facility_code,))
+
     def get_email_context(self):
         return {
             'case': self,
             'ehps': self.get_ehps(),
             'site': Site.objects.get_current(),
+            'ci': self.get_case_investigator(),
         }
 
     def get_text_email_content(self):
