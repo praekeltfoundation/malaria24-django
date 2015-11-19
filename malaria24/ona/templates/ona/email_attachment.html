@@ -1,0 +1,232 @@
+{% load staticfiles %}<html>
+<style type="text/css">
+    .variable {
+      color: red;
+      font-weight: strong;
+      font-family: courier;
+    }
+    .section_heading {
+      background-color: #DEDFDE;
+      text-transform: uppercase;
+      font-weight: bold;
+      text-align: center;
+    }
+</style>
+<body>
+  <table border="1" style="width: 100%; border: 1px #DEDFDE solid;" cellspacing="0" cellpadding="2">
+    <tr>
+      <td colspan="12" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
+    </tr>
+    <tr>
+      <td colspan="12" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
+    </tr>
+    <tr>
+      <td colspan="4" style="width: 33%">Case Number:</td>
+      <td colspan="4" style="width: 33%; text-align: center;"><img style="width: 10em;margin-left: auto; margin-right:auto;" src="http://{{site.domain}}{% static "ona/img/logo.png" %}"/></td>
+      <td colspan="4" style="width: 33%">Date Form Received for data capturing:</td>
+    </tr>
+    <tr>
+      <td colspan="12" class="section_heading">Section A: General information on case to be investigated</td>
+    </tr>
+    <tr>
+      <td colspan="12">1. Diagnosis Date:</td>
+    </tr>
+    <tr>
+      <td colspan="6">2a. Patient's Name: <span class="variable"><strong>{{case.first_name}}</strong></span></td>
+      <td colspan="6">2b. Surname: <span class="variable"><strong>{{case.last_name}}</strong></span></td>
+    </tr>
+    <tr>
+      <td colspan="4">3. Age: <span class="variable"><strong>{{case.age}}</strong></span></td>
+      <td colspan="4">4. Date of birth: <span class="variable"><strong>{{case.date_of_birth}}</strong></span></td>
+      <td colspan="4">5. Gender: <span class="variable"><strong>{{case.gender}}</strong></span></td>
+    </tr>
+    <tr>
+      <td colspan="6">6. Reporting Health Facility: <span class="variable"><strong>{{case.facility_names}}</strong></span></td>
+      <td colspan="6">7. Province: <span class="variable"><strong>{{case.provinces}}</strong></span></td>
+    </tr>
+    <tr>
+      <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable"><strong>{{case.create_date_time|date:"D d M Y" }}</strong></span></td>
+      <td colspan="6">9. Date notification form captured in MIS:</td>
+    </tr>
+    <tr>
+      <td colspan="12">10. Treatment given to patient: </td>
+    </tr>
+    <tr>
+      <td colspan="12" class="section_heading">Section B: Case Investigator Detail &amp; Investigation Address</td>
+    </tr>
+    <tr>
+      <td colspan="4">1a. Name of Case Investigator:</td>
+      <td colspan="4">1b. Surname:</td>
+      <td colspan="4">1c. Investigation Date:</td>
+    </tr>
+    <tr>
+      <td colspan="12">3a. Case Investigation Status:</td>
+    </tr>
+    <tr>
+      <td colspan="12">3b. If the case was untraceable, please indicate the reason:<br/></td>
+    </tr>
+    <tr>
+      <td colspan="4">Incomplete details of address. Cannot go out to trace.<br/></td>
+      <td colspan="4">Visited, but patient not found<br/></td>
+      <td colspan="2">Migrant<br/></td>
+      <td colspan="2">Other<br/></td>
+    </tr>
+    <tr>
+      <td colspan="12">4a. Exact residential address (include name of area / section / zone / homestead number) where the patient was visited by the case investigator</td>
+    </tr>
+    <tr>
+      <td colspan="12"><span class="variable"><strong>{{case.landmark}} / {{case.landmark_description}}</strong><span></td>
+    </tr>
+    <tr>
+      <td colspan="6">4b. Locality / village: <span class="variable"><strong>{{case.locality}}</strong></span></td>
+      <td colspan="6">4c. Municipality: <span class="variable"><strong>{{case.subdistricts}}</strong></span></td>
+    </tr>
+    <tr>
+      <td colspan="6">4d. District: <span class="variable"><strong>{{case.districts}}</strong></span></td>
+      <td colspan="6">5. Patient's contact number: <span class="variable"><strong>{{case.msisdn}}</strong></span></td>
+    </tr>
+    <tr>
+      <td colspan="12">6. GPS coordinates:</td>
+    </tr>
+    <tr>
+      <td colspan="12">7. Source of case investigation information: <span class="variable"><strong>MalariaConnect</strong></span></td>
+    </tr>
+    <tr>
+      <td colspan="12" class="section_heading">Section C: Questions to Patient</td>
+    </tr>
+    <tr>
+      <td colspan="6">1a. Is it the first time for the patient to have malaria: </td>
+      <td colspan="6">1b. If no, please indicate when last did the patient have malaria: </td>
+    </tr>
+    <tr>
+      <td colspan="6">2a. Is the patient protecting her/himself against malaria: </td>
+      <td colspan="6">2b. If yes, please indicate how patient is protecting her/himself against malaria: </td>
+    </tr>
+    <tr>
+      <td colspan="6">2c. Is the patient pregnant?: </td>
+      <td colspan="6">3a. Has the patient's house been sprayed?:</td>
+    </tr>
+    <tr>
+      <td colspan="6">3b. If yes, when last was the house sprayed?:</td>
+      <td colspan="6">3c. What insecticide was used?:</td>
+    </tr>
+    <tr>
+      <td colspan="12">3d. If no, what was the reason:</td>
+    </tr>
+    <tr>
+      <td colspan="6">4. Does the house/homestead have a hut card?:</td>
+      <td colspan="6">5. Occupation of Patient:</td>
+    </tr>
+    <tr>
+    </tr>
+    <tr>
+      <td colspan="12">6. When did you start feeling sick?:</td>
+    </tr>
+    <tr>
+      <td colspan="12">7. Where did the person travel to? <span class="variable"><strong>{{case.abroad}}</strong></span></td>
+    </tr>
+    <tr>
+      <td colspan="12"><table border="1" cellspacing="0" style="width: 100%; border-color: #DEDFDE;">
+        <tr>
+          <th>Country / Province visited</th>
+          <th>0-7 days before falling ill</th>
+          <th>8-21 days before falling ill</th>
+          <th>22-365 days before falling ill</th>
+
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+      </table></td>
+    </tr>
+    <tr>
+      <td colspan="12" class="section_heading">Section D: Investigation Outcome</td>
+    </tr>
+    <tr>
+      <td colspan="12">1. Was the Source locality on the original form notification from (GW17/5) CORRECT prior to the verification during this case investigation?:</td>
+    </tr>
+    <tr>
+      <td colspan="6">2. What is the final outcome on the case classification:</td>
+      <td colspan="6">2a. Case Classification:</td>
+    </tr>
+    <tr>
+      <td colspan="6">2b. Diagnosis: </td>
+      <td colspan="6">2c. Source Country:</td>
+    </tr>
+    <tr>
+      <td colspan="6">2d. Source Province: </td>
+      <td colspan="6">2e. Source District:</td>
+    </tr>
+    <tr>
+      <td colspan="6">2f. Source Municipality:</td>
+      <td colspan="6">2g. Source Locality:</td>
+    </tr>
+    <tr>
+      <td colspan="12">2h. GPS Coordinates for source of infection (if local case)</td>
+    </tr>
+    <tr>
+      <td colspan="12">3. Parasite identified</td>
+    </tr>
+    <tr>
+      <td colspan="12" class="section_heading">Section E: Tests Conducted In Community During Case Investigation</td>
+    </tr>
+    <tr>
+      <td colspan="6">1. Total community members tested with RDT: </td>
+      <td colspan="6">2. Total RDT Positives:</td>
+    </tr>
+    <tr>
+      <td colspan="6">3. Total blood smears collected:</td>
+      <td colspan="6">4. Number of households visited:</td>
+    </tr>
+    <tr>
+      <td colspan="12" class="section_heading">Section F: Observations By Case Investigator</td>
+    </tr>
+    <tr>
+      <td colspan="6">1. Any breeding sites found?: </td>
+      <td colspan="6">2. Any action taken?</td>
+    </tr>
+    <tr>
+      <td colspan="12">3. Other observations by case investigation officer (including entomological surveillance)?</td>
+    </tr>
+    <tr>
+      <td colspan="6">4. Follow-up Smear taken?: </td>
+      <td colspan="6">5. Case Investigator Signature:</td>
+    </tr>
+    <tr>
+      <td colspan="12" class="section_heading">Section G: Observations by Supervisor</td>
+    </tr>
+    <tr>
+      <td colspan="6">1. Did the case investigator complete all the questions to make the correct classification?: </td>
+      <td colspan="6">4. Designation?:</td>
+    </tr>
+    <tr>
+      <td colspan="6">2. Did the case investigator UPDATE the travel and other fields on the copy notification (GW 17/5)?:</td>
+      <td colspan="6">5. Contact number?:</td>
+    </tr>
+    <tr>
+      <td colspan="6">3. Was the Case Investigation Form checked by supervisor?: </td>
+      <td colspan="6">6. Date checked by supervisor?:</td>
+    </tr>
+    <tr>
+      <td colspan="6">Supervisor: </td>
+      <td colspan="6">Signature:</td>
+    </tr>
+
+  </table>
+</body>
+</html>
