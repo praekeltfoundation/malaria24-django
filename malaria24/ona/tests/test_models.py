@@ -208,6 +208,7 @@ class EhpReportedCaseTest(MalariaTestCase):
     def test_capture_no_reported_by(self):
         with LogCapture() as log:
             ehp = self.mk_ehp()
+            ci = self.mk_ci()
             with patch.object(tasks, 'make_pdf') as mock_make_pdf:
                 mock_make_pdf.return_value = 'garbage for testing'
                 case = self.mk_case(facility_code=ehp.facility_code,
