@@ -4,6 +4,7 @@
       color: red;
       font-weight: strong;
       font-family: courier;
+      text-transform: uppercase;
     }
     .section_heading {
       background-color: #DEDFDE;
@@ -34,24 +35,24 @@
       <td colspan="12" class="section_heading">Section A: General information on case to be investigated</td>
     </tr>
     <tr>
-      <td colspan="6">2a. Patient's Name: <span class="variable"><strong>{{case.first_name}}</strong></span></td>
-      <td colspan="6">2b. Surname: <span class="variable"><strong>{{case.last_name}}</strong></span></td>
+      <td colspan="6">Patient's Name: <span class="variable"><strong>{{case.first_name}}</strong></span></td>
+      <td colspan="6">Surname: <span class="variable"><strong>{{case.last_name}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="4">3. Age: <span class="variable"><strong>{{case.age}}</strong></span></td>
-      <td colspan="4">4. Date of birth: <span class="variable"><strong>{{case.date_of_birth}}</strong></span></td>
-      <td colspan="4">5. Gender: <span class="variable"><strong>{{case.gender}}</strong></span></td>
+      <td colspan="4">Age: <span class="variable"><strong>{{case.age}}</strong></span></td>
+      <td colspan="4">Date of birth: <span class="variable"><strong>{{case.date_of_birth}}</strong></span></td>
+      <td colspan="4">Gender: <span class="variable"><strong>{{case.gender}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="6">6. Reporting Health Facility: <span class="variable"><strong>{{case.facility_names}}</strong></span></td>
+      <td colspan="6">Reporting Health Facility: <span class="variable"><strong>{{case.facility_names}}</strong></span></td>
       <td colspan="6">Facility Code: <span class="variable"><strong>{{case.facility_code}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="6">7. Province: <span class="variable"><strong>{{case.provinces}}</strong></span></td>
+      <td colspan="6">Province: <span class="variable"><strong>{{case.provinces}}</strong></span></td>
       <td colspan="6">District: <span class="variable"><strong>{{case.districts}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="12">11. South African ID: <span class="variable"><strong>{{case.sa_id_number}}</strong></span></td>
+      <td colspan="12">South African ID: <span class="variable"><strong>{{case.sa_id_number}}</strong></span></td>
     </tr>
     <tr>
       <td colspan="12" class="section_heading">Section B: Case Investigator Detail &amp; Investigation Address</td>
@@ -67,15 +68,15 @@
       <td colspan="12"><span class="variable"><strong>{{case.landmark}} / {{case.landmark_description}}</strong><span></td>
     </tr>
     <tr>
-      <td colspan="6">4b. Locality / village: <span class="variable"><strong>{{case.locality}}</strong></span></td>
-      <td colspan="6">4c. Municipality: <span class="variable"><strong>{{case.subdistricts}}</strong></span></td>
+      <td colspan="6">Locality / village: <span class="variable"><strong>{{case.locality}}</strong></span></td>
+      <td colspan="6">Municipality: <span class="variable"><strong>{{case.subdistricts}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="6">4d. District: <span class="variable"><strong>{{case.districts}}</strong></span></td>
-      <td colspan="6">5. Patient's contact number: <span class="variable"><strong>{{case.msisdn}}</strong></span></td>
+      <td colspan="6">District: <span class="variable"><strong>{{case.districts}}</strong></span></td>
+      <td colspan="6">Patient's contact number: <span class="variable"><strong>{{case.msisdn}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="12">7. Source of case investigation information: <span class="variable"><strong>MalariaConnect</strong></span></td>
+      <td colspan="12">Source of case investigation information: <span class="variable"><strong>MalariaConnect</strong></span></td>
     </tr>
     <tr>
       <td colspan="12">Where did the patient travel 21 days before falling ill? <span class="variable"><strong>{{case.abroad}}</strong></span></td>
