@@ -10,17 +10,44 @@
       text-transform: uppercase;
       font-weight: bold;
       text-align: center;
+      font-size: 14px;
+    }
+    .answer_space {
+      height: 32px;
+      vertical-align: top;
+    }
+    .option_block {
+      border:1px solid black;
+      padding: 5px 10px;
+      margin: 0px;
+      float:left;
+      min-width: 10px;
+      line-height: 8px;
+      min-height: 8px;
+    }
+    .empty {
+      margin-right: 10px;
+    }
+    .question {
+      float:left;
+      margin-right: 3px;
+    }
+    table {
+      font-size: 11px;
+    }
+    table td {
+      padding: 0px 1px;
     }
 </style>
 <body>
-  <table border="1" style="width: 100%; border: 1px #DEDFDE solid;" cellspacing="0" cellpadding="2">
+  <table border="1" style="width: 100%; border: 1px #DEDFDE solid;" cellspacing="0" cellpadding="0">
     <tr>
-      <td colspan="12" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
+      <td colspan="12" style="text-align: center;font-size:16px;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
     </tr>
     <tr>
-      <td colspan="12" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
+      <td colspan="12" style="text-align: center;;font-size:16px;"><strong>Malaria Case Investigators Report</strong></td>
     </tr>
-    <tr>
+    <tr class="answer_space">
       <td colspan="4" style="width: 33%">Case Number:</td>
       <td colspan="4" style="width: 33%; text-align: center;"><img style="width: 10em;margin-left: auto; margin-right:auto;" src="http://{{site.domain}}{% static "ona/img/logo.png" %}"/></td>
       <td colspan="4" style="width: 33%">Date Form Received for data capturing:</td>
@@ -44,12 +71,14 @@
       <td colspan="6">6. Reporting Health Facility: <span class="variable"><strong>{{case.facility_names}}</strong></span></td>
       <td colspan="6">7. Province: <span class="variable"><strong>{{case.provinces}}</strong></span></td>
     </tr>
-    <tr>
+    <tr class="answer_space">
       <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable"><strong>{{case.create_date_time|date:"D d M Y" }}</strong></span></td>
       <td colspan="6">9. Date notification form captured in MIS:</td>
     </tr>
     <tr>
-      <td colspan="12">10. Treatment given to patient: </td>
+      <td colspan="12"><span class="question">10. Treatment given to patient:</span>
+        <div class="option_block">ACT</div><div class="option_block">Oral Quinine</div><div class="option_block">IV Artesunate</div>
+      </td>
     </tr>
     <tr>
       <td colspan="12" class="section_heading">Section B: Case Investigator Detail &amp; Investigation Address</td>
@@ -60,22 +89,21 @@
       <td colspan="4">1c. Investigation Date:</td>
     </tr>
     <tr>
-      <td colspan="12">3a. Case Investigation Status:</td>
+      <td colspan="12"><span class="question">3a. Case Investigation Status:</span>
+        <div class="option_block">Traced</div><div class="option_block">Untraceable</div>
+      </td>
     </tr>
     <tr>
-      <td colspan="12">3b. If the case was untraceable, please indicate the reason:<br/></td>
+      <td colspan="12">3b. If the case was untraceable, please indicate the reason:<br/>
+      <span class="question">Incomplete details of address. Cannot go out to trace.</span><div class="option_block empty"></div>
+      <span class="question">Visited, but patient not found</span><div class="option_block empty"></div>
+      <span class="question">Migrant</span><div class="option_block empty"></div>
+      <span class="question">Other</span><div class="option_block" style="width: 110px;"></div>
     </tr>
-    <tr>
-      <td colspan="4">Incomplete details of address. Cannot go out to trace.<br/></td>
-      <td colspan="4">Visited, but patient not found<br/></td>
-      <td colspan="2">Migrant<br/></td>
-      <td colspan="2">Other<br/></td>
-    </tr>
-    <tr>
-      <td colspan="12">4a. Exact residential address (include name of area / section / zone / homestead number) where the patient was visited by the case investigator</td>
-    </tr>
-    <tr>
-      <td colspan="12"><span class="variable"><strong>{{case.landmark}} / {{case.landmark_description}}</strong><span></td>
+    <tr class="answer_space">
+      <td colspan="12">4a. Exact residential address (include name of area / section / zone / homestead number) where the patient was visited by the case investigator
+      <br/><span class="variable"><strong>{{case.landmark}} / {{case.landmark_description}}</strong><span>
+      </td>
     </tr>
     <tr>
       <td colspan="6">4b. Locality / village: <span class="variable"><strong>{{case.locality}}</strong></span></td>
@@ -95,27 +123,77 @@
       <td colspan="12" class="section_heading">Section C: Questions to Patient</td>
     </tr>
     <tr>
-      <td colspan="6">1a. Is it the first time for the patient to have malaria: </td>
+      <td colspan="6">
+        <span class="question">1a. Is it the first time for the patient to have malaria:</span>
+        <div class="option_block">Yes</div>
+        <div class="option_block">No</div
+      </td>
       <td colspan="6">1b. If no, please indicate when last did the patient have malaria: </td>
     </tr>
     <tr>
-      <td colspan="6">2a. Is the patient protecting her/himself against malaria: </td>
-      <td colspan="6">2b. If yes, please indicate how patient is protecting her/himself against malaria: </td>
+      <td colspan="12">
+        <div style="float:left; margin-right: 13px;">
+          <span class="question">2a. Is the patient protecting her/himself against malaria:</span>
+          <div class="option_block">Yes</div>
+          <div class="option_block">No</div>
+        </div>
+      
+        <span class="question" style="margin-bottom:12px;">2b. If yes, please indicate how patient is protecting her/himself against malaria:</span><br/>
+        <span class="question">Repellents used on skin</span><div class="option_block empty"></div>
+        <span class="question">Coils</span><div class="option_block empty"></div>
+        <span class="question">Aerosol Mosquito Spray</span><div class="option_block empty"></div>
+        <span class="question">Bed net</span><div class="option_block empty"></div>
+        <span class="question">Prophylaxis</span><div class="option_block empty"></div>
+        <span class="question">Other</span><div class="option_block" style="width: 150px;"></div>
+      </td>
     </tr>
     <tr>
-      <td colspan="6">2c. Is the patient pregnant?: </td>
-      <td colspan="6">3a. Has the patient's house been sprayed?:</td>
+      <td colspan="6">
+        <span class="question">2c. Is the patient pregnant?:</span>
+        <div class="option_block">Yes</div>
+        <div class="option_block">No</div
+      </td>
+      <td colspan="6">
+        <span class="question">3a. Has the patient's house been sprayed?:</span>
+        <div class="option_block">Yes</div>
+        <div class="option_block">No</div>
+      </td>
     </tr>
     <tr>
       <td colspan="6">3b. If yes, when last was the house sprayed?:</td>
-      <td colspan="6">3c. What insecticide was used?:</td>
+      <td colspan="6">
+        <span class="question">3c. What insecticide was used?:</span>
+        <div class="option_block">DDT</div><div class="option_block">Pyrethroid</div><div class="option_block">Carbamates</div>
+      </td>
     </tr>
     <tr>
-      <td colspan="12">3d. If no, what was the reason:</td>
+      <td colspan="12">
+        <span class="question">3d. If no, what was the reason:</span><br/>
+        <span class="question">House Outside Spray Area</span><div class="option_block empty"></div>
+        <span class="question">Refusal</span><div class="option_block empty"></div>
+        <span class="question">Sick people in house</span><div class="option_block empty"></div>
+        <span class="question">House is usually locked</span><div class="option_block empty"></div>
+        <span class="question">Other</span><div class="option_block" style="width: 150px;"></div>
+      </td>
     </tr>
     <tr>
-      <td colspan="6">4. Does the house/homestead have a hut card?:</td>
-      <td colspan="6">5. Occupation of Patient:</td>
+      <td colspan="12">
+        <div style="float:left; margin-right:10px;">
+          <span class="question">4. Does the house/homestead have a hut card?:</span>
+          <div class="option_block">Yes</div>
+          <div class="option_block">No</div>
+          <div class="option_block">Not Applicable</div>
+        </div>
+        <span class="question" style="margin-bottom:12px;">5. Occupation of Patient:</span>
+        <span class="question">Mining</span><div class="option_block empty"></div>
+        <span class="question">Farming</span><div class="option_block empty"></div>
+        <span class="question">Truck Driver</span><div class="option_block empty"></div>
+        <br/><br/><span class="question">Taxi Driver</span><div class="option_block empty"></div>
+        <span class="question">Scholar/Student</span><div class="option_block empty"></div>
+        <span class="question">Self Employed</span><div class="option_block empty"></div>
+        <span class="question">Unemployed</span><div class="option_block empty"></div>
+        <span class="question">Other</span><div class="option_block" style="width: 150px;"></div>
+      </td>
     </tr>
     <tr>
     </tr>
@@ -158,14 +236,27 @@
       <td colspan="12" class="section_heading">Section D: Investigation Outcome</td>
     </tr>
     <tr>
-      <td colspan="12">1. Was the Source locality on the original form notification from (GW17/5) CORRECT prior to the verification during this case investigation?:</td>
+      <td colspan="12">
+        <span class="question">1. Was the Source locality on the original form notification from (GW17/5) CORRECT prior to the verification during this case investigation?:</span>
+        <div class="option_block">Yes</div>
+        <div class="option_block">No</div>
+      </td>
     </tr>
     <tr>
       <td colspan="6">2. What is the final outcome on the case classification:</td>
-      <td colspan="6">2a. Case Classification:</td>
+      <td colspan="6">
+        <span class="question">2a. Case Classification:</span>
+        <div class="option_block">Local</div>
+        <div class="option_block">Imported</div>
+      </td>
     </tr>
     <tr>
-      <td colspan="6">2b. Diagnosis: </td>
+      <td colspan="6">
+        <span class="question">2b. Diagnosis:</span>
+        <div class="option_block">RDT</div>
+        <div class="option_block">Blood Smear</div>
+        <div class="option_block">Both</div>
+      </td>
       <td colspan="6">2c. Source Country:</td>
     </tr>
     <tr>
@@ -180,47 +271,106 @@
       <td colspan="12">2h. GPS Coordinates for source of infection (if local case)</td>
     </tr>
     <tr>
-      <td colspan="12">3. Parasite identified</td>
+      <td colspan="12">
+        <span class="question">3. Parasite identified:</span>
+        <div class="option_block"><em>P. falciparum</em></div>
+        <div class="option_block"><em>P. ovale</em></div>
+        <div class="option_block"><em>P. vivax</em></div>
+        <div class="option_block"><em>P. malariae</em></div>
+      </td>
     </tr>
     <tr>
       <td colspan="12" class="section_heading">Section E: Tests Conducted In Community During Case Investigation</td>
     </tr>
     <tr>
-      <td colspan="6">1. Total community members tested with RDT: </td>
-      <td colspan="6">2. Total RDT Positives:</td>
+      <td colspan="6">
+        <span class="question">1. Total community members <br/>tested with RDT:</span>
+        <div class="option_block"></div>
+        <div class="option_block"></div>
+        <div class="option_block">Not Applicable</div>
+      </td>
+      <td colspan="6">
+        <span class="question">2. Total RDT Positives:</span>
+        <div class="option_block"></div>
+        <div class="option_block"></div>
+        <div class="option_block">Not Applicable</div>
+      </td>
     </tr>
     <tr>
-      <td colspan="6">3. Total blood smears collected:</td>
-      <td colspan="6">4. Number of households visited:</td>
+      <td colspan="6">
+        <span class="question">3. Total blood smears collected:</span>
+        <div class="option_block"></div>
+        <div class="option_block"></div>
+        <div class="option_block">Not Applicable</div>
+      </td>
+      <td colspan="6">
+        <span class="question">4. Number of households visited:</span>
+        <div class="option_block"></div>
+        <div class="option_block"></div>
+        <div class="option_block">Not Applicable</div>
+      </td>
     </tr>
     <tr>
       <td colspan="12" class="section_heading">Section F: Observations By Case Investigator</td>
     </tr>
     <tr>
-      <td colspan="6">1. Any breeding sites found?: </td>
-      <td colspan="6">2. Any action taken?</td>
+      <td colspan="6">
+        <span class="question">1. Any breeding sites found?:</span>
+        <div class="option_block">Yes</div>
+        <div class="option_block">No</div>
+        </td>
+      <td colspan="6">
+        <span class="question">2. Any action taken?</span><br/>
+        <span class="question">Water Drained</span><div class="option_block empty"></div>
+        <span class="question">Larvicide Applied<br/>(Specify type used)</span><div class="option_block empty"></div>
+        <span class="question">Other</span><div class="option_block" style="width: 100px;"></div>
+      </td>
     </tr>
-    <tr>
+    <tr style="vertical-align:top;height:60px;">
       <td colspan="12">3. Other observations by case investigation officer (including entomological surveillance)?</td>
     </tr>
     <tr>
-      <td colspan="6">4. Follow-up Smear taken?: </td>
+      <td colspan="6">
+        <span class="question">4. Follow-up Smear taken?:</span>
+        <div class="option_block">14 days</div>
+        <div class="option_block">21 Days</div>
+        <div class="option_block">28 Days</div>  
+      </td>
       <td colspan="6">5. Case Investigator Signature:</td>
     </tr>
     <tr>
       <td colspan="12" class="section_heading">Section G: Observations by Supervisor</td>
     </tr>
     <tr>
-      <td colspan="6">1. Did the case investigator complete all the questions to make the correct classification?: </td>
-      <td colspan="6">4. Designation?:</td>
+      <td colspan="6">
+        <span class="question">1. Did the case investigator complete all the questions <br/> to make the correct classification?:</span>
+        <div class="option_block">Yes</div>
+        <div class="option_block">No</div>
+      </td>
+      <td colspan="6">
+        <span class="question">4. Designation?:</span>
+        <div class="option_block">CDC</div>
+        <div class="option_block">EHP</div>
+        <div class="option_block">Case Investigator</div>
+        <div class="option_block">Team Leader</div>
+        <div class="option_block">MSA</div>
+      </td>
     </tr>
     <tr>
-      <td colspan="6">2. Did the case investigator UPDATE the travel and other fields on the copy notification (GW 17/5)?:</td>
-      <td colspan="6">5. Contact number?:</td>
+      <td colspan="7">
+        <span class="question">2. Did the case investigator UPDATE the travel and other <br/> fields on the copy notification (GW 17/5)?:</span>
+        <div class="option_block">Yes</div>
+        <div class="option_block">No</div>
+      </td>
+      <td colspan="5">5. Contact number?:</td>
     </tr>
     <tr>
-      <td colspan="6">3. Was the Case Investigation Form checked by supervisor?: </td>
-      <td colspan="6">6. Date checked by supervisor?:</td>
+      <td colspan="7">
+        <span class="question">3. Was the Case Investigation Form checked by supervisor?:</span>
+        <div class="option_block">Yes</div>
+        <div class="option_block">No</div>
+      </td>
+      <td colspan="5">6. Date checked by supervisor?:</td>
     </tr>
     <tr>
       <td colspan="6">Supervisor: </td>
