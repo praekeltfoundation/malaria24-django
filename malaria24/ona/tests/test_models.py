@@ -171,6 +171,18 @@ class EhpReportedCaseTest(MalariaTestCase):
                        'No EHPs found for facility code facility_code.'))
 
     @responses.activate
+    def test_capture_no_ci(self):
+        with LogCapture() as log:
+            ehp = self.mk_ehp()
+            with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+                mock_make_pdf.return_value = 'garbage for testing'
+                case = self.mk_case(facility_code=ehp.facility_code)
+            log.check(('root',
+                       'WARNING',
+                       'No CIs found for facility code %s.' % (
+                            ehp.facility_code)))
+
+    @responses.activate
     def test_capture_no_ehp_phonenumber(self):
         with LogCapture() as log:
             ehp = self.mk_ehp(phone_number='')
