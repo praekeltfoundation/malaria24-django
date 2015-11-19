@@ -143,9 +143,9 @@ class ReportedCase(models.Model):
             facility_code=self.facility_code)
 
         # there should only be one CI per facility
-        if len(investigators) == 1:
+        if investigators.count() == 1:
             return investigators[0]
-        elif len(investigators) == 0:
+        elif investigators.count() == 0:
             logging.warning('No CIs found for facility code %s.' % (
                 self.facility_code,))
         else:
