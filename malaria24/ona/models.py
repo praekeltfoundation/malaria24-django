@@ -153,6 +153,11 @@ class ReportedCase(models.Model):
         return render_to_string(
             'ona/html_email.html', self.get_email_context())
 
+    def get_pdf_email_content(self):
+        # use attachment file
+        return render_to_string(
+            'ona/email_attachment.html', self.get_email_context())
+
 EHP = 'EHP'
 CASE_INVESTIGATOR = 'CASE_INVESTIGATOR'
 MANAGER_DISTRICT = 'MANAGER_DISTRICT'

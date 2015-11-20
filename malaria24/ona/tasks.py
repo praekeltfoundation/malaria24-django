@@ -85,10 +85,11 @@ def send_case_email(case_pk, recipients):
     subject = 'Malaria case number %s' % (case.case_number,)
     text_content = case.get_text_email_content()
     html_content = case.get_html_email_content()
+    pdf_content = case.get_pdf_email_content()
     from_email = settings.DEFAULT_FROM_EMAIL
     msg = EmailMultiAlternatives(subject, text_content, from_email, recipients)
     msg.attach_alternative(html_content, "text/html")
-    msg.attach_alternative(make_pdf(html_content), "application/pdf")
+    msg.attach_alternative(make_pdf(pdf_content), "application/pdf")
     msg.send()
 
 
