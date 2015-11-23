@@ -245,6 +245,17 @@ class SMS(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class Email(models.Model):
+    """
+    An Email sent from the system, for audit trail purposes.
+    """
+    to = models.CharField(max_length=255)
+    html_content = models.TextField()
+    pdf_content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class Facility(models.Model):
     facility_code = models.CharField(max_length=255)
     facility_name = models.CharField(max_length=255, null=True, blank=True)
