@@ -6,7 +6,8 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 
 from malaria24 import celery_app
-from malaria24.ona.models import ReportedCase, SMS, Digest, Facility, OnaForm
+from malaria24.ona.models import (ReportedCase, SMS, Digest, Facility, OnaForm,
+                                  Email)
 
 from onapie.client import Client
 
@@ -91,6 +92,8 @@ def send_case_email(case_pk, recipients):
     msg.attach_alternative(html_content, "text/html")
     msg.attach_alternative(make_pdf(pdf_content), "application/pdf")
     msg.send()
+    Email.objects.create(to=recipients[0], html_content=html_content,
+                         pdf_content=pdf_content)
 
 
 def make_pdf(html_content):  # pragma: no cover
