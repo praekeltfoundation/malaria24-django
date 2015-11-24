@@ -14,3 +14,6 @@ dependencies:
   - zlib1g-dev
   - gettext
   - wkhtmltopdf
+  - xvfb
+
+  
