@@ -130,7 +130,8 @@ class MISTest(MalariaTestCase):
                          'Malaria case number %s' % (case.case_number,))
         self.assertEqual(message.to, [mis.email_address])
         self.assertTrue('does not support HTML' in message.body)
-        [html_alternative, pdf_alternative] = message.alternatives
+        [html_alternative] = message.alternatives
+        [pdf_attachment] = message.attachments
         content, content_type = html_alternative
         self.assertTrue(case.facility_code in content)
         self.assertTrue(case.sa_id_number in content)
@@ -142,8 +143,9 @@ class MISTest(MalariaTestCase):
         self.assertTrue(
             'http://example.com/static/ona/img/logo.png' in content)
         self.assertEqual('text/html', content_type)
-        self.assertEqual(('garbage for testing', 'application/pdf'),
-                         pdf_alternative)
+        self.assertEqual(('Reported_Case_None.pdf',
+                          'garbage for testing', 'application/pdf'),
+                         pdf_attachment)
 
 
 class EhpReportedCaseTest(MalariaTestCase):
@@ -254,7 +256,8 @@ class EhpReportedCaseTest(MalariaTestCase):
                          'Malaria case number %s' % (case.case_number,))
         self.assertEqual(message.to, [ehp.email_address])
         self.assertTrue('does not support HTML' in message.body)
-        [html_alternative, pdf_alternative] = message.alternatives
+        [html_alternative] = message.alternatives
+        [pdf_attachment] = message.attachments
         content, content_type = html_alternative
         self.assertTrue(case.facility_code in content)
         self.assertTrue(case.sa_id_number in content)
@@ -266,8 +269,9 @@ class EhpReportedCaseTest(MalariaTestCase):
         self.assertTrue(
             'http://example.com/static/ona/img/logo.png' in content)
         self.assertEqual('text/html', content_type)
-        self.assertEqual(('garbage for testing', 'application/pdf'),
-                         pdf_alternative)
+        self.assertEqual(('Reported_Case_None.pdf',
+                          'garbage for testing', 'application/pdf'),
+                         pdf_attachment)
 
     @responses.activate
     def test_age(self):
