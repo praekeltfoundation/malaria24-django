@@ -90,7 +90,9 @@ def send_case_email(case_pk, recipients):
     from_email = settings.DEFAULT_FROM_EMAIL
     msg = EmailMultiAlternatives(subject, text_content, from_email, recipients)
     msg.attach_alternative(html_content, "text/html")
-    msg.attach_alternative(make_pdf(pdf_content), "application/pdf")
+    msg.attach('Reported_Case_%s.pdf' % (case.case_number,),
+               make_pdf(pdf_content),
+               "application/pdf")
     msg.send()
     Email.objects.create(to=recipients[0], html_content=html_content,
                          pdf_content=pdf_content)
