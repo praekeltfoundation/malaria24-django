@@ -112,7 +112,7 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-DEFAULT_FROM_EMAIL = 'MalariaConnect<malaria24@praekelt.com>'
+DEFAULT_FROM_EMAIL = 'MalariaConnect <malaria24@praekelt.com>'
 
 # Logging
 LOGGING = {
