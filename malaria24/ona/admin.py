@@ -54,9 +54,27 @@ class SMSAdmin(admin.ModelAdmin):
 
 class EmailAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
-    list_display = ('to', 'html_content', 'pdf_content', 'created_at')
+    list_display = ('to', 'created_at', 'email_link')
     list_filter = ('created_at',)
-    search_fields = ('to', 'html_content')
+    search_fields = ('to',)
+
+    def get_urls(self):
+        urls = super(EmailAdmin, self).get_urls()
+        my_urls = [
+            url(r'^sent_email/(?P<pk>\d+)/$', self.admin_site.admin_view(
+                self.email_view), name='email_view'),
+        ]
+        return my_urls + urls
+
+    def email_link(self, email):
+        return '<a href="./sent_email/%s/">View Email</a>' % (
+            email.pk,)
+    email_link.short_description = 'Email'
+    email_link.allow_tags = True
+
+    def email_view(self, request, pk):
+        email = Email.objects.get(pk=pk)
+        return HttpResponse(email.html_content)
 
 
 class ActorAdmin(admin.ModelAdmin):
