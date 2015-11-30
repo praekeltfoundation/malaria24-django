@@ -1,5 +1,4 @@
 import logging
-
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
@@ -7,7 +6,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.template.loader import render_to_string
 from django.utils import timezone
-
 from datetime import datetime
 
 
@@ -17,6 +15,18 @@ class Digest(models.Model):
     """
     created_at = models.DateTimeField(auto_now_add=True)
     recipients = models.ManyToManyField('Actor')
+
+    # PROVINCES = [
+    #     ('The Eastern Cape', 'The Eastern Cape'),
+    #     ('The Free State', 'The Free State'),
+    #     ('Gauteng', 'Gauteng'),
+    #     ('KwaZulu-Natal', 'KwaZulu-Natal'),
+    #     ('Limpopo', 'Limpopo'),
+    #     ('Mpumalanga', 'Mpumalanga'),
+    #     ('The Northern Cape', 'The Northern Cape'),
+    #     ('North West', 'North West'),
+    #     ('The Western Cape', 'The Western Cape'),
+    # ]
 
     @classmethod
     def compile_digest(cls):
@@ -38,11 +48,29 @@ class Digest(models.Model):
         return digest
 
     def send_digest_email(self):
+        provinces = []
         context = {
             'digest': self,
+            'provinces': provinces,
         }
+
+        # populate provinces
+        for p, p_name in PROVINCES:
+            codes = Facility.objects.filter(province=p).values_list(
+                'facility_code')
+            province_cases = ReportedCase.objects.filter(
+                facility_code__in=list(codes))
+            females = province_cases.filter(gender__icontains='f')
+            if females:
+                females = females.count()
+            else:
+                females = 0
+            males = province_cases.count() - females
+            provinces.append({'province': p_name, 'cases': province_cases.count(),
+                             'females': females, 'males': males})
         text_content = render_to_string('ona/text_digest.txt', context)
         html_content = render_to_string('ona/html_digest.html', context)
+        print provinces
         return send_mail(
             subject='Digest of reported Malaria cases %s' % (
                 timezone.now().strftime('%x'),),

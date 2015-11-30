@@ -315,6 +315,9 @@ class DigestTest(MalariaTestCase):
 
     @responses.activate
     def test_send_digest_email(self):
+        Facility.objects.create(facility_code='0001',
+                                facility_name='Facility 1',
+                                province='Limpopo')
         manager1 = self.mk_actor(role=MANAGER_DISTRICT,
                                  email_address='manager@example.org')
         ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
