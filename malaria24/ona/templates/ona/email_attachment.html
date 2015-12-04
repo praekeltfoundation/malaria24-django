@@ -59,20 +59,20 @@
       <td colspan="12">1. Diagnosis Date:</td>
     </tr>
     <tr>
-      <td colspan="6">2a. Patient's Name: <span class="variable"><strong>{{case.first_name}}</strong></span></td>
-      <td colspan="6">2b. Surname: <span class="variable"><strong>{{case.last_name}}</strong></span></td>
+      <td colspan="6">2a. Patient's Name: <span class="variable"><strong>{{case.first_name|upper}}</strong></span></td>
+      <td colspan="6">2b. Surname: <span class="variable"><strong>{{case.last_name|upper}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="4">3. Age: <span class="variable"><strong>{{case.age}}</strong></span></td>
-      <td colspan="4">4. Date of birth: <span class="variable"><strong>{{case.date_of_birth}}</strong></span></td>
-      <td colspan="4">5. Gender: <span class="variable"><strong>{{case.gender}}</strong></span></td>
+      <td colspan="4">3. Age: <span class="variable"><strong>{{case.age|upper}}</strong></span></td>
+      <td colspan="4">4. Date of birth: <span class="variable"><strong>{{case.date_of_birth|upper}}</strong></span></td>
+      <td colspan="4">5. Gender: <span class="variable"><strong>{{case.gender|upper}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="6">6. Reporting Health Facility: <span class="variable"><strong>{{case.facility_names}}</strong></span></td>
-      <td colspan="6">7. Province: <span class="variable"><strong>{{case.provinces}}</strong></span></td>
+      <td colspan="6">6. Reporting Health Facility: <span class="variable"><strong>{{case.facility_names|upper}}</strong></span></td>
+      <td colspan="6">7. Province: <span class="variable"><strong>{{case.provinces|upper}}</strong></span></td>
     </tr>
     <tr class="answer_space">
-      <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable"><strong>{{case.create_date_time|date:"D d M Y" }}</strong></span></td>
+      <td colspan="6">8. Date notification form was sent/collected from health facility: <span class="variable"><strong>{{case.create_date_time|date:"D d M Y"|upper }}</strong></span></td>
       <td colspan="6">9. Date notification form captured in MIS:</td>
     </tr>
     <tr>
@@ -102,16 +102,16 @@
     </tr>
     <tr class="answer_space">
       <td colspan="12">4a. Exact residential address (include name of area / section / zone / homestead number) where the patient was visited by the case investigator
-      <br/><span class="variable"><strong>{{case.landmark}} / {{case.landmark_description}}</strong><span>
+      <br/><span class="variable"><strong>{{case.landmark|upper}} / {{case.landmark_description|upper}}</strong><span>
       </td>
     </tr>
     <tr>
-      <td colspan="6">4b. Locality / village: <span class="variable"><strong>{{case.locality}}</strong></span></td>
-      <td colspan="6">4c. Municipality: <span class="variable"><strong>{{case.subdistricts}}</strong></span></td>
+      <td colspan="6">4b. Locality / village: <span class="variable"><strong>{{case.locality|upper}}</strong></span></td>
+      <td colspan="6">4c. Municipality: <span class="variable"><strong>{{case.subdistricts|upper}}</strong></span></td>
     </tr>
     <tr>
-      <td colspan="6">4d. District: <span class="variable"><strong>{{case.districts}}</strong></span></td>
-      <td colspan="6">5. Patient's contact number: <span class="variable"><strong>{{case.msisdn}}</strong></span></td>
+      <td colspan="6">4d. District: <span class="variable"><strong>{{case.districts|upper}}</strong></span></td>
+      <td colspan="6">5. Patient's contact number: <span class="variable"><strong>{{case.msisdn|upper}}</strong></span></td>
     </tr>
     <tr>
       <td colspan="12">6. GPS coordinates:</td>
@@ -201,7 +201,7 @@
       <td colspan="12">6. When did you start feeling sick?:</td>
     </tr>
     <tr>
-      <td colspan="12">7. Where did the person travel to? <span class="variable"><strong>{{case.abroad}}</strong></span></td>
+      <td colspan="12">7. Where did the person travel to? <span class="variable"><strong>{{case.abroad|upper}}</strong></span></td>
     </tr>
     <tr>
       <td colspan="12"><table border="1" cellspacing="0" style="width: 100%; border-color: #DEDFDE;">
