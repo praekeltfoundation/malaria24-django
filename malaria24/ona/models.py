@@ -317,7 +317,7 @@ def alert_ehps(reported_case):
     sms_copy = ('New Case: %(case_number)s '
                 '%(facility_name)s, %(first_name)s '
                 '%(last_name)s, %(locality)s, '
-                '%(landmark)s, age %(age)d, '
+                '%(landmark)s, %(landmark_description)s, age %(age)d, '
                 '%(gender)s, phone: %(msisdn)s') % {
         'case_number': reported_case.case_number,
         'facility_name': reported_case.facility_names,
@@ -325,6 +325,7 @@ def alert_ehps(reported_case):
         'last_name': reported_case.last_name,
         'locality': reported_case.locality,
         'landmark': reported_case.landmark,
+        'landmark_description': reported_case.landmark_description,
         'age': reported_case.age,
         'gender': reported_case.gender,
         'msisdn': reported_case.msisdn}
@@ -377,11 +378,12 @@ def alert_case_investigators(reported_case):
         if case_investigator.phone_number:
             send_sms.delay(
                 to=case_investigator.phone_number,
-                content=('New Case: %(case_number)s '
-                         '%(facility_name)s, %(first_name)s '
-                         '%(last_name)s, %(locality)s, '
-                         '%(landmark)s, age %(age)d, '
-                         '%(gender)s, phone: %(msisdn)s')
+                content=(
+                    'New Case: %(case_number)s '
+                    '%(facility_name)s, %(first_name)s '
+                    '%(last_name)s, %(locality)s, '
+                    '%(landmark)s, %(landmark_description)s, age %(age)d, '
+                    '%(gender)s, phone: %(msisdn)s')
                 % {
                     'case_number': reported_case.case_number,
                     'facility_name': reported_case.facility_names,
@@ -389,6 +391,7 @@ def alert_case_investigators(reported_case):
                     'last_name': reported_case.last_name,
                     'locality': reported_case.locality,
                     'landmark': reported_case.landmark,
+                    'landmark_description': reported_case.landmark_description,
                     'age': reported_case.age,
                     'gender': reported_case.gender,
                     'msisdn': reported_case.msisdn,

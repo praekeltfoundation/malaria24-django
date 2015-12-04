@@ -72,7 +72,7 @@ class CaseInvestigatorTest(MalariaTestCase):
             ci_sms.content,
             'New Case: case_number facility_name, '
             'first_name last_name, '
-            'locality, landmark, '
+            'locality, landmark, landmark_description, '
             'age %d, gender, '
             'phone: msisdn' % case.age)
         self.assertEqual(ci_sms.message_id, 'the-message-id')
@@ -228,7 +228,7 @@ class EhpReportedCaseTest(MalariaTestCase):
             ehp_sms.content,
             'New Case: case_number facility_name, '
             'first_name last_name, '
-            'locality, landmark, '
+            'locality, landmark, landmark_description, '
             'age %d, gender, '
             'phone: msisdn' % case.age)
         self.assertEqual(ehp_sms.message_id, 'the-message-id')
@@ -257,7 +257,7 @@ class EhpReportedCaseTest(MalariaTestCase):
             ehp_sms.content,
             'New Case: case_number facility_name, '
             'first_name last_name, '
-            'locality, landmark, '
+            'locality, landmark, landmark_description, '
             'age %d, gender, '
             'phone: msisdn' % case.age)
         self.assertEqual(ehp_sms.message_id, 'the-message-id')
