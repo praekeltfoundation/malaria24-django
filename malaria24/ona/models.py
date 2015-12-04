@@ -322,6 +322,9 @@ def alert_ehps(reported_case):
                                     'report will be sent to you via email.'))
             send_case_email.delay(reported_case.pk, [ehp.email_address])
         elif ehp.phone_number:
+            send_sms.delay(to=ehp.phone_number,
+                           content=('A new case has been reported, the full '
+                                    'report will be sent to you via email.'))
             logging.warning(
                 ('Unable to Email report for case %s to %s. '
                  'Missing email_address.') % (
@@ -329,6 +332,7 @@ def alert_ehps(reported_case):
                     ehp))
 
         elif ehp.email_address:
+            send_case_email.delay(reported_case.pk, [ehp.email_address])
             logging.warning(
                 ('Unable to SMS report for case %s to %s. '
                  'Missing phone_number.') % (

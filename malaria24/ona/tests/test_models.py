@@ -231,6 +231,28 @@ class EhpReportedCaseTest(MalariaTestCase):
         self.assertEqual(reporter_sms.message_id, 'the-message-id')
 
     @responses.activate
+    def test_capture_phone_number_only(self):
+        self.assertEqual(SMS.objects.count(), 0)
+        ehp = self.mk_ehp(email_address='')
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            case = self.mk_case(facility_code=ehp.facility_code)
+
+        [ehp_sms, reporter_sms] = SMS.objects.all()
+        self.assertEqual(ehp_sms.to, 'phone_number')
+        self.assertEqual(ehp_sms.content,
+                         'A new case has been reported, the full report will '
+                         'be sent to you via email.')
+        self.assertEqual(ehp_sms.message_id, 'the-message-id')
+        self.assertEqual(reporter_sms.to, 'reported_by')
+        self.assertEqual(
+            reporter_sms.content,
+            ('Your reported case for %s %s has been '
+             'assigned case number %s.') % (
+                case.first_name, case.last_name, case.case_number))
+        self.assertEqual(reporter_sms.message_id, 'the-message-id')
+
+    @responses.activate
     def test_idempotency(self):
         self.assertEqual(SMS.objects.count(), 0)
         ehp = self.mk_ehp()
@@ -248,6 +270,41 @@ class EhpReportedCaseTest(MalariaTestCase):
                                            subdistrict='The Subdistrict',
                                            province='The Province')
         ehp = self.mk_ehp(facility_code=facility.facility_code)
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            case = self.mk_case(facility_code=facility.facility_code)
+        [message] = mail.outbox
+        self.assertEqual(message.subject,
+                         'Malaria case number %s' % (case.case_number,))
+        self.assertEqual(message.to, [ehp.email_address])
+        self.assertTrue('does not support HTML' in message.body)
+        [html_alternative] = message.alternatives
+        [pdf_attachment] = message.attachments
+        content, content_type = html_alternative
+        self.assertTrue(case.facility_code in content)
+        self.assertTrue(case.sa_id_number in content)
+        self.assertTrue('The District' in content)
+        self.assertTrue('The Subdistrict' in content)
+        self.assertTrue('The Province' in content)
+        self.assertTrue('landmark' in content)
+        self.assertTrue('landmark_description' in content)
+        self.assertTrue(
+            'http://example.com/static/ona/img/logo.png' in content)
+        self.assertEqual('text/html', content_type)
+        self.assertEqual(('Reported_Case_None.pdf',
+                          'garbage for testing', 'application/pdf'),
+                         pdf_attachment)
+
+    @responses.activate
+    def test_email_sending_when_no_phone_number_specified(self):
+        facility = Facility.objects.create(facility_code='0001',
+                                           facility_name='Facility 1',
+                                           district='The District',
+                                           subdistrict='The Subdistrict',
+                                           province='The Province')
+        ehp = self.mk_ehp(
+            facility_code=facility.facility_code,
+            phone_number='')
         with patch.object(tasks, 'make_pdf') as mock_make_pdf:
             mock_make_pdf.return_value = 'garbage for testing'
             case = self.mk_case(facility_code=facility.facility_code)
