@@ -63,15 +63,18 @@ class CaseInvestigatorTest(MalariaTestCase):
             facility_name='facility_name',
             facility_code='facility_code')
         ci = self.mk_ci(facility_code=facility.facility_code)
-        self.mk_case(facility_code=facility.facility_code,
-                     case_number='case_number')
+        case = self.mk_case(
+            facility_code=facility.facility_code,
+            case_number='case_number')
         [ci_sms] = SMS.objects.all()
         self.assertEqual(ci_sms.to, ci.phone_number)
         self.assertEqual(
             ci_sms.content,
-            'Hello. A new malaria case has been reported at facility_name '
-            'with Case no: case_number. Contact your EHP for more details. '
-            'Thank you')
+            'New Case: case_number facility_name, '
+            'first_name last_name, '
+            'locality, landmark, '
+            'age %d, gender, '
+            'phone: msisdn' % case.age)
         self.assertEqual(ci_sms.message_id, 'the-message-id')
 
 

@@ -366,11 +366,22 @@ def alert_case_investigators(reported_case):
         if case_investigator.phone_number:
             send_sms.delay(
                 to=case_investigator.phone_number,
-                content=('Hello. A new malaria case has been reported at '
-                         '%s with Case no: %s. Contact your EHP for '
-                         'more details. Thank you') % (
-                             reported_case.facility_names,
-                             reported_case.case_number,))
+                content=('New Case: %(case_number)s '
+                         '%(facility_name)s, %(first_name)s '
+                         '%(last_name)s, %(locality)s, '
+                         '%(landmark)s, age %(age)d, '
+                         '%(gender)s, phone: %(msisdn)s')
+                % {
+                    'case_number': reported_case.case_number,
+                    'facility_name': reported_case.facility_names,
+                    'first_name': reported_case.first_name,
+                    'last_name': reported_case.last_name,
+                    'locality': reported_case.locality,
+                    'landmark': reported_case.landmark,
+                    'age': reported_case.age,
+                    'gender': reported_case.gender,
+                    'msisdn': reported_case.msisdn,
+                })
         else:
             logging.warning(
                 ('Unable to SMS report for case %s to %s. '
