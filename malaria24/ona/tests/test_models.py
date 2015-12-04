@@ -63,15 +63,18 @@ class CaseInvestigatorTest(MalariaTestCase):
             facility_name='facility_name',
             facility_code='facility_code')
         ci = self.mk_ci(facility_code=facility.facility_code)
-        self.mk_case(facility_code=facility.facility_code,
-                     case_number='case_number')
+        case = self.mk_case(
+            facility_code=facility.facility_code,
+            case_number='case_number')
         [ci_sms] = SMS.objects.all()
         self.assertEqual(ci_sms.to, ci.phone_number)
         self.assertEqual(
             ci_sms.content,
-            'Hello. A new malaria case has been reported at facility_name '
-            'with Case no: case_number. Contact your EHP for more details. '
-            'Thank you')
+            'New Case: case_number facility_name, '
+            'first_name last_name, '
+            'locality, landmark, landmark_description, '
+            'age %d, gender, '
+            'phone: msisdn' % case.age)
         self.assertEqual(ci_sms.message_id, 'the-message-id')
 
 
@@ -212,15 +215,22 @@ class EhpReportedCaseTest(MalariaTestCase):
     def test_capture_all_ok(self):
         self.assertEqual(SMS.objects.count(), 0)
         ehp = self.mk_ehp()
+        self.mk_facility(
+            facility_name='facility_name', facility_code='facility_code')
         with patch.object(tasks, 'make_pdf') as mock_make_pdf:
             mock_make_pdf.return_value = 'garbage for testing'
-            case = self.mk_case(facility_code=ehp.facility_code)
+            case = self.mk_case(
+                facility_code=ehp.facility_code, case_number='case_number')
 
         [ehp_sms, reporter_sms] = SMS.objects.all()
         self.assertEqual(ehp_sms.to, 'phone_number')
-        self.assertEqual(ehp_sms.content,
-                         'A new case has been reported, the full report will '
-                         'be sent to you via email.')
+        self.assertEqual(
+            ehp_sms.content,
+            'New Case: case_number facility_name, '
+            'first_name last_name, '
+            'locality, landmark, landmark_description, '
+            'age %d, gender, '
+            'phone: msisdn' % case.age)
         self.assertEqual(ehp_sms.message_id, 'the-message-id')
         self.assertEqual(reporter_sms.to, 'reported_by')
         self.assertEqual(
@@ -234,15 +244,22 @@ class EhpReportedCaseTest(MalariaTestCase):
     def test_capture_phone_number_only(self):
         self.assertEqual(SMS.objects.count(), 0)
         ehp = self.mk_ehp(email_address='')
+        self.mk_facility(
+            facility_name='facility_name', facility_code='facility_code')
         with patch.object(tasks, 'make_pdf') as mock_make_pdf:
             mock_make_pdf.return_value = 'garbage for testing'
-            case = self.mk_case(facility_code=ehp.facility_code)
+            case = self.mk_case(
+                facility_code=ehp.facility_code, case_number='case_number')
 
         [ehp_sms, reporter_sms] = SMS.objects.all()
         self.assertEqual(ehp_sms.to, 'phone_number')
-        self.assertEqual(ehp_sms.content,
-                         'A new case has been reported, the full report will '
-                         'be sent to you via email.')
+        self.assertEqual(
+            ehp_sms.content,
+            'New Case: case_number facility_name, '
+            'first_name last_name, '
+            'locality, landmark, landmark_description, '
+            'age %d, gender, '
+            'phone: msisdn' % case.age)
         self.assertEqual(ehp_sms.message_id, 'the-message-id')
         self.assertEqual(reporter_sms.to, 'reported_by')
         self.assertEqual(
