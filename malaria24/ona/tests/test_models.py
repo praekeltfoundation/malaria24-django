@@ -296,6 +296,41 @@ class EhpReportedCaseTest(MalariaTestCase):
                          pdf_attachment)
 
     @responses.activate
+    def test_email_sending_when_no_phone_number_specified(self):
+        facility = Facility.objects.create(facility_code='0001',
+                                           facility_name='Facility 1',
+                                           district='The District',
+                                           subdistrict='The Subdistrict',
+                                           province='The Province')
+        ehp = self.mk_ehp(
+            facility_code=facility.facility_code,
+            phone_number='')
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            case = self.mk_case(facility_code=facility.facility_code)
+        [message] = mail.outbox
+        self.assertEqual(message.subject,
+                         'Malaria case number %s' % (case.case_number,))
+        self.assertEqual(message.to, [ehp.email_address])
+        self.assertTrue('does not support HTML' in message.body)
+        [html_alternative] = message.alternatives
+        [pdf_attachment] = message.attachments
+        content, content_type = html_alternative
+        self.assertTrue(case.facility_code in content)
+        self.assertTrue(case.sa_id_number in content)
+        self.assertTrue('The District' in content)
+        self.assertTrue('The Subdistrict' in content)
+        self.assertTrue('The Province' in content)
+        self.assertTrue('landmark' in content)
+        self.assertTrue('landmark_description' in content)
+        self.assertTrue(
+            'http://example.com/static/ona/img/logo.png' in content)
+        self.assertEqual('text/html', content_type)
+        self.assertEqual(('Reported_Case_None.pdf',
+                          'garbage for testing', 'application/pdf'),
+                         pdf_attachment)
+
+    @responses.activate
     def test_age(self):
         case = self.mk_case(date_of_birth="1982-01-01")
         self.assertEqual(33, case.age)
