@@ -231,6 +231,28 @@ class EhpReportedCaseTest(MalariaTestCase):
         self.assertEqual(reporter_sms.message_id, 'the-message-id')
 
     @responses.activate
+    def test_capture_phone_number_only(self):
+        self.assertEqual(SMS.objects.count(), 0)
+        ehp = self.mk_ehp(email_address='')
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            case = self.mk_case(facility_code=ehp.facility_code)
+
+        [ehp_sms, reporter_sms] = SMS.objects.all()
+        self.assertEqual(ehp_sms.to, 'phone_number')
+        self.assertEqual(ehp_sms.content,
+                         'A new case has been reported, the full report will '
+                         'be sent to you via email.')
+        self.assertEqual(ehp_sms.message_id, 'the-message-id')
+        self.assertEqual(reporter_sms.to, 'reported_by')
+        self.assertEqual(
+            reporter_sms.content,
+            ('Your reported case for %s %s has been '
+             'assigned case number %s.') % (
+                case.first_name, case.last_name, case.case_number))
+        self.assertEqual(reporter_sms.message_id, 'the-message-id')
+
+    @responses.activate
     def test_idempotency(self):
         self.assertEqual(SMS.objects.count(), 0)
         ehp = self.mk_ehp()
