@@ -16,7 +16,7 @@ install:
 
 script:
   - flake8 malaria24
-  - py.test --cov=malaria24 --cov-report=term --ds=test_settings
+  - py.test
 after_success:
   - coveralls
 deploy:
