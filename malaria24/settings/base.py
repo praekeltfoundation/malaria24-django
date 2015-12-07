@@ -164,19 +164,23 @@ LOGGING = {
 
 # SQLite (simplest install)
 import dj_database_url
-# DATABASES = {'default': dj_database_url.config(
-#     default='sqlite:///%s' % (join(PROJECT_ROOT, 'db.sqlite3'),))}
+DATABASES = {'default': dj_database_url.config(
+    default='sqlite:///%s' % (join(PROJECT_ROOT, 'db.sqlite3'),))}
 
 # PostgreSQL (Recommended, but requires the psycopg2 library and Postgresql
 #             development headers)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'malaria24',
-        'USER': 'codieroelf',
-    }
-}
-
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'base',
+#         'USER': 'postgres',
+#         'PASSWORD': '',
+#         'HOST': '',  # Set to empty string for localhost.
+#         'PORT': '',  # Set to empty string for default.
+#         # number of seconds database connections should persist for
+#         'CONN_MAX_AGE': 600,
+#     }
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
