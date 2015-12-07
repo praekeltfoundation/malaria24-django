@@ -15,23 +15,25 @@
 <body>
   <table border="1" style="width: 100%; border: 1px #DEDFDE solid;" cellspacing="0" cellpadding="2">
     <tr>
-      <td colspan="8" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
+      <td colspan="5" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
     </tr>
     <tr>
-      <td colspan="8" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
+      <td colspan="5" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
     </tr>
     <tr>
-      <th>Province</th>
-      <th>No. of Cases</th>
-      <th>Male</th>
-      <th>Female</th>
+      <th>Case Number</th>
+      <th>Facility Code</th>
+      <th>Facility Name</th>
+      <th>Date &amp; Time</th>
+      <th>EHP</th>
     </tr>
-    {% for province in provinces %}
+    {% for case in digest.reportedcase_set.all %}
         <tr>
-          <td>{{province.province}}</td>
-          <td>{{province.cases}}</td>
-          <td>{{province.males}}</td>
-          <td>{{province.females}}</td>
+          <td>{{case.case_number}}</td>
+          <td>{{case.facility_code}}</td>
+          <td>{{case.facility_name}}</td>
+          <td>{{ case.create_date_time|date:"D d M Y" }} {{ case.create_date_time|time:"H:i" }}</td>
+          <td>{% for ehp in case.ehps.all %}{{ehp.name}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
         </tr>
     {% endfor %}
   </table>
