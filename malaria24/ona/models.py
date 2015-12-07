@@ -103,7 +103,8 @@ class NationalDigest(models.Model):
     def send_digest_email(self):
         context = self.get_digest_email_data()
         text_content = render_to_string('ona/text_digest.txt', context)
-        html_content = render_to_string('ona/html_national_digest.html', context)
+        html_content = render_to_string('ona/html_national_digest.html',
+                                        context)
 
         return send_mail(
             subject='Digest of reported Malaria cases %s' % (
