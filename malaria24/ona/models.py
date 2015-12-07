@@ -130,11 +130,7 @@ class ProvincialDigest(models.Model):
             return
 
         recipients = Actor.objects.filter(
-            role__in=[EHP,
-                      MANAGER_DISTRICT,
-                      MANAGER_PROVINCIAL,
-                      MANAGER_NATIONAL,
-                      MIS],
+            role__in=[MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
         digest.recipients = recipients
@@ -180,13 +176,13 @@ class ProvincialDigest(models.Model):
             text_content = render_to_string('ona/text_digest.txt', context)
             html_content = render_to_string(
                 'ona/html_provincial_digest.html', context)
-            print html_content
-            return send_mail(
+            send_mail(
                 subject='Digest of reported Malaria cases %s' % (
                     timezone.now().strftime('%x'),),
                 message=text_content,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[manager.email_address],
+                recipient_list=[manager.email_address] +
+                    [actor.email_address for actor in self.recipients.all()],
                 html_message=html_content)
 
 
