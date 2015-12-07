@@ -10,7 +10,7 @@ from malaria24.ona.models import (
     ReportedCase, SMS, Digest,
     new_case_alert_ehps, new_case_alert_case_investigators,
     new_case_alert_mis,
-    MANAGER_DISTRICT,
+    MANAGER_DISTRICT, MIS, MANAGER_NATIONAL,
     MANAGER_PROVINCIAL, Facility, NationalDigest, ProvincialDigest)
 from malaria24.ona import tasks
 
@@ -425,7 +425,7 @@ class DigestTest(MalariaTestCase):
         Facility.objects.create(facility_code='222222',
                                 facility_name='Facility 2',
                                 province='The Eastern Cape')
-        self.mk_actor(role=MANAGER_DISTRICT,
+        self.mk_actor(role=MANAGER_NATIONAL,
                       email_address='manager@example.org')
         ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
         ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
@@ -452,6 +452,8 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(data['provinces'][4]['province'], 'Limpopo')
         self.assertEqual(data['provinces'][4]['under5'], 10)
         self.assertEqual(data['provinces'][4]['over5'], 0)
+        self.assertEqual(
+            message.to, ['manager@example.org', 'mis@example.org'])
 
     @responses.activate
     def test_send_provincial_digest_email(self):
@@ -466,9 +468,11 @@ class DigestTest(MalariaTestCase):
         manager1 = self.mk_actor(role=MANAGER_PROVINCIAL,
                                  email_address='manager@example.org',
                                  facility_code='342315')
+        manager2 = self.mk_actor(role=MIS,
+                                 email_address='mis@example.org',
+                                 facility_code='342315')
         ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
         ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
-        self.mk_mis(name='MIS', email_address='mis@example.org')
 
         for i in range(10):
             case = self.mk_case()
@@ -491,3 +495,5 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(data['districts'][0]['males'], 0)
         self.assertEqual(data['districts'][0]['under5'], 10)
         self.assertEqual(data['districts'][0]['over5'], 0)
+        self.assertEqual(
+            message.to, ['manager@example.org', 'mis@example.org'])
