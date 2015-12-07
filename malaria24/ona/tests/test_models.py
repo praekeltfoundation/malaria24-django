@@ -351,11 +351,11 @@ class DigestTest(MalariaTestCase):
         Facility.objects.create(facility_code='222222',
                                 facility_name='Facility 2',
                                 province='The Eastern Cape')
-        manager1 = self.mk_actor(role=MANAGER_DISTRICT,
-                                 email_address='manager@example.org')
+        self.mk_actor(role=MANAGER_DISTRICT,
+                      email_address='manager@example.org')
         ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
         ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
-        mis = self.mk_mis(name='MIS', email_address='mis@example.org')
+        self.mk_mis(name='MIS', email_address='mis@example.org')
 
         for i in range(10):
             case = self.mk_case()
