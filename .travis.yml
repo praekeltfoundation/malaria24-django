@@ -13,14 +13,10 @@ install:
   - pip install flake8 --cache-dir $HOME/.pip-cache/
   - pip install -r requirements-dev.txt --cache-dir $HOME/.pip-cache/
   - pip install -e . --cache-dir $HOME/.pip-cache/
-  - echo "ONAPIE_ACCESS_TOKEN = 'foo'" >> malaria24/settings/local.py
-  - echo "VUMI_GO_ACCOUNT_KEY = 'VUMI_GO_ACCOUNT_KEY'" >> malaria24/settings/local.py
-  - echo "VUMI_GO_API_TOKEN = 'VUMI_GO_API_TOKEN'" >> malaria24/settings/local.py
-  - echo "VUMI_GO_CONVERSATION_KEY = 'VUMI_GO_CONVERSATION_KEY'" >> malaria24/settings/local.py
 
 script:
   - flake8 malaria24
-  - py.test --cov=malaria24 --cov-report=term
+  - py.test
 after_success:
   - coveralls
 deploy:
