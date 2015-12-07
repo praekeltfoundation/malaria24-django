@@ -119,7 +119,7 @@ class NationalDigest(models.Model):
 
 class ProvincialDigest(models.Model):
     """
-    A National Digest of reported cases.
+    A Provincial Digest of reported cases.
     """
     created_at = models.DateTimeField(auto_now_add=True)
     recipients = models.ManyToManyField('Actor')
@@ -177,13 +177,15 @@ class ProvincialDigest(models.Model):
             text_content = render_to_string('ona/text_digest.txt', context)
             html_content = render_to_string(
                 'ona/html_provincial_digest.html', context)
+            mailing_list = [
+                manager.email_address
+            ] + [actor.email_address for actor in self.recipients.all()]
             send_mail(
                 subject='Digest of reported Malaria cases %s' % (
                     timezone.now().strftime('%x'),),
                 message=text_content,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[manager.email_address] +
-                    [actor.email_address for actor in self.recipients.all()],
+                recipient_list=mailing_list,
                 html_message=html_content)
 
 
