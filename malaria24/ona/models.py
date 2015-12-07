@@ -450,14 +450,29 @@ def alert_ehps(reported_case):
         logging.warning('No EHPs found for facility code %s.' % (
             reported_case.facility_code,))
 
+    sms_copy = ('New Case: %(case_number)s '
+                '%(facility_name)s, %(first_name)s '
+                '%(last_name)s, %(locality)s, '
+                '%(landmark)s, %(landmark_description)s, age %(age)d, '
+                '%(gender)s, phone: %(msisdn)s') % {
+        'case_number': reported_case.case_number,
+        'facility_name': reported_case.facility_names,
+        'first_name': reported_case.first_name,
+        'last_name': reported_case.last_name,
+        'locality': reported_case.locality,
+        'landmark': reported_case.landmark,
+        'landmark_description': reported_case.landmark_description,
+        'age': reported_case.age,
+        'gender': reported_case.gender,
+        'msisdn': reported_case.msisdn}
+
     for ehp in ehps:
         reported_case.ehps.add(ehp)
         if ehp.phone_number and ehp.email_address:
-            send_sms.delay(to=ehp.phone_number,
-                           content=('A new case has been reported, the full '
-                                    'report will be sent to you via email.'))
+            send_sms.delay(to=ehp.phone_number, content=sms_copy)
             send_case_email.delay(reported_case.pk, [ehp.email_address])
         elif ehp.phone_number:
+            send_sms.delay(to=ehp.phone_number, content=sms_copy)
             logging.warning(
                 ('Unable to Email report for case %s to %s. '
                  'Missing email_address.') % (
@@ -465,6 +480,7 @@ def alert_ehps(reported_case):
                     ehp))
 
         elif ehp.email_address:
+            send_case_email.delay(reported_case.pk, [ehp.email_address])
             logging.warning(
                 ('Unable to SMS report for case %s to %s. '
                  'Missing phone_number.') % (
@@ -498,11 +514,24 @@ def alert_case_investigators(reported_case):
         if case_investigator.phone_number:
             send_sms.delay(
                 to=case_investigator.phone_number,
-                content=('Hello. A new malaria case has been reported at '
-                         '%s with Case no: %s. Contact your EHP for '
-                         'more details. Thank you') % (
-                             reported_case.facility_names,
-                             reported_case.case_number,))
+                content=(
+                    'New Case: %(case_number)s '
+                    '%(facility_name)s, %(first_name)s '
+                    '%(last_name)s, %(locality)s, '
+                    '%(landmark)s, %(landmark_description)s, age %(age)d, '
+                    '%(gender)s, phone: %(msisdn)s')
+                % {
+                    'case_number': reported_case.case_number,
+                    'facility_name': reported_case.facility_names,
+                    'first_name': reported_case.first_name,
+                    'last_name': reported_case.last_name,
+                    'locality': reported_case.locality,
+                    'landmark': reported_case.landmark,
+                    'landmark_description': reported_case.landmark_description,
+                    'age': reported_case.age,
+                    'gender': reported_case.gender,
+                    'msisdn': reported_case.msisdn,
+                })
         else:
             logging.warning(
                 ('Unable to SMS report for case %s to %s. '
