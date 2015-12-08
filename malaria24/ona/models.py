@@ -85,7 +85,7 @@ class NationalDigest(models.Model):
             females = province_cases.filter(gender__icontains='f').count()
             males = province_cases.exclude(gender__icontains='f').count()
             over5 = len([x for x in province_cases if x.age >= 5])
-            under5 = len(province_cases) - over5
+            under5 = province_cases.count() - over5
             provinces.append({'province': p_name,
                               'cases': province_cases.count(),
                               'females': females, 'males': males,
@@ -153,7 +153,7 @@ class ProvincialDigest(models.Model):
             females = district_cases.filter(gender__icontains='f').count()
             males = district_cases.exclude(gender__icontains='f').count()
             over5 = len([x for x in district_cases if x.age >= 5])
-            under5 = len(district_cases) - over5
+            under5 = district_cases.count() - over5
             district_list.append({
                 'district': district,
                 'cases': district_cases.count(),
