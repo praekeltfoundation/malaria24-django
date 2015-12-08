@@ -1,0 +1,8 @@
+National Department of Health: Malaria Elimination Programme {{week}}
+=====================================================================
+
+Facility, No. of Cases, Males, Females, Under 5, Over 5
+
+{% for facility in facility %}
+{{facility.facility}},{{facility.cases}},{{facility.males}},{{facility.females}},{{facility.under5}},{{facility.over5}}
+{% endfor %}

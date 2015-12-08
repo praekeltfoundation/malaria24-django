@@ -1,4 +1,11 @@
-from malaria24.settings.base import *
+from malaria24.settings import *
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'malaria24',
+    }
+}
 
 ONAPIE_ACCESS_TOKEN = 'foo'
 VUMI_GO_ACCOUNT_KEY = 'VUMI_GO_ACCOUNT_KEY'

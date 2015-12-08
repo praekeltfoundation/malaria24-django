@@ -1,0 +1,46 @@
+<html>
+<style type="text/css">
+    .variable {
+      color: red;
+      font-weight: strong;
+      font-family: courier;
+    }
+    .section_heading {
+      background-color: #DEDFDE;
+      text-transform: uppercase;
+      font-weight: bold;
+      text-align: center;
+    }
+</style>
+<body>
+  <table border="1" style="width: 100%; border: 1px #DEDFDE solid;" cellspacing="0" cellpadding="2">
+    <tr>
+      <td colspan="8" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
+    </tr>
+    <tr>
+      <td colspan="8" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
+    </tr>
+    <tr>
+      <td colspan="8" style="text-align: center;"><strong>{{week}}</strong></td>
+    </tr>
+    <tr>
+      <th>District</th>
+      <th>No. of Cases</th>
+      <th>Male</th>
+      <th>Female</th>
+      <th>Under 5</th>
+      <th>Over 5</th>
+    </tr>
+    {% for district in districts %}
+        <tr>
+          <td>{{district.district}}</td>
+          <td>{{district.cases}}</td>
+          <td>{{district.males}}</td>
+          <td>{{district.females}}</td>
+          <td>{{district.under5}}</td>
+          <td>{{district.over5}}</td>
+        </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>
