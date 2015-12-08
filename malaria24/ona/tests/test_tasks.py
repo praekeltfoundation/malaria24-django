@@ -1,11 +1,12 @@
 from django.db.models.signals import post_save
 from django.core import mail
-
+from datetime import *
 import pkg_resources
 import responses
 
 from malaria24.ona.models import (
-    ReportedCase, new_case_alert_ehps, MIS, OnaForm)
+    ReportedCase, new_case_alert_ehps, MIS, MANAGER_DISTRICT, MANAGER_NATIONAL,
+    MANAGER_PROVINCIAL, OnaForm, Facility)
 from malaria24.ona.tasks import (
     ona_fetch_reported_cases, compile_and_send_digest_email,
     ona_fetch_forms)
@@ -91,12 +92,54 @@ class OnaTest(MalariaTestCase):
 
     @responses.activate
     def test_compile_and_send_digest_email(self):
-        manager = self.mk_actor(role=MIS,
-                                email_address='manager@example.org')
+        mis = self.mk_actor(role=MIS,
+                            email_address='manager@example.org')
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        self.mk_actor(role=MANAGER_DISTRICT,
+                      email_address='manager@example.org',
+                      facility_code='342315')
+        self.mk_actor(role=MANAGER_PROVINCIAL,
+                      email_address='m2@example.org',
+                      facility_code='342315')
+        self.mk_actor(role=MANAGER_NATIONAL,
+                      email_address='m3@example.org',
+                      facility_code='342315')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for i in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='222222')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='333333')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
         self.mk_case()
         compile_and_send_digest_email()
-        [message] = mail.outbox
-        self.assertEqual(message.to, [manager.email_address])
+        message = list(mail.outbox)[1]
+        self.assertEqual(message.to, [
+            'm2@example.org',
+            mis.email_address])
+        self.assertEqual(len(mail.outbox), 4)
 
     @responses.activate
     def test_ona_fetch_forms(self):
