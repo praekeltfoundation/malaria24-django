@@ -379,11 +379,10 @@ class DigestTest(MalariaTestCase):
 
     @responses.activate
     def test_compile_digest(self):
-        manager1 = self.mk_actor(role='MANAGER_DISTRICT')
-        manager2 = self.mk_actor(role='MANAGER_DISTRICT')
+        manager1 = self.mk_actor(role='MIS')
         cases = [self.mk_case() for i in range(10)]
         digest = Digest.compile_digest()
-        self.assertEqual([manager1, manager2],
+        self.assertEqual([manager1],
                          list(digest.recipients.all().order_by('pk')))
         self.assertEqual([c.pk for c in cases],
                          [c.pk for c in digest.reportedcase_set.all()])
@@ -392,8 +391,8 @@ class DigestTest(MalariaTestCase):
     def test_send_digest_email(self):
         Facility.objects.create(facility_code='0001',
                                 facility_name='Facility 1')
-        manager1 = self.mk_actor(role=MANAGER_DISTRICT,
-                                 email_address='manager@example.org')
+        self.mk_actor(role=MANAGER_DISTRICT,
+                      email_address='manager@example.org')
         ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
         ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
         mis = self.mk_mis(name='MIS', email_address='mis@example.org')
@@ -411,11 +410,7 @@ class DigestTest(MalariaTestCase):
         html_content, content_type = alternative
         self.assertEqual(message.body.count('EHP1, EHP2'), 10)
         self.assertEqual(html_content.count('EHP1, EHP2'), 10)
-        self.assertEqual(message.to, [
-            manager1.email_address,
-            ehp1.email_address,
-            ehp2.email_address,
-            mis.email_address])
+        self.assertEqual(message.to, [mis.email_address])
 
     @responses.activate
     def test_send_national_digest_email(self):

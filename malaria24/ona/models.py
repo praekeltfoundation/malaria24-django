@@ -23,11 +23,7 @@ class Digest(models.Model):
             return
 
         recipients = Actor.objects.filter(
-            role__in=[EHP,
-                      MANAGER_DISTRICT,
-                      MANAGER_PROVINCIAL,
-                      MANAGER_NATIONAL,
-                      MIS],
+            role__in=[MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
         digest.recipients = recipients
@@ -100,10 +96,10 @@ class NationalDigest(models.Model):
 
     def send_digest_email(self):
         context = self.get_digest_email_data()
-        text_content = render_to_string('ona/text_digest.txt', context)
+        text_content = render_to_string(
+            'ona/text_national_digest.txt', context)
         html_content = render_to_string('ona/html_national_digest.html',
                                         context)
-
         return send_mail(
             subject='Digest of reported Malaria cases %s' % (
                 timezone.now().strftime('%x'),),
@@ -170,7 +166,8 @@ class ProvincialDigest(models.Model):
     def send_digest_email(self):
         for manager in Actor.objects.provincial():
             context = self.get_digest_email_data(manager.facility_code)
-            text_content = render_to_string('ona/text_digest.txt', context)
+            text_content = render_to_string(
+                'ona/text_provincial_digest.txt', context)
             html_content = render_to_string(
                 'ona/html_provincial_digest.html', context)
             mailing_list = [
@@ -231,7 +228,8 @@ class DistrictDigest(models.Model):
     def send_digest_email(self):
         for manager in Actor.objects.district():
             context = self.get_digest_email_data(manager.facility_code)
-            text_content = render_to_string('ona/text_digest.txt', context)
+            text_content = render_to_string(
+                'ona/text_district_digest.txt', context)
             html_content = render_to_string(
                 'ona/html_district_digest.html', context)
             mailing_list = [

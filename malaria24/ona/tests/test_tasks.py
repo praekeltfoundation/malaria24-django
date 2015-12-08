@@ -5,7 +5,7 @@ import pkg_resources
 import responses
 
 from malaria24.ona.models import (
-    ReportedCase, new_case_alert_ehps, MANAGER_DISTRICT, OnaForm)
+    ReportedCase, new_case_alert_ehps, MIS, OnaForm)
 from malaria24.ona.tasks import (
     ona_fetch_reported_cases, compile_and_send_digest_email,
     ona_fetch_forms)
@@ -91,7 +91,7 @@ class OnaTest(MalariaTestCase):
 
     @responses.activate
     def test_compile_and_send_digest_email(self):
-        manager = self.mk_actor(role=MANAGER_DISTRICT,
+        manager = self.mk_actor(role=MIS,
                                 email_address='manager@example.org')
         self.mk_case()
         compile_and_send_digest_email()

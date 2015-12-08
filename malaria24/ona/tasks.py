@@ -7,7 +7,8 @@ from django.core.mail import send_mail
 
 from malaria24 import celery_app
 from malaria24.ona.models import (ReportedCase, SMS, Digest, Facility, OnaForm,
-                                  Email)
+                                  Email, NationalDigest, ProvincialDigest,
+                                  DistrictDigest)
 
 from onapie.client import Client
 
@@ -115,8 +116,31 @@ def compile_and_send_digest_email():
     cases = ReportedCase.objects.filter(digest__isnull=True)
     if not cases.exists():
         return
-
+    compile_and_send_national_digest_email()
+    compile_and_send_provincial_digest_email()
+    compile_and_send_district_digest_email()
     digest = Digest.compile_digest()
+    if digest:
+        return digest.send_digest_email()
+
+
+@celery_app.task(ignore_result=True)
+def compile_and_send_national_digest_email():
+    digest = NationalDigest.compile_digest()
+    if digest:
+        return digest.send_digest_email()
+
+
+@celery_app.task(ignore_result=True)
+def compile_and_send_provincial_digest_email():
+    digest = ProvincialDigest.compile_digest()
+    if digest:
+        return digest.send_digest_email()
+
+
+@celery_app.task(ignore_result=True)
+def compile_and_send_district_digest_email():
+    digest = DistrictDigest.compile_digest()
     if digest:
         return digest.send_digest_email()
 
