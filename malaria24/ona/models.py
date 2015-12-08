@@ -68,16 +68,13 @@ class NationalDigest(models.Model):
     def get_digest_email_data(self):
         provinces = []
         date = datetime.today()
-        start_week = date - timedelta(date.weekday())
-        end_week = start_week + timedelta(7)
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
         # populate provinces
         for p, p_name in PROVINCES:
             codes = Facility.objects.filter(province=p).values_list(
                 'facility_code')
             province_cases = ReportedCase.objects.filter(
-                facility_code__in=codes,
-                created_at__range=[start_week, end_week])
+                facility_code__in=codes)
             females = province_cases.filter(gender__icontains='f').count()
             males = province_cases.exclude(gender__icontains='f').count()
             over5 = len([x for x in province_cases if x.age >= 5])
@@ -131,8 +128,6 @@ class ProvincialDigest(models.Model):
     def get_digest_email_data(self, facility_code):
         district_list = []
         date = datetime.today()
-        start_week = date - timedelta(date.weekday())
-        end_week = start_week + timedelta(7)
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
         province = Facility.objects.get(
             facility_code=facility_code).province
@@ -144,8 +139,7 @@ class ProvincialDigest(models.Model):
                     'facility_code',
                     flat=True).distinct().order_by("district")
             district_cases = ReportedCase.objects.filter(
-                facility_code__in=district_fac_codes,
-                created_at__range=[start_week, end_week])
+                facility_code__in=district_fac_codes)
             females = district_cases.filter(gender__icontains='f').count()
             males = district_cases.exclude(gender__icontains='f').count()
             over5 = len([x for x in district_cases if x.age >= 5])
@@ -201,12 +195,9 @@ class DistrictDigest(models.Model):
 
     def get_digest_email_data(self, facility_code):
         date = datetime.today()
-        start_week = date - timedelta(date.weekday())
-        end_week = start_week + timedelta(7)
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
         facility_cases = ReportedCase.objects.filter(
-            facility_code=facility_code,
-            created_at__range=[start_week, end_week])
+            facility_code=facility_code)
         females = facility_cases.filter(gender__icontains='f').count()
         males = facility_cases.exclude(gender__icontains='f').count()
         over5 = len([x for x in facility_cases if x.age >= 5])
