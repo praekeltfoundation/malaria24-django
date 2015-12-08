@@ -189,6 +189,68 @@ class ProvincialDigest(models.Model):
                 html_message=html_content)
 
 
+class DistrictDigest(models.Model):
+    """
+    A District Digest of reported cases.
+    """
+    created_at = models.DateTimeField(auto_now_add=True)
+    recipients = models.ManyToManyField('Actor')
+
+    @classmethod
+    def compile_digest(cls):
+        new_cases = ReportedCase.objects.filter(digest__isnull=True)
+        if not new_cases.exists():
+            return
+
+        recipients = Actor.objects.filter(
+            role__in=[MIS],
+            email_address__isnull=False)
+        digest = cls.objects.create()
+        digest.recipients = recipients
+        digest.save()
+        new_cases.update(digest=digest)
+        return digest
+
+    def get_digest_email_data(self, facility_code):
+        date = datetime.today()
+        week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
+        facility_cases = ReportedCase.objects.filter(
+            facility_code=facility_code)
+        females = facility_cases.filter(gender__icontains='f').count()
+        males = facility_cases.exclude(gender__icontains='f').count()
+        over5 = len([x for x in facility_cases if x.age >= 5])
+        under5 = len(facility_cases) - over5
+        fac_list = [{
+            'facility': Facility.objects.get(facility_code=facility_code).facility_name,
+            'cases': facility_cases.count(),
+            'females': females, 'males': males,
+            'under5': under5,
+            'over5': over5,
+            'week': week}]
+        return {
+            'digest': self,
+            'facility': fac_list,
+            'week': week,
+        }
+
+    def send_digest_email(self):
+        for manager in Actor.objects.district():
+            context = self.get_digest_email_data(manager.facility_code)
+            text_content = render_to_string('ona/text_digest.txt', context)
+            html_content = render_to_string(
+                'ona/html_district_digest.html', context)
+            mailing_list = [
+                manager.email_address
+            ] + [actor.email_address for actor in self.recipients.all()]
+            send_mail(
+                subject='Digest of reported Malaria cases %s' % (
+                    timezone.now().strftime('%x'),),
+                message=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=mailing_list,
+                html_message=html_content)
+
+
 class OnaForm(models.Model):
     uuid = models.CharField(max_length=255)
     form_id = models.CharField(max_length=255, null=True)

@@ -10,7 +10,7 @@ from malaria24.ona.models import (
     ReportedCase, SMS, Digest,
     new_case_alert_ehps, new_case_alert_case_investigators,
     new_case_alert_mis,
-    MANAGER_DISTRICT, MIS, MANAGER_NATIONAL,
+    MANAGER_DISTRICT, MIS, MANAGER_NATIONAL, DistrictDigest,
     MANAGER_PROVINCIAL, Facility, NationalDigest, ProvincialDigest)
 from malaria24.ona import tasks
 
@@ -524,3 +524,64 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(len(data['districts']), 2)
         self.assertEqual(
             message.to, ['manager@example.org', 'mis@example.org'])
+
+    @responses.activate
+    def test_send_district_digest_email(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        Facility.objects.create(facility_code='222222',
+                                facility_name='Facility 2',
+                                province='Limpopo',
+                                district=u'Example2')
+        Facility.objects.create(facility_code='333333',
+                                facility_name='Facility 2',
+                                province='The Eastern Cape',
+                                district=u'Example2')
+        manager1 = self.mk_actor(role=MANAGER_DISTRICT,
+                                 email_address='manager@example.org',
+                                 facility_code='342315')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='342315')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for i in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='222222')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='333333')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = DistrictDigest.compile_digest()
+        digest.send_digest_email()
+        [message] = mail.outbox
+        [alternative] = message.alternatives
+        html_content, content_type = alternative
+        data = digest.get_digest_email_data(manager1.facility_code)
+        self.assertEqual(data['facility'][0]['facility'], 'Facility 1')
+        self.assertEqual(data['facility'][0]['females'], 10)
+        self.assertEqual(data['facility'][0]['males'], 0)
+        self.assertEqual(data['facility'][0]['under5'], 10)
+        self.assertEqual(data['facility'][0]['over5'], 0)
+        self.assertEqual(len(data['facility']), 1)
+        self.assertEqual(message.to, ['manager@example.org', 'mis@example.org'])
