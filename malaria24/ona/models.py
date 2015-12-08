@@ -221,7 +221,8 @@ class DistrictDigest(models.Model):
         over5 = len([x for x in facility_cases if x.age >= 5])
         under5 = len(facility_cases) - over5
         fac_list = [{
-            'facility': Facility.objects.get(facility_code=facility_code).facility_name,
+            'facility': Facility.objects.get(
+                facility_code=facility_code).facility_name,
             'cases': facility_cases.count(),
             'females': females, 'males': males,
             'under5': under5,
