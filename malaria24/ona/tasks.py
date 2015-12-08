@@ -116,9 +116,9 @@ def compile_and_send_digest_email():
     cases = ReportedCase.objects.filter(digest__isnull=True)
     if not cases.exists():
         return
-    NationalDigest.compile_digest()
-    ProvincialDigest.compile_digest()
-    DistrictDigest.compile_digest()
+    NationalDigest.compile_digest().send_digest_email()
+    ProvincialDigest.compile_digest().send_digest_email()
+    DistrictDigest.compile_digest().send_digest_email()
     digest = Digest.compile_digest()
     if digest:
         return digest.send_digest_email()
