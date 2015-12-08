@@ -584,4 +584,5 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(data['facility'][0]['under5'], 10)
         self.assertEqual(data['facility'][0]['over5'], 0)
         self.assertEqual(len(data['facility']), 1)
-        self.assertEqual(message.to, ['manager@example.org', 'mis@example.org'])
+        self.assertEqual(
+            message.to, ['manager@example.org', 'mis@example.org'])
