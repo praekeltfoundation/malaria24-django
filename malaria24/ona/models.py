@@ -61,17 +61,12 @@ class NationalDigest(models.Model):
 
     @classmethod
     def compile_digest(cls):
-        new_cases = ReportedCase.objects.filter(digest__isnull=True)
-        if not new_cases.exists():
-            return
-
         recipients = Actor.objects.filter(
             role__in=[MANAGER_NATIONAL, MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
         digest.recipients = recipients
         digest.save()
-        new_cases.update(digest=digest)
         return digest
 
     def get_digest_email_data(self):
@@ -129,17 +124,12 @@ class ProvincialDigest(models.Model):
 
     @classmethod
     def compile_digest(cls):
-        new_cases = ReportedCase.objects.filter(digest__isnull=True)
-        if not new_cases.exists():
-            return
-
         recipients = Actor.objects.filter(
             role__in=[MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
         digest.recipients = recipients
         digest.save()
-        new_cases.update(digest=digest)
         return digest
 
     def get_digest_email_data(self, facility_code):
@@ -204,17 +194,12 @@ class DistrictDigest(models.Model):
 
     @classmethod
     def compile_digest(cls):
-        new_cases = ReportedCase.objects.filter(digest__isnull=True)
-        if not new_cases.exists():
-            return
-
         recipients = Actor.objects.filter(
             role__in=[MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
         digest.recipients = recipients
         digest.save()
-        new_cases.update(digest=digest)
         return digest
 
     def get_digest_email_data(self, facility_code):
