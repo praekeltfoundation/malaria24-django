@@ -70,25 +70,43 @@ class NationalDigest(models.Model):
         date = datetime.today()
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
         # populate provinces
+        total_cases = 0
+        total_females = 0
+        total_males = 0
+        total_under5 = 0
+        total_over5 = 0
         for p, p_name in PROVINCES:
             codes = Facility.objects.filter(province=p).values_list(
                 'facility_code')
             province_cases = ReportedCase.objects.filter(
                 facility_code__in=codes)
+            total_cases += province_cases.count()
             females = province_cases.filter(gender__icontains='f').count()
+            total_females += females
             males = province_cases.exclude(gender__icontains='f').count()
+            total_males += males
             over5 = len([x for x in province_cases if x.age >= 5])
+            total_over5 += over5
             under5 = province_cases.count() - over5
+            total_under5 += under5
             provinces.append({'province': p_name,
                               'cases': province_cases.count(),
                               'females': females, 'males': males,
                               'under5': under5,
                               'over5': over5,
                               'week': week})
+        totals = {}
+        totals['total_cases'] = total_cases
+        totals['total_females'] = total_females
+        totals['total_males'] = total_males
+        totals['total_under5'] = total_under5
+        totals['total_over5'] = total_over5
+
         return {
             'digest': self,
             'provinces': provinces,
             'week': week,
+            'totals': totals
         }
 
     def send_digest_email(self):
@@ -133,6 +151,11 @@ class ProvincialDigest(models.Model):
             facility_code=facility_code).province
         districts = Facility.objects.filter(province=province).values_list(
             'district', flat=True).distinct().order_by("district")
+        total_cases = 0
+        total_females = 0
+        total_males = 0
+        total_under5 = 0
+        total_over5 = 0
         for district in districts:
             district_fac_codes = Facility.objects.filter(
                 district=district).values_list(
@@ -140,10 +163,15 @@ class ProvincialDigest(models.Model):
                     flat=True).distinct().order_by("district")
             district_cases = ReportedCase.objects.filter(
                 facility_code__in=district_fac_codes)
+            total_cases = district_cases.count()
             females = district_cases.filter(gender__icontains='f').count()
+            total_females += females
             males = district_cases.exclude(gender__icontains='f').count()
+            total_males = +males
             over5 = len([x for x in district_cases if x.age >= 5])
+            total_over5 += over5
             under5 = district_cases.count() - over5
+            total_under5 += under5
             district_list.append({
                 'district': district,
                 'cases': district_cases.count(),
@@ -151,10 +179,17 @@ class ProvincialDigest(models.Model):
                 'under5': under5,
                 'over5': over5,
                 'week': week})
+        totals = {}
+        totals['total_cases'] = total_cases
+        totals['total_females'] = total_females
+        totals['total_males'] = total_males
+        totals['total_under5'] = total_under5
+        totals['total_over5'] = total_over5
         return {
             'digest': self,
             'districts': district_list,
             'week': week,
+            'totals': totals,
         }
 
     def send_digest_email(self):

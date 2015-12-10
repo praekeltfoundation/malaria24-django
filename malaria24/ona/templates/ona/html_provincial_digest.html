@@ -18,7 +18,7 @@
       <td colspan="8" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
     </tr>
     <tr>
-      <td colspan="8" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
+      <td colspan="8" style="text-align: center;"><strong>National MalariaConnect Report</strong></td>
     </tr>
     <tr>
       <td colspan="8" style="text-align: center;"><strong>{{week}}</strong></td>
@@ -34,13 +34,21 @@
     {% for district in districts %}
         <tr>
           <td>{{district.district}}</td>
-          <td>{{district.cases}}</td>
-          <td>{{district.males}}</td>
-          <td>{{district.females}}</td>
-          <td>{{district.under5}}</td>
-          <td>{{district.over5}}</td>
+          <td style="text-align: right;">{{district.cases}}</td>
+          <td style="text-align: right;">{{district.males}}</td>
+          <td style="text-align: right;">{{district.females}}</td>
+          <td style="text-align: right;">{{district.under5}}</td>
+          <td style="text-align: right;">{{district.over5}}</td>
         </tr>
     {% endfor %}
+    <tr>
+      <td><strong>Total</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_cases}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_males}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_females}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_under5}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_over5}}</strong></td>
+    </tr>
   </table>
 </body>
 </html>
