@@ -18,7 +18,7 @@
       <td colspan="8" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
     </tr>
     <tr>
-      <td colspan="8" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
+      <td colspan="8" style="text-align: center;"><strong>National MalariaConnect Report</strong></td>
     </tr>
     <tr>
       <td colspan="8" style="text-align: center;"><strong>{{week}}</strong></td>
@@ -34,13 +34,23 @@
     {% for facility in facility %}
         <tr>
           <td>{{facility.facility}}</td>
-          <td>{{facility.cases}}</td>
-          <td>{{facility.males}}</td>
-          <td>{{facility.females}}</td>
-          <td>{{facility.under5}}</td>
-          <td>{{facility.over5}}</td>
+          <td style="text-align: right;">{{facility.cases}}</td>
+          <td style="text-align: right;">{{facility.males}}</td>
+          <td style="text-align: right;">{{facility.females}}</td>
+          <td style="text-align: right;">{{facility.under5}}</td>
+          <td style="text-align: right;">{{facility.over5}}</td>
         </tr>
     {% endfor %}
+    <tr>
+      {% for facility in facility %}
+        <td><strong>Total</strong></td>
+        <td style="text-align: right;"><strong>{{facility.cases}}</strong></td>
+        <td style="text-align: right;"><strong>{{facility.males}}</strong></td>
+        <td style="text-align: right;"><strong>{{facility.females}}</strong></td>
+        <td style="text-align: right;"><strong>{{facility.under5}}</strong></td>
+        <td style="text-align: right;"><strong>{{facility.over5}}</strong></td>
+      {% endfor %}
+    </tr>
   </table>
 </body>
 </html>

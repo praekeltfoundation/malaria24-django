@@ -455,6 +455,7 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(data['provinces'][4]['under5'], 10)
         self.assertEqual(data['provinces'][4]['over5'], 0)
         self.assertEqual(len(data['provinces']), 9)
+        self.assertEqual(data['totals']['total_females'], 10)
         self.assertEqual(
             message.to, ['manager@example.org', 'mis@example.org'])
 
@@ -517,6 +518,7 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(data['districts'][0]['under5'], 10)
         self.assertEqual(data['districts'][0]['over5'], 0)
         self.assertEqual(len(data['districts']), 2)
+        self.assertEqual(data['totals']['total_females'], 10)
         self.assertEqual(
             message.to, ['manager@example.org', 'mis@example.org'])
 
