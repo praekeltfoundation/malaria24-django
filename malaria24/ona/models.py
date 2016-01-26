@@ -42,9 +42,9 @@ class Digest(models.Model):
                 timezone.now().strftime('%x'),),
             message=text_content,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[actor.email_address
+            recipient_list=set([actor.email_address
                             for actor
-                            in self.recipients.all()],
+                            in self.recipients.all()]),
             html_message=html_content)
 
 

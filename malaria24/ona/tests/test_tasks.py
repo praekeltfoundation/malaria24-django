@@ -136,9 +136,9 @@ class OnaTest(MalariaTestCase):
         self.mk_case()
         compile_and_send_digest_email()
         message = list(mail.outbox)[1]
-        self.assertEqual(message.to, [
+        self.assertEqual(set(message.to), set([
             'm2@example.org',
-            mis.email_address])
+            mis.email_address]))
         self.assertEqual(len(mail.outbox), 4)
 
     @responses.activate
