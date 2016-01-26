@@ -459,7 +459,7 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(len(data['provinces']), 9)
         self.assertEqual(data['totals']['total_females'], 10)
         self.assertEqual(
-            message.to, ['manager@example.org', 'mis@example.org'])
+            set(message.to), set(['manager@example.org', 'mis@example.org']))
 
     @responses.activate
     def test_send_provincial_digest_email(self):
@@ -522,7 +522,7 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(len(data['districts']), 2)
         self.assertEqual(data['totals']['total_females'], 10)
         self.assertEqual(
-            message.to, ['manager@example.org', 'mis@example.org'])
+            set(message.to), set(['manager@example.org', 'mis@example.org']))
 
     @responses.activate
     def test_send_district_digest_email(self):
@@ -544,6 +544,9 @@ class DigestTest(MalariaTestCase):
         self.mk_actor(role=MIS,
                       email_address='mis@example.org',
                       facility_code='342315')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='222222')
         ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
         ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
 
@@ -584,4 +587,4 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(data['facility'][0]['over5'], 0)
         self.assertEqual(len(data['facility']), 1)
         self.assertEqual(
-            message.to, ['manager@example.org', 'mis@example.org'])
+            set(message.to), set(['manager@example.org', 'mis@example.org']))
