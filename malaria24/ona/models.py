@@ -43,8 +43,8 @@ class Digest(models.Model):
             message=text_content,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=set([actor.email_address
-                            for actor
-                            in self.recipients.all()]),
+                                for actor
+                                in self.recipients.all()]),
             html_message=html_content)
 
 
