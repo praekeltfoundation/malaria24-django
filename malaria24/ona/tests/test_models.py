@@ -542,6 +542,9 @@ class DigestTest(MalariaTestCase):
         self.mk_actor(role=MIS,
                       email_address='mis@example.org',
                       facility_code='342315')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='222222')
         ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
         ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
 
