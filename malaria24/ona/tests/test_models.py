@@ -350,8 +350,10 @@ class EhpReportedCaseTest(MalariaTestCase):
 
     @responses.activate
     def test_age(self):
-        case = self.mk_case(date_of_birth="1982-01-01")
-        self.assertEqual(33, case.age)
+        with patch.object(ReportedCase, 'get_today') as patch_today:
+            patch_today.return_value = datetime(2015, 01, 01)
+            case = self.mk_case(date_of_birth="1982-01-01")
+            self.assertEqual(33, case.age)
 
     @responses.activate
     def test_facility_name(self):

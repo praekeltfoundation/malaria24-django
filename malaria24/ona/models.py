@@ -312,6 +312,9 @@ class ReportedCase(models.Model):
     ehps = models.ManyToManyField('Actor', blank=True)
     form = models.ForeignKey('OnaForm', null=True, blank=True)
 
+    def get_today(self):
+        return datetime.today()
+
     def get_facilities(self):
         return Facility.objects.filter(facility_code=self.facility_code)
 
@@ -340,7 +343,7 @@ class ReportedCase(models.Model):
     @property
     def age(self):
         "Returns the age of the patient"
-        today = datetime.today()
+        today = self.get_today()
         try:
             dob = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
         except ValueError:
