@@ -199,9 +199,9 @@ class ProvincialDigest(models.Model):
                 'ona/text_provincial_digest.txt', context)
             html_content = render_to_string(
                 'ona/html_provincial_digest.html', context)
-            mailing_list = [
+            mailing_list = set([
                 manager.email_address
-            ] + [actor.email_address for actor in self.recipients.all()]
+            ] + [actor.email_address for actor in self.recipients.all()])
             send_mail(
                 subject='Digest of reported Malaria cases %s' % (
                     timezone.now().strftime('%x'),),
@@ -258,9 +258,9 @@ class DistrictDigest(models.Model):
                 'ona/text_district_digest.txt', context)
             html_content = render_to_string(
                 'ona/html_district_digest.html', context)
-            mailing_list = [
+            mailing_list = set([
                 manager.email_address
-            ] + [actor.email_address for actor in self.recipients.all()]
+            ] + [actor.email_address for actor in self.recipients.all()])
             send_mail(
                 subject='Digest of reported Malaria cases %s' % (
                     timezone.now().strftime('%x'),),
