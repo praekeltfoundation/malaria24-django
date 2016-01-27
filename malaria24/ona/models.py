@@ -237,9 +237,15 @@ class DistrictDigest(models.Model):
         males = facility_cases.exclude(gender__icontains='f').count()
         over5 = len([x for x in facility_cases if x.age >= 5])
         under5 = facility_cases.count() - over5
+
+        facilities = Facility.objects.filter(facility_code=facility_code)
+        if facilities.exists():
+            facility_name = facilities.first().facility_name
+        else:
+            facility_name = 'Unknown (facility code: %s)' % (facility_code,)
+
         fac_list = [{
-            'facility': Facility.objects.get(
-                facility_code=facility_code).facility_name,
+            'facility': facility_name,
             'cases': facility_cases.count(),
             'females': females, 'males': males,
             'under5': under5,
