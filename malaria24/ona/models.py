@@ -79,7 +79,7 @@ class NationalDigest(models.Model):
             codes = Facility.objects.filter(province=p).values_list(
                 'facility_code')
             province_cases = ReportedCase.objects.filter(
-                facility_code__in=codes)
+                facility_code__in=codes, digest__isnull=True)
             total_cases += province_cases.count()
             females = province_cases.filter(gender__icontains='f').count()
             total_females += females
@@ -162,7 +162,7 @@ class ProvincialDigest(models.Model):
                     'facility_code',
                     flat=True).distinct().order_by("district")
             district_cases = ReportedCase.objects.filter(
-                facility_code__in=district_fac_codes)
+                facility_code__in=district_fac_codes, digest__isnull=True)
             total_cases = district_cases.count()
             females = district_cases.filter(gender__icontains='f').count()
             total_females += females
@@ -232,7 +232,7 @@ class DistrictDigest(models.Model):
         date = datetime.today()
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
         facility_cases = ReportedCase.objects.filter(
-            facility_code=facility_code)
+            facility_code=facility_code, digest__isnull=True)
         females = facility_cases.filter(gender__icontains='f').count()
         males = facility_cases.exclude(gender__icontains='f').count()
         over5 = len([x for x in facility_cases if x.age >= 5])
