@@ -83,7 +83,8 @@ class ActorAdmin(admin.ModelAdmin):
                     'email_address',
                     'phone_number',
                     'role',
-                    'facility_code')
+                    'facility_code',
+                    'province')
     list_filter = ('role', 'created_at')
 
 
