@@ -255,11 +255,6 @@ class DistrictDigest(models.Model):
 
         district_cases = ReportedCase.objects.filter(
             facility_code__in=district_fac_codes, digest__isnull=True)
-        females = district_cases.filter(gender__icontains='f').count()
-        males = district_cases.exclude(gender__icontains='f').count()
-        over5 = len([x for x in district_cases if x.age >= 5])
-        under5 = district_cases.count() - over5
-
         facilities = Facility.objects.filter(district=district)
         fac_list = []
         for fac in facilities:
@@ -268,9 +263,14 @@ class DistrictDigest(models.Model):
             else:
                 facility_name = 'Unknown (district: %s)' % (district,)
 
+            fac_cases = district_cases.filter(facility_code=fac.facility_code)
+            females = fac_cases.filter(gender__icontains='f').count()
+            males = fac_cases.exclude(gender__icontains='f').count()
+            over5 = len([x for x in fac_cases if x.age >= 5])
+            under5 = fac_cases.count() - over5
             fac_list.append({
                 'facility': facility_name,
-                'cases': district_cases.count(),
+                'cases': fac_cases.count(),
                 'females': females, 'males': males,
                 'under5': under5,
                 'over5': over5,

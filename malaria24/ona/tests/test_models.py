@@ -544,7 +544,7 @@ class DigestTest(MalariaTestCase):
         Facility.objects.create(facility_code='222222',
                                 facility_name='Facility 2',
                                 province='Limpopo',
-                                district=u'Example2')
+                                district=u'Example1')
         Facility.objects.create(facility_code='333333',
                                 facility_name='Facility 3',
                                 province='The Eastern Cape',
@@ -596,8 +596,11 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(data['facility'][0]['females'], 10)
         self.assertEqual(data['facility'][0]['males'], 0)
         self.assertEqual(data['facility'][0]['under5'], 10)
+        self.assertEqual(data['facility'][1]['facility'], 'Facility 2')
+        self.assertEqual(data['facility'][1]['males'], 10)
+        self.assertEqual(data['facility'][1]['under5'], 10)
         self.assertEqual(data['facility'][0]['over5'], 0)
-        self.assertEqual(len(data['facility']), 1)
+        self.assertEqual(len(data['facility']), 2)
         self.assertEqual(
             set(message.to), set(['manager@example.org', 'mis@example.org']))
 
