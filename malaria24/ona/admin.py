@@ -77,14 +77,37 @@ class EmailAdmin(admin.ModelAdmin):
         return HttpResponse(email.html_content)
 
 
+class ActorAdminForm(forms.ModelForm):
+    district = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super(ActorAdminForm, self).__init__(*args, **kwargs)
+        self.fields['district'].choices = [(
+            d, d) for d in Facility.objects.all().values_list(
+                'district', flat=True).distinct().order_by("district")]
+
+    class Meta:
+        model = Actor
+        fields = (
+            'name',
+            'email_address',
+            'phone_number',
+            'role',
+            'facility_code',
+            'province',
+            'district')
+
+
 class ActorAdmin(admin.ModelAdmin):
+    form = ActorAdminForm
     date_hierarchy = 'created_at'
     list_display = ('name',
                     'email_address',
                     'phone_number',
                     'role',
                     'facility_code',
-                    'province')
+                    'province',
+                    'district')
     list_filter = ('role', 'created_at')
 
 

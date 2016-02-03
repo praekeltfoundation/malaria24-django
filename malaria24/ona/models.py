@@ -143,12 +143,13 @@ class ProvincialDigest(models.Model):
         digest.save()
         return digest
 
-    def get_digest_email_data(self, facility_code):
+    def get_digest_email_data(self, province, facility_code):
         district_list = []
         date = datetime.today()
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
-        province = Facility.objects.get(
-            facility_code=facility_code).province
+        if not province:
+            province = Facility.objects.get(
+                facility_code=facility_code).province
         districts = Facility.objects.filter(province=province).values_list(
             'district', flat=True).distinct().order_by("district")
         total_cases = 0
@@ -194,7 +195,8 @@ class ProvincialDigest(models.Model):
 
     def send_digest_email(self):
         for manager in Actor.objects.provincial():
-            context = self.get_digest_email_data(manager.facility_code)
+            context = self.get_digest_email_data(
+                manager.province, manager.facility_code)
             text_content = render_to_string(
                 'ona/text_provincial_digest.txt', context)
             html_content = render_to_string(
@@ -228,25 +230,35 @@ class DistrictDigest(models.Model):
         digest.save()
         return digest
 
-    def get_digest_email_data(self, facility_code):
+    def get_digest_email_data(self, district, facility_code):
         date = datetime.today()
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
-        facility_cases = ReportedCase.objects.filter(
-            facility_code=facility_code)
-        females = facility_cases.filter(gender__icontains='f').count()
-        males = facility_cases.exclude(gender__icontains='f').count()
-        over5 = len([x for x in facility_cases if x.age >= 5])
-        under5 = facility_cases.count() - over5
+        district_fac_codes = []
+        if not district:
+            district = Facility.objects.get(
+                facility_code=facility_code).district
 
-        facilities = Facility.objects.filter(facility_code=facility_code)
+        district_fac_codes = Facility.objects.filter(
+            district=district).values_list(
+                'facility_code',
+                flat=True).distinct().order_by("district")
+
+        district_cases = ReportedCase.objects.filter(
+            facility_code__in=district_fac_codes)
+        females = district_cases.filter(gender__icontains='f').count()
+        males = district_cases.exclude(gender__icontains='f').count()
+        over5 = len([x for x in district_cases if x.age >= 5])
+        under5 = district_cases.count() - over5
+
+        facilities = Facility.objects.filter(district=district)
         if facilities.exists():
             facility_name = facilities.first().facility_name
         else:
-            facility_name = 'Unknown (facility code: %s)' % (facility_code,)
+            facility_name = 'Unknown (district: %s)' % (district,)
 
         fac_list = [{
             'facility': facility_name,
-            'cases': facility_cases.count(),
+            'cases': district_cases.count(),
             'females': females, 'males': males,
             'under5': under5,
             'over5': over5,
@@ -259,7 +271,8 @@ class DistrictDigest(models.Model):
 
     def send_digest_email(self):
         for manager in Actor.objects.district():
-            context = self.get_digest_email_data(manager.facility_code)
+            context = self.get_digest_email_data(
+                manager.district, manager.facility_code)
             text_content = render_to_string(
                 'ona/text_district_digest.txt', context)
             html_content = render_to_string(
@@ -434,33 +447,6 @@ class ActorManager(models.Manager):
             ActorManager, self).get_queryset().filter(role=MANAGER_NATIONAL)
 
 
-class Actor(models.Model):
-    """
-    An Actor within the system with a defined role.
-    """
-    name = models.CharField(max_length=255)
-    email_address = models.EmailField(null=True, blank=True)
-    phone_number = models.CharField(max_length=255, null=True, blank=True)
-    facility_code = models.CharField(max_length=255, null=True, blank=True)
-    role = models.CharField(choices=[
-        (EHP, 'EHP'),
-        (CASE_INVESTIGATOR, 'Case Investigator'),
-        (MANAGER_DISTRICT, 'District Manager'),
-        (MANAGER_PROVINCIAL, 'Provincial Manager'),
-        (MANAGER_NATIONAL, 'National Manager'),
-        (MIS, 'MIS'),
-    ], null=True, max_length=255)
-    province = models.CharField(
-        max_length=255, null=True, blank=True, choices=PROVINCES)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    objects = ActorManager()
-
-    def __unicode__(self):
-        return u'%s (%s)' % (self.name, self.role)
-
-
 class SMS(models.Model):
     """
     An SMS sent from the system, for audit trail purposes.
@@ -510,6 +496,35 @@ class Facility(models.Model):
             'subdistrict': self.subdistrict,
             'phase': self.phase,
         }
+
+
+class Actor(models.Model):
+    """
+    An Actor within the system with a defined role.
+    """
+    name = models.CharField(max_length=255)
+    email_address = models.EmailField(null=True, blank=True)
+    phone_number = models.CharField(max_length=255, null=True, blank=True)
+    facility_code = models.CharField(max_length=255, null=True, blank=True)
+    role = models.CharField(choices=[
+        (EHP, 'EHP'),
+        (CASE_INVESTIGATOR, 'Case Investigator'),
+        (MANAGER_DISTRICT, 'District Manager'),
+        (MANAGER_PROVINCIAL, 'Provincial Manager'),
+        (MANAGER_NATIONAL, 'National Manager'),
+        (MIS, 'MIS'),
+    ], null=True, max_length=255)
+    province = models.CharField(
+        max_length=255, null=True, blank=True, choices=PROVINCES)
+    district = models.CharField(
+        max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ActorManager()
+
+    def __unicode__(self):
+        return u'%s (%s)' % (self.name, self.role)
 
 
 def new_case_alert_ehps(sender, instance, created, **kwargs):
