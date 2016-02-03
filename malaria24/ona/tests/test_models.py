@@ -591,6 +591,130 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(len(data['facility']), 1)
         self.assertEqual(
             set(message.to), set(['manager@example.org', 'mis@example.org']))
+
         data = digest.get_digest_email_data(
             None, manager1.facility_code)
         self.assertEqual(data['facility'][0]['facility'], 'Facility 1')
+
+    @responses.activate
+    def test_send_with_old_and_new_data_district(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        manager1 = self.mk_actor(role=MANAGER_DISTRICT,
+                                 email_address='manager@example.org',
+                                 facility_code='342315')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='342315')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for i in range(10):
+            digest = Digest.objects.create()
+            case = self.mk_case(
+                gender='female', facility_code='342315', digest=digest)
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(
+                gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = DistrictDigest.compile_digest()
+        digest.send_digest_email()
+        [message] = mail.outbox
+        [alternative] = message.alternatives
+        html_content, content_type = alternative
+        data = digest.get_digest_email_data(manager1.facility_code)
+        self.assertEqual(data['facility'][0]['females'], 10)
+
+    @responses.activate
+    def test_send_with_old_and_new_data_provincial(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        manager1 = self.mk_actor(role=MANAGER_PROVINCIAL,
+                                 email_address='manager@example.org',
+                                 facility_code='342315')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='342315')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for i in range(10):
+            digest = Digest.objects.create()
+            case = self.mk_case(
+                gender='female', facility_code='342315', digest=digest)
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(
+                gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = ProvincialDigest.compile_digest()
+        digest.send_digest_email()
+        [message] = mail.outbox
+        [alternative] = message.alternatives
+        html_content, content_type = alternative
+        data = digest.get_digest_email_data(manager1.facility_code)
+        self.assertEqual(data['districts'][0]['females'], 10)
+
+    @responses.activate
+    def test_send_with_old_and_new_data_national(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='342315')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for i in range(10):
+            digest = Digest.objects.create()
+            case = self.mk_case(
+                gender='female', facility_code='342315', digest=digest)
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(
+                gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = NationalDigest.compile_digest()
+        digest.send_digest_email()
+        [message] = mail.outbox
+        [alternative] = message.alternatives
+        html_content, content_type = alternative
+        data = digest.get_digest_email_data()
+        self.assertEqual(data['provinces'][4]['females'], 10)

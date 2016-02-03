@@ -79,7 +79,7 @@ class NationalDigest(models.Model):
             codes = Facility.objects.filter(province=p).values_list(
                 'facility_code')
             province_cases = ReportedCase.objects.filter(
-                facility_code__in=codes)
+                facility_code__in=codes, digest__isnull=True)
             total_cases += province_cases.count()
             females = province_cases.filter(gender__icontains='f').count()
             total_females += females
@@ -163,7 +163,7 @@ class ProvincialDigest(models.Model):
                     'facility_code',
                     flat=True).distinct().order_by("district")
             district_cases = ReportedCase.objects.filter(
-                facility_code__in=district_fac_codes)
+                facility_code__in=district_fac_codes, digest__isnull=True)
             total_cases = district_cases.count()
             females = district_cases.filter(gender__icontains='f').count()
             total_females += females
@@ -233,7 +233,7 @@ class DistrictDigest(models.Model):
     def get_digest_email_data(self, district, facility_code):
         date = datetime.today()
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
-        district_fac_codes = []
+
         if not district:
             district = Facility.objects.get(
                 facility_code=facility_code).district
@@ -251,18 +251,20 @@ class DistrictDigest(models.Model):
         under5 = district_cases.count() - over5
 
         facilities = Facility.objects.filter(district=district)
-        if facilities.exists():
-            facility_name = facilities.first().facility_name
-        else:
-            facility_name = 'Unknown (district: %s)' % (district,)
+        fac_list = []
+        for fac in facilities:
+            if fac:
+                facility_name = fac.facility_name
+            else:
+                facility_name = 'Unknown (district: %s)' % (district,)
 
-        fac_list = [{
-            'facility': facility_name,
-            'cases': district_cases.count(),
-            'females': females, 'males': males,
-            'under5': under5,
-            'over5': over5,
-            'week': week}]
+            fac_list.append({
+                'facility': facility_name,
+                'cases': district_cases.count(),
+                'females': females, 'males': males,
+                'under5': under5,
+                'over5': over5,
+                'week': week})
         return {
             'digest': self,
             'facility': fac_list,
