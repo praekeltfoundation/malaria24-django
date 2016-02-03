@@ -5,4 +5,4 @@ pytest-xdist
 flake8
 responses
 mock
-testfixtures
+testfixtures==4.5.1
