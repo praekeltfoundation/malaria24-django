@@ -151,7 +151,7 @@ class ProvincialDigest(models.Model):
             try:
                 province = Facility.objects.get(
                     facility_code=facility_code).province
-            except:
+            except Facility.DoesNotExist:
                 return {}
         districts = Facility.objects.filter(province=province).values_list(
             'district', flat=True).distinct().order_by("district")
@@ -200,6 +200,10 @@ class ProvincialDigest(models.Model):
         for manager in Actor.objects.provincial():
             context = self.get_digest_email_data(
                 manager.province, manager.facility_code)
+            if not context:
+                logging.warning(
+                    'No province or facility_code for %s.' % manager.name)
+                continue
             text_content = render_to_string(
                 'ona/text_provincial_digest.txt', context)
             html_content = render_to_string(
@@ -241,7 +245,7 @@ class DistrictDigest(models.Model):
             try:
                 district = Facility.objects.get(
                     facility_code=facility_code).district
-            except:
+            except Facility.DoesNotExist:
                 return {}
 
         district_fac_codes = Facility.objects.filter(
@@ -281,6 +285,10 @@ class DistrictDigest(models.Model):
         for manager in Actor.objects.district():
             context = self.get_digest_email_data(
                 manager.district, manager.facility_code)
+            if not context:
+                logging.warning(
+                    'No district or facility_code for %s.' % manager.name)
+                continue
             text_content = render_to_string(
                 'ona/text_district_digest.txt', context)
             html_content = render_to_string(

@@ -82,7 +82,7 @@ class ActorAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ActorAdminForm, self).__init__(*args, **kwargs)
-        self.fields['district'].choices = [('---------', '---------')] + [(
+        self.fields['district'].choices = [('', '---------')] + [(
             d, d) for d in Facility.objects.all().values_list(
                 'district', flat=True).distinct().order_by("district")]
 
