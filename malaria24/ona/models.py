@@ -244,7 +244,7 @@ class DistrictDigest(models.Model):
                 flat=True).distinct().order_by("district")
 
         district_cases = ReportedCase.objects.filter(
-            facility_code__in=district_fac_codes)
+            facility_code__in=district_fac_codes, digest__isnull=True)
         females = district_cases.filter(gender__icontains='f').count()
         males = district_cases.exclude(gender__icontains='f').count()
         over5 = len([x for x in district_cases if x.age >= 5])

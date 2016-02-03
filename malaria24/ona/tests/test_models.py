@@ -635,7 +635,8 @@ class DigestTest(MalariaTestCase):
         [message] = mail.outbox
         [alternative] = message.alternatives
         html_content, content_type = alternative
-        data = digest.get_digest_email_data(manager1.facility_code)
+        data = digest.get_digest_email_data(
+            manager1.district, manager1.facility_code)
         self.assertEqual(data['facility'][0]['females'], 10)
 
     @responses.activate
@@ -677,7 +678,8 @@ class DigestTest(MalariaTestCase):
         [message] = mail.outbox
         [alternative] = message.alternatives
         html_content, content_type = alternative
-        data = digest.get_digest_email_data(manager1.facility_code)
+        data = digest.get_digest_email_data(
+            manager1.province, manager1.facility_code)
         self.assertEqual(data['districts'][0]['females'], 10)
 
     @responses.activate
