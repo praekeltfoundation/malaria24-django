@@ -148,8 +148,11 @@ class ProvincialDigest(models.Model):
         date = datetime.today()
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
         if not province:
-            province = Facility.objects.get(
-                facility_code=facility_code).province
+            try:
+                province = Facility.objects.get(
+                    facility_code=facility_code).province
+            except:
+                return {}
         districts = Facility.objects.filter(province=province).values_list(
             'district', flat=True).distinct().order_by("district")
         total_cases = 0
@@ -235,8 +238,11 @@ class DistrictDigest(models.Model):
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
 
         if not district:
-            district = Facility.objects.get(
-                facility_code=facility_code).district
+            try:
+                district = Facility.objects.get(
+                    facility_code=facility_code).district
+            except:
+                return {}
 
         district_fac_codes = Facility.objects.filter(
             district=district).values_list(

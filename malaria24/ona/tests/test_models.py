@@ -525,6 +525,8 @@ class DigestTest(MalariaTestCase):
             set(message.to), set(['manager@example.org', 'mis@example.org']))
         data = digest.get_digest_email_data(None, manager1.facility_code)
         self.assertEqual(data['districts'][0]['district'], u'Example1')
+        data = digest.get_digest_email_data(None, None)
+        self.assertEqual(data, {})
 
     @responses.activate
     def test_send_district_digest_email(self):
@@ -595,6 +597,8 @@ class DigestTest(MalariaTestCase):
         data = digest.get_digest_email_data(
             None, manager1.facility_code)
         self.assertEqual(data['facility'][0]['facility'], 'Facility 1')
+        data = digest.get_digest_email_data(None, None)
+        self.assertEqual(data, {})
 
     @responses.activate
     def test_send_with_old_and_new_data_district(self):
