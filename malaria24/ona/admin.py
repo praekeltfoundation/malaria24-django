@@ -78,11 +78,11 @@ class EmailAdmin(admin.ModelAdmin):
 
 
 class ActorAdminForm(forms.ModelForm):
-    district = forms.CharField()
+    district = forms.ChoiceField()
 
     def __init__(self, *args, **kwargs):
         super(ActorAdminForm, self).__init__(*args, **kwargs)
-        self.fields['district'].choices = [(
+        self.fields['district'].choices = [('---------', '---------')] + [(
             d, d) for d in Facility.objects.all().values_list(
                 'district', flat=True).distinct().order_by("district")]
 
