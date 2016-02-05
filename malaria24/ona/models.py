@@ -48,7 +48,20 @@ class Digest(models.Model):
             html_message=html_content)
 
 
-class NationalDigest(models.Model):
+class CalculationsMixin(object):
+
+    def calculate_over_under_5(self, qs):
+        over5 = len([x for x in qs if x.age >= 5])
+        under5 = qs.count() - over5
+        return (over5, under5)
+
+    def calculate_male_female(self, qs):
+        females = qs.filter(gender__icontains='f').count()
+        males = qs.exclude(gender__icontains='f').count()
+        return (females, males)
+
+
+class NationalDigest(models.Model, CalculationsMixin):
     """
     A National Digest of reported cases.
     """
@@ -69,29 +82,27 @@ class NationalDigest(models.Model):
         provinces = []
         date = datetime.today()
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
-        # populate provinces
-        total_cases = 0
-        total_females = 0
-        total_males = 0
-        total_under5 = 0
-        total_over5 = 0
+        total_cases = total_females = total_males = 0
+        total_under5 = total_over5 = 0
+
         for p, p_name in PROVINCES:
             codes = Facility.objects.filter(province=p).values_list(
                 'facility_code')
             province_cases = ReportedCase.objects.filter(
                 facility_code__in=codes, digest__isnull=True)
             total_cases += province_cases.count()
-            females = province_cases.filter(gender__icontains='f').count()
-            total_females += females
-            males = province_cases.exclude(gender__icontains='f').count()
-            total_males += males
-            over5 = len([x for x in province_cases if x.age >= 5])
+
+            female, male = self.calculate_male_female(province_cases)
+            total_females += female
+            total_males += male
+
+            over5, under5 = self.calculate_over_under_5(province_cases)
+
             total_over5 += over5
-            under5 = province_cases.count() - over5
             total_under5 += under5
             provinces.append({'province': p_name,
                               'cases': province_cases.count(),
-                              'females': females, 'males': males,
+                              'females': female, 'males': male,
                               'under5': under5,
                               'over5': over5,
                               'week': week})
@@ -126,7 +137,7 @@ class NationalDigest(models.Model):
             html_message=html_content)
 
 
-class ProvincialDigest(models.Model):
+class ProvincialDigest(models.Model, CalculationsMixin):
     """
     A Provincial Digest of reported cases.
     """
@@ -155,11 +166,9 @@ class ProvincialDigest(models.Model):
                 return {}
         districts = Facility.objects.filter(province=province).values_list(
             'district', flat=True).distinct().order_by("district")
-        total_cases = 0
-        total_females = 0
-        total_males = 0
-        total_under5 = 0
-        total_over5 = 0
+        total_cases = total_females = total_males = 0
+        total_under5 = total_over5 = 0
+
         for district in districts:
             district_fac_codes = Facility.objects.filter(
                 district=district).values_list(
@@ -167,19 +176,20 @@ class ProvincialDigest(models.Model):
                     flat=True).distinct().order_by("district")
             district_cases = ReportedCase.objects.filter(
                 facility_code__in=district_fac_codes, digest__isnull=True)
-            total_cases = district_cases.count()
-            females = district_cases.filter(gender__icontains='f').count()
-            total_females += females
-            males = district_cases.exclude(gender__icontains='f').count()
-            total_males = +males
-            over5 = len([x for x in district_cases if x.age >= 5])
+            total_cases += district_cases.count()
+
+            female, male = self.calculate_male_female(district_cases)
+            total_females += female
+            total_males += male
+
+            over5, under5 = self.calculate_over_under_5(district_cases)
+
             total_over5 += over5
-            under5 = district_cases.count() - over5
             total_under5 += under5
             district_list.append({
                 'district': district,
                 'cases': district_cases.count(),
-                'females': females, 'males': males,
+                'females': female, 'males': male,
                 'under5': under5,
                 'over5': over5,
                 'week': week})
@@ -220,7 +230,7 @@ class ProvincialDigest(models.Model):
                 html_message=html_content)
 
 
-class DistrictDigest(models.Model):
+class DistrictDigest(models.Model, CalculationsMixin):
     """
     A District Digest of reported cases.
     """
@@ -257,6 +267,9 @@ class DistrictDigest(models.Model):
             facility_code__in=district_fac_codes, digest__isnull=True)
         facilities = Facility.objects.filter(district=district)
         fac_list = []
+        total_cases = total_females = total_males = 0
+        total_under5 = total_over5 = 0
+
         for fac in facilities:
             if fac:
                 facility_name = fac.facility_name
@@ -264,21 +277,34 @@ class DistrictDigest(models.Model):
                 facility_name = 'Unknown (district: %s)' % (district,)
 
             fac_cases = district_cases.filter(facility_code=fac.facility_code)
-            females = fac_cases.filter(gender__icontains='f').count()
-            males = fac_cases.exclude(gender__icontains='f').count()
-            over5 = len([x for x in fac_cases if x.age >= 5])
-            under5 = fac_cases.count() - over5
+            total_cases += fac_cases.count()
+
+            female, male = self.calculate_male_female(fac_cases)
+            total_females += female
+            total_males += male
+
+            over5, under5 = self.calculate_over_under_5(fac_cases)
+
+            total_over5 += over5
+            total_under5 += under5
             fac_list.append({
                 'facility': facility_name,
                 'cases': fac_cases.count(),
-                'females': females, 'males': males,
+                'females': female, 'males': male,
                 'under5': under5,
                 'over5': over5,
                 'week': week})
+        totals = {}
+        totals['total_cases'] = total_cases
+        totals['total_females'] = total_females
+        totals['total_males'] = total_males
+        totals['total_under5'] = total_under5
+        totals['total_over5'] = total_over5
         return {
             'digest': self,
             'facility': fac_list,
             'week': week,
+            'totals': totals
         }
 
     def send_digest_email(self):

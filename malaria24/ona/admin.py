@@ -78,7 +78,7 @@ class EmailAdmin(admin.ModelAdmin):
 
 
 class ActorAdminForm(forms.ModelForm):
-    district = forms.ChoiceField()
+    district = forms.ChoiceField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(ActorAdminForm, self).__init__(*args, **kwargs)

@@ -6,3 +6,4 @@ Province, No. of Cases, Males, Females, Under 5, Over 5
 {% for province in provinces %}
 {{province.province}},{{province.cases}},{{province.males}},{{province.females}},{{province.under5}},{{province.over5}}
 {% endfor %}
+{{totals.total_province}},{{totals.total_cases}},{{totals.total_males}},{{totals.total_females}},{{totals.total_under5}},{{totals.total_over5}}
