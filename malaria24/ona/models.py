@@ -82,8 +82,8 @@ class NationalDigest(models.Model, CalculationsMixin):
         provinces = []
         date = datetime.today()
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
-        total_cases = total_females = total_males = total_under5 = 0
-        total_over5 = 0
+        total_cases = total_females = total_males = 0
+        total_under5 = total_over5 = 0
 
         for p, p_name in PROVINCES:
             codes = Facility.objects.filter(province=p).values_list(
@@ -166,8 +166,8 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                 return {}
         districts = Facility.objects.filter(province=province).values_list(
             'district', flat=True).distinct().order_by("district")
-        total_cases = total_females = total_males = total_under5 = 0
-        total_over5 = 0
+        total_cases = total_females = total_males = 0
+        total_under5 = total_over5 = 0
 
         for district in districts:
             district_fac_codes = Facility.objects.filter(
@@ -267,8 +267,8 @@ class DistrictDigest(models.Model, CalculationsMixin):
             facility_code__in=district_fac_codes, digest__isnull=True)
         facilities = Facility.objects.filter(district=district)
         fac_list = []
-        total_cases = total_females = total_males = total_under5 = 0
-        total_over5 = 0
+        total_cases = total_females = total_males = 0
+        total_under5 = total_over5 = 0
 
         for fac in facilities:
             if fac:
