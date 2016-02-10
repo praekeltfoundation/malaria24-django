@@ -31,16 +31,16 @@
       <th>Under 5</th>
       <th>Over 5</th>
     </tr>
-    <tr>
-      {% for facility in facility %}
-        <td><strong>Total</strong></td>
+    {% for facility in facility %}
+      <tr>
+        <td><strong>{{facility.facility}}</strong></td>
         <td style="text-align: right;"><strong>{{facility.cases}}</strong></td>
         <td style="text-align: right;"><strong>{{facility.males}}</strong></td>
         <td style="text-align: right;"><strong>{{facility.females}}</strong></td>
         <td style="text-align: right;"><strong>{{facility.under5}}</strong></td>
         <td style="text-align: right;"><strong>{{facility.over5}}</strong></td>
-      {% endfor %}
-    </tr>
+      </tr>
+    {% endfor %}
     <tr>
       <td><strong>Total</strong></td>
       <td style="text-align: right;"><strong>{{totals.total_cases}}</strong></td>
