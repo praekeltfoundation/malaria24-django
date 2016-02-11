@@ -151,6 +151,26 @@ class MISTest(MalariaTestCase):
                           'garbage for testing', 'application/pdf'),
                          pdf_attachment)
 
+    @responses.activate
+    def test_email_sending_when_same_actor_multiple_facilities(self):
+        facility = Facility.objects.create(facility_code='0001',
+                                           facility_name='Facility 1',
+                                           district='The District',
+                                           subdistrict='The Subdistrict',
+                                           province='The Province')
+        facility = Facility.objects.create(facility_code='0002',
+                                           facility_name='Facility 1',
+                                           district='The District',
+                                           subdistrict='The Subdistrict',
+                                           province='The Province')
+        self.mk_mis(province=facility.province, facility_code='0001')
+        self.mk_mis(province=facility.province, facility_code='0002')
+        with patch.object(tasks, 'make_pdf') as mock_make_pdf:
+            mock_make_pdf.return_value = 'garbage for testing'
+            self.mk_case(facility_code=facility.facility_code)
+
+        self.assertEqual(len(mail.outbox), 1)
+
 
 class EhpReportedCaseTest(MalariaTestCase):
 
