@@ -693,24 +693,25 @@ def alert_case_mis(reported_case):
     facilities = reported_case.get_facilities()
     provinces = set([facility.province for facility in facilities])
     mis_set = Actor.objects.mis().filter(
-        province__in=provinces)
+        province__in=provinces).values_list(
+            'name', 'role', 'email_address').distinct()
 
-    if not mis_set.exists():
+    if not mis_set:
         logging.warning(
             'No MIS found for facility code %s.' % (
                 reported_case.facility_code,))
 
-    for mis in mis_set:
-        if mis.email_address:
+    for name, role, email in mis_set:
+        if email:
             send_case_email.delay(
-                reported_case.pk, [mis.email_address])
+                reported_case.pk, [email])
 
         else:
             logging.warning(
-                ('Unable to Email report for case %s to %s. '
+                ('Unable to Email report for case %s to %s (%s). '
                  'Missing email_address.') % (
                     reported_case.case_number,
-                    mis))
+                    name, role))
 
 
 post_save.connect(new_case_alert_ehps, sender=ReportedCase)
