@@ -248,8 +248,6 @@ class DistrictDigest(models.Model, CalculationsMixin):
         return digest
 
     def get_digest_email_data(self, district, facility_code):
-        date = datetime.today()
-
         if not district:
             try:
                 district = Facility.objects.get(
