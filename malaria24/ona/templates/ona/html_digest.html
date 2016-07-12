@@ -18,7 +18,10 @@
       <td colspan="5" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
     </tr>
     <tr>
-      <td colspan="5" style="text-align: center;"><strong>Malaria Case Investigators Report</strong></td>
+      <td colspan="5" style="text-align: center;"><strong>MalariaConnect Case Summary</strong></td>
+    </tr>
+    <tr>
+      <td colspan="5" style="text-align: center;"><strong>{{week}}</strong></td>
     </tr>
     <tr>
       <th>Case Number</th>
@@ -31,7 +34,7 @@
         <tr>
           <td>{{case.case_number}}</td>
           <td>{{case.facility_code}}</td>
-          <td>{{case.facility_name}}</td>
+          <td>{{case.facility_names}}</td>
           <td>{{ case.create_date_time|date:"D d M Y" }} {{ case.create_date_time|time:"H:i" }}</td>
           <td>{% for ehp in case.ehps.all %}{{ehp.name}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
         </tr>

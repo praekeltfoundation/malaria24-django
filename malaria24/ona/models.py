@@ -32,8 +32,18 @@ class Digest(models.Model):
         return digest
 
     def send_digest_email(self):
+        start_date = self.reportedcase_set.all() \
+            .first().create_date_time.strftime(
+                "%d %B %Y"
+        )
+        end_date = self.reportedcase_set.all() \
+            .last().create_date_time.strftime(
+                "%d %B %Y"
+        )
+        week = "{0} to {1}".format(start_date, end_date)
         context = {
             'digest': self,
+            'week': week,
         }
         text_content = render_to_string('ona/text_digest.txt', context)
         html_content = render_to_string('ona/html_digest.html', context)
