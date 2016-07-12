@@ -276,6 +276,11 @@ class DistrictDigest(models.Model, CalculationsMixin):
             else:
                 facility_name = 'Unknown (district: %s)' % (district,)
 
+            if fac.district:
+                district_name = fac.district
+            else:
+                district_name = 'Unknown district'
+
             fac_cases = district_cases.filter(facility_code=fac.facility_code)
             total_cases += fac_cases.count()
 
@@ -289,6 +294,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
             total_under5 += under5
             fac_list.append({
                 'facility': facility_name,
+                'district': district_name,
                 'cases': fac_cases.count(),
                 'females': female, 'males': male,
                 'under5': under5,
