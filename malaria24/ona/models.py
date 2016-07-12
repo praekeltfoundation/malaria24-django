@@ -248,9 +248,6 @@ class DistrictDigest(models.Model, CalculationsMixin):
         return digest
 
     def get_digest_email_data(self, district, facility_code):
-        date = datetime.today()
-        week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
-
         if not district:
             try:
                 district = Facility.objects.get(
@@ -265,6 +262,13 @@ class DistrictDigest(models.Model, CalculationsMixin):
 
         district_cases = ReportedCase.objects.filter(
             facility_code__in=district_fac_codes, digest__isnull=True)
+        start_date = district_cases.first().create_date_time.strftime(
+            "%d %B %Y"
+        )
+        end_date = district_cases.last().create_date_time.strftime(
+            "%d %B %Y"
+        )
+        week = "{0} to {1}".format(start_date, end_date)
         facilities = Facility.objects.filter(district=district)
         fac_list = []
         total_cases = total_females = total_males = 0

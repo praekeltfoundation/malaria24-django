@@ -32,6 +32,7 @@
       <th>Over 5</th>
     </tr>
     {% for district in districts %}
+      {% if district.cases %}
         <tr>
           <td>{{district.district}}</td>
           <td style="text-align: right;">{{district.cases}}</td>
@@ -40,6 +41,7 @@
           <td style="text-align: right;">{{district.under5}}</td>
           <td style="text-align: right;">{{district.over5}}</td>
         </tr>
+      {% endif %}
     {% endfor %}
     <tr>
       <td><strong>Total</strong></td>
