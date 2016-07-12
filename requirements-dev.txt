@@ -2,7 +2,7 @@ pytest
 pytest-django
 pytest-cov
 pytest-xdist
-flake8
+flake8==2.5.5
 responses
 mock
 testfixtures==4.5.1
