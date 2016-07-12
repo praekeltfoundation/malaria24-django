@@ -32,15 +32,20 @@ class Digest(models.Model):
         return digest
 
     def send_digest_email(self):
-        start_date = self.reportedcase_set.all() \
-            .first().create_date_time.strftime(
-                "%d %B %Y"
-        )
-        end_date = self.reportedcase_set.all() \
-            .last().create_date_time.strftime(
-                "%d %B %Y"
-        )
-        week = "{0} to {1}".format(start_date, end_date)
+        if self.reportedcase_set.all():
+            start_date = self.reportedcase_set.all() \
+                .first().create_date_time.strftime(
+                    "%d %B %Y"
+            )
+            end_date = self.reportedcase_set.all() \
+                .last().create_date_time.strftime(
+                    "%d %B %Y"
+            )
+            week = "{0} to {1}".format(start_date, end_date)
+        else:
+            date = datetime.today()
+            week = 'Week ' + str(
+                date.strftime("%U")) + ' ' + str(date.year)
         context = {
             'digest': self,
             'week': week,
@@ -272,13 +277,18 @@ class DistrictDigest(models.Model, CalculationsMixin):
 
         district_cases = ReportedCase.objects.filter(
             facility_code__in=district_fac_codes, digest__isnull=True)
-        start_date = district_cases.first().create_date_time.strftime(
-            "%d %B %Y"
-        )
-        end_date = district_cases.last().create_date_time.strftime(
-            "%d %B %Y"
-        )
-        week = "{0} to {1}".format(start_date, end_date)
+        if district_cases:
+            start_date = district_cases.first().create_date_time.strftime(
+                "%d %B %Y"
+            )
+            end_date = district_cases.last().create_date_time.strftime(
+                "%d %B %Y"
+            )
+            week = "{0} to {1}".format(start_date, end_date)
+        else:
+            date = datetime.today()
+            week = 'Week ' + str(
+                date.strftime("%U")) + ' ' + str(date.year)
         facilities = Facility.objects.filter(district=district)
         fac_list = []
         total_cases = total_females = total_males = 0

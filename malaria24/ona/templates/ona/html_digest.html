@@ -15,16 +15,17 @@
 <body>
   <table border="1" style="width: 100%; border: 1px #DEDFDE solid;" cellspacing="0" cellpadding="2">
     <tr>
-      <td colspan="5" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
+      <td colspan="8" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
     </tr>
     <tr>
-      <td colspan="5" style="text-align: center;"><strong>MalariaConnect Case Summary</strong></td>
+      <td colspan="8" style="text-align: center;"><strong>MalariaConnect Case Summary</strong></td>
     </tr>
     <tr>
-      <td colspan="5" style="text-align: center;"><strong>{{week}}</strong></td>
+      <td colspan="8" style="text-align: center;"><strong>{{week}}</strong></td>
     </tr>
     <tr>
       <th>Case Number</th>
+      <th>District</th>
       <th>Facility Code</th>
       <th>Facility Name</th>
       <th>Date &amp; Time</th>
@@ -33,6 +34,7 @@
     {% for case in digest.reportedcase_set.all %}
         <tr>
           <td>{{case.case_number}}</td>
+          <td>{{case.districts}}</td>
           <td>{{case.facility_code}}</td>
           <td>{{case.facility_names}}</td>
           <td>{{ case.create_date_time|date:"D d M Y" }} {{ case.create_date_time|time:"H:i" }}</td>
