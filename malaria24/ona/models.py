@@ -296,15 +296,13 @@ class DistrictDigest(models.Model, CalculationsMixin):
         total_under5 = total_over5 = 0
 
         for fac in facilities:
+            facility_name = 'Unknown (district: %s)' % (district,)
             if fac:
                 facility_name = fac.facility_name
-            else:
-                facility_name = 'Unknown (district: %s)' % (district,)
 
+            district_name = 'Unknown district'
             if fac.district:
                 district_name = fac.district
-            else:
-                district_name = 'Unknown district'
 
             fac_cases = district_cases.filter(facility_code=fac.facility_code)
             total_cases += fac_cases.count()
