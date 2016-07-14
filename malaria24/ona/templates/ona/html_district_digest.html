@@ -25,6 +25,7 @@
     </tr>
     <tr>
       <th>Facility</th>
+      <th>District</th>
       <th>No. of Cases</th>
       <th>Male</th>
       <th>Female</th>
@@ -34,6 +35,7 @@
     {% for facility in facility %}
       <tr>
         <td><strong>{{facility.facility}}</strong></td>
+        <td style="text-align: right;"><strong>{{facility.district}}</strong></td>
         <td style="text-align: right;"><strong>{{facility.cases}}</strong></td>
         <td style="text-align: right;"><strong>{{facility.males}}</strong></td>
         <td style="text-align: right;"><strong>{{facility.females}}</strong></td>
@@ -42,6 +44,7 @@
       </tr>
     {% endfor %}
     <tr>
+      <td></td>
       <td><strong>Total</strong></td>
       <td style="text-align: right;"><strong>{{totals.total_cases}}</strong></td>
       <td style="text-align: right;"><strong>{{totals.total_males}}</strong></td>

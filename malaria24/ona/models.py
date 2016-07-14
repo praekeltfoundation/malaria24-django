@@ -32,8 +32,24 @@ class Digest(models.Model):
         return digest
 
     def send_digest_email(self):
+        date = datetime.today()
+        week = 'Week ' + str(
+            date.strftime("%U")) + ' ' + str(date.year)
+
+        if self.reportedcase_set.all():
+            start_date = self.reportedcase_set.all() \
+                .first().create_date_time.strftime(
+                    "%d %B %Y"
+            )
+            end_date = self.reportedcase_set.all() \
+                .last().create_date_time.strftime(
+                    "%d %B %Y"
+            )
+            week = "{0} to {1}".format(start_date, end_date)
+
         context = {
             'digest': self,
+            'week': week,
         }
         text_content = render_to_string('ona/text_digest.txt', context)
         html_content = render_to_string('ona/html_digest.html', context)
@@ -262,23 +278,31 @@ class DistrictDigest(models.Model, CalculationsMixin):
 
         district_cases = ReportedCase.objects.filter(
             facility_code__in=district_fac_codes, digest__isnull=True)
-        start_date = district_cases.first().create_date_time.strftime(
-            "%d %B %Y"
-        )
-        end_date = district_cases.last().create_date_time.strftime(
-            "%d %B %Y"
-        )
-        week = "{0} to {1}".format(start_date, end_date)
+        date = datetime.today()
+        week = 'Week ' + str(
+            date.strftime("%U")) + ' ' + str(date.year)
+        if district_cases:
+            start_date = district_cases.first().create_date_time.strftime(
+                "%d %B %Y"
+            )
+            end_date = district_cases.last().create_date_time.strftime(
+                "%d %B %Y"
+            )
+            week = "{0} to {1}".format(start_date, end_date)
+
         facilities = Facility.objects.filter(district=district)
         fac_list = []
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
 
         for fac in facilities:
+            facility_name = 'Unknown (district: %s)' % (district,)
             if fac:
                 facility_name = fac.facility_name
-            else:
-                facility_name = 'Unknown (district: %s)' % (district,)
+
+            district_name = 'Unknown district'
+            if fac.district:
+                district_name = fac.district
 
             fac_cases = district_cases.filter(facility_code=fac.facility_code)
             total_cases += fac_cases.count()
@@ -293,6 +317,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
             total_under5 += under5
             fac_list.append({
                 'facility': facility_name,
+                'district': district_name,
                 'cases': fac_cases.count(),
                 'females': female, 'males': male,
                 'under5': under5,
