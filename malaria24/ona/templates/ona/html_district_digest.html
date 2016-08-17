@@ -33,15 +33,17 @@
       <th>Over 5</th>
     </tr>
     {% for facility in facility %}
-      <tr>
-        <td><strong>{{facility.facility}}</strong></td>
-        <td style="text-align: right;"><strong>{{facility.district}}</strong></td>
-        <td style="text-align: right;"><strong>{{facility.cases}}</strong></td>
-        <td style="text-align: right;"><strong>{{facility.males}}</strong></td>
-        <td style="text-align: right;"><strong>{{facility.females}}</strong></td>
-        <td style="text-align: right;"><strong>{{facility.under5}}</strong></td>
-        <td style="text-align: right;"><strong>{{facility.over5}}</strong></td>
-      </tr>
+      {% if facility.cases %}
+        <tr>
+          <td><strong>{{facility.facility}}</strong></td>
+          <td style="text-align: right;"><strong>{{facility.district}}</strong></td>
+          <td style="text-align: right;"><strong>{{facility.cases}}</strong></td>
+          <td style="text-align: right;"><strong>{{facility.males}}</strong></td>
+          <td style="text-align: right;"><strong>{{facility.females}}</strong></td>
+          <td style="text-align: right;"><strong>{{facility.under5}}</strong></td>
+          <td style="text-align: right;"><strong>{{facility.over5}}</strong></td>
+        </tr>
+      {% endif %}
     {% endfor %}
     <tr>
       <td></td>
