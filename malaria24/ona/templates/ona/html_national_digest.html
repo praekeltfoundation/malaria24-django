@@ -18,7 +18,7 @@
       <td colspan="8" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
     </tr>
     <tr>
-      <td colspan="8" style="text-align: center;"><strong>National MalariaConnect Report</strong></td>
+      <td colspan="8" style="text-align: center;"><strong>MalariaConnect Summary</strong></td>
     </tr>
     <tr>
       <td colspan="8" style="text-align: center;"><strong>{{week}}</strong></td>
@@ -32,6 +32,7 @@
       <th>Over 5</th>
     </tr>
     {% for province in provinces %}
+      {% if province.cases %}
         <tr>
           <td>{{province.province}}</td>
           <td style="text-align: right;">{{province.cases}}</td>
@@ -40,6 +41,7 @@
           <td style="text-align: right;">{{province.under5}}</td>
           <td style="text-align: right;">{{province.over5}}</td>
         </tr>
+      {% endif %}
     {% endfor %}
     <tr>
       <td><strong>Total</strong></td>

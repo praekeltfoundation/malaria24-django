@@ -122,13 +122,22 @@ class NationalDigest(models.Model, CalculationsMixin):
                               'under5': under5,
                               'over5': over5,
                               'week': week})
+            if province_cases:
+                start_date = province_cases \
+                    .first().create_date_time.strftime(
+                        "%d %B %Y"
+                    )
+                end_date = province_cases \
+                    .last().create_date_time.strftime(
+                        "%d %B %Y"
+                    )
+                week = "{0} to {1}".format(start_date, end_date)
         totals = {}
         totals['total_cases'] = total_cases
         totals['total_females'] = total_females
         totals['total_males'] = total_males
         totals['total_under5'] = total_under5
         totals['total_over5'] = total_over5
-
         return {
             'digest': self,
             'provinces': provinces,
@@ -209,6 +218,16 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                 'under5': under5,
                 'over5': over5,
                 'week': week})
+            if district_cases:
+                start_date = district_cases \
+                    .first().create_date_time.strftime(
+                        "%d %B %Y"
+                    )
+                end_date = district_cases \
+                    .last().create_date_time.strftime(
+                        "%d %B %Y"
+                    )
+                week = "{0} to {1}".format(start_date, end_date)
         totals = {}
         totals['total_cases'] = total_cases
         totals['total_females'] = total_females
