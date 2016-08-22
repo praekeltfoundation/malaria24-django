@@ -89,6 +89,10 @@ class CalculationsMixin(object):
         other = qs.exclude(abroad__in=c_list).count()
         return (somalia, ethiopia, mozambique, zambia, zimbabwe, other)
 
+    def noInternationalTravel(self, qs):
+        noInternTravel = qs.filter(abroad__icontains='No').count()
+        return noInternTravel
+
 
 class NationalDigest(models.Model, CalculationsMixin):
     """
@@ -113,7 +117,7 @@ class NationalDigest(models.Model, CalculationsMixin):
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
-        total_somalia = total_ethiopia = \
+        total_somalia = total_ethiopia = total_no_international_travel = \
             total_mozambique = total_zambia = total_zimbabwe = 0
         total_other = 0
 
@@ -137,6 +141,8 @@ class NationalDigest(models.Model, CalculationsMixin):
                 over5, under5 = self.calculate_over_under_5(province_cases)
                 somalia, ethiopia, mozambique, zambia, zimbabwe, other = \
                     self.calculate_travelhistory(province_cases)
+                no_international_travel = \
+                    self.noInternationalTravel(province_cases)
 
                 total_over5 += over5
                 total_under5 += under5
@@ -147,6 +153,7 @@ class NationalDigest(models.Model, CalculationsMixin):
                 total_zambia += zambia
                 total_zimbabwe += zimbabwe
                 total_other += other
+                total_no_international_travel += no_international_travel
 
                 provinces.append({
                     'province': p_name,
@@ -155,6 +162,7 @@ class NationalDigest(models.Model, CalculationsMixin):
                     'females': female, 'males': male,
                     'under5': under5,
                     'over5': over5,
+                    'no_international_travel': no_international_travel,
                     'week': week,
                     'somalia': somalia,
                     'ethiopia': ethiopia,
@@ -182,6 +190,8 @@ class NationalDigest(models.Model, CalculationsMixin):
         totals['total_under5'] = total_under5
         totals['total_over5'] = total_over5
 
+        totals['total_no_international_travel'] = \
+            total_no_international_travel
         totals['total_somalia'] = total_somalia
         totals['total_ethiopia'] = total_ethiopia
         totals['total_mozambique'] = total_mozambique

@@ -15,13 +15,17 @@
 <body>
   <table border="1" style="width: 100%; border: 1px #DEDFDE solid;" cellspacing="0" cellpadding="2">
     <tr>
-      <td colspan="13" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
+      <td colspan="14" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
     </tr>
     <tr>
-      <td colspan="13" style="text-align: center;"><strong>MalariaConnect Summary</strong></td>
+      <td colspan="14" style="text-align: center;"><strong>MalariaConnect Summary</strong></td>
     </tr>
     <tr>
-      <td colspan="13" style="text-align: center;"><strong>{{week}}</strong></td>
+      <td colspan="14" style="text-align: center;"><strong>{{week}}</strong></td>
+    </tr>
+    <tr>
+      <td colspan="7" style="text-align: center;"></td>
+      <td colspan="7" style="text-align: center;"><strong>International Travel History</strong></td>
     </tr>
     <tr>
       <th>Province</th>
@@ -31,6 +35,7 @@
       <th>Female</th>
       <th>Under 5</th>
       <th>Over 5</th>
+      <th>No international travel</th>
       <th>Somalia</th>
       <th>Ethiopia</th>
       <th>Mozambique</th>
@@ -48,6 +53,7 @@
           <td style="text-align: right;">{{province.females}}</td>
           <td style="text-align: right;">{{province.under5}}</td>
           <td style="text-align: right;">{{province.over5}}</td>
+          <td style="text-align: right;">{{province.no_international_travel}}</td>
           <td style="text-align: right;">{{province.somalia}}</td>
           <td style="text-align: right;">{{province.ethiopia}}</td>
           <td style="text-align: right;">{{province.mozambique}}</td>
@@ -64,6 +70,7 @@
       <td style="text-align: right;"><strong>{{totals.total_females}}</strong></td>
       <td style="text-align: right;"><strong>{{totals.total_under5}}</strong></td>
       <td style="text-align: right;"><strong>{{totals.total_over5}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_no_international_travel}}</strong></td>
       <td style="text-align: right;"><strong>{{totals.total_somalia}}</strong></td>
       <td style="text-align: right;"><strong>{{totals.total_ethiopia}}</strong></td>
       <td style="text-align: right;"><strong>{{totals.total_mozambique}}</strong></td>
