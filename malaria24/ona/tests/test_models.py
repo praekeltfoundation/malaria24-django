@@ -438,10 +438,12 @@ class DigestTest(MalariaTestCase):
     def test_send_national_digest_email(self):
         Facility.objects.create(facility_code='342315',
                                 facility_name='Facility 1',
-                                province='Limpopo')
+                                province='Limpopo',
+                                district=u'Example1')
         Facility.objects.create(facility_code='222222',
                                 facility_name='Facility 2',
-                                province='The Eastern Cape')
+                                province='The Eastern Cape',
+                                district=u'Example2')
         self.mk_actor(role=MANAGER_NATIONAL,
                       email_address='manager@example.org')
         ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
@@ -470,13 +472,13 @@ class DigestTest(MalariaTestCase):
         [alternative] = message.alternatives
         html_content, content_type = alternative
         data = digest.get_digest_email_data()
-        self.assertEqual(data['provinces'][4]['females'], 10)
-        self.assertEqual(data['provinces'][4]['males'], 0)
+        self.assertEqual(data['provinces'][1]['females'], 10)
+        self.assertEqual(data['provinces'][1]['males'], 0)
         self.assertEqual(data['provinces'][0]['males'], 10)
-        self.assertEqual(data['provinces'][4]['province'], 'Limpopo')
-        self.assertEqual(data['provinces'][4]['under5'], 10)
-        self.assertEqual(data['provinces'][4]['over5'], 0)
-        self.assertEqual(len(data['provinces']), 9)
+        self.assertEqual(data['provinces'][1]['province'], 'Limpopo')
+        self.assertEqual(data['provinces'][1]['under5'], 10)
+        self.assertEqual(data['provinces'][1]['over5'], 0)
+        self.assertEqual(len(data['provinces']), 2)
         self.assertEqual(data['totals']['total_females'], 10)
         self.assertEqual(
             set(message.to), set(['manager@example.org', 'mis@example.org']))
@@ -763,4 +765,4 @@ class DigestTest(MalariaTestCase):
         [alternative] = message.alternatives
         html_content, content_type = alternative
         data = digest.get_digest_email_data()
-        self.assertEqual(data['provinces'][4]['females'], 10)
+        self.assertEqual(data['provinces'][0]['females'], 10)

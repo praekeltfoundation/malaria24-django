@@ -76,6 +76,23 @@ class CalculationsMixin(object):
         males = qs.exclude(gender__icontains='f').count()
         return (females, males)
 
+    def calculate_travelhistory(self, qs):
+        somalia = qs.filter(abroad__icontains='Somalia').count()
+        ethiopia = qs.filter(abroad__icontains='Ethiopia').count()
+        mozambique = qs.filter(abroad__icontains='Mozambique').count()
+        zambia = qs.filter(abroad__icontains='Zambia').count()
+        zimbabwe = qs.filter(abroad__icontains='Zimbabwe').count()
+        c_list = [
+            'Zimbabwe', 'Somalia', 'Ethiopia', 'Mozambique',
+            'Zambia'
+        ]
+        other = qs.exclude(abroad__in=c_list).count()
+        return (somalia, ethiopia, mozambique, zambia, zimbabwe, other)
+
+    def noInternationalTravel(self, qs):
+        noInternTravel = qs.filter(abroad__icontains='No').count()
+        return noInternTravel
+
 
 class NationalDigest(models.Model, CalculationsMixin):
     """
@@ -100,44 +117,88 @@ class NationalDigest(models.Model, CalculationsMixin):
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
+        total_somalia = total_ethiopia = total_no_international_travel = \
+            total_mozambique = total_zambia = total_zimbabwe = 0
+        total_other = 0
 
         for p, p_name in PROVINCES:
-            codes = Facility.objects.filter(province=p).values_list(
-                'facility_code')
-            province_cases = ReportedCase.objects.filter(
-                facility_code__in=codes, digest__isnull=True)
-            total_cases += province_cases.count()
+            districts = Facility.objects.filter(province=p).values_list(
+                'district', flat=True).distinct().order_by("district")
+            for district in districts:
+                district_fac_codes = Facility.objects.filter(
+                    district=district).values_list(
+                    'facility_code',
+                    flat=True).distinct().order_by("district")
+                province_cases = ReportedCase.objects.filter(
+                    facility_code__in=district_fac_codes, digest__isnull=True)
 
-            female, male = self.calculate_male_female(province_cases)
-            total_females += female
-            total_males += male
+                total_cases += province_cases.count()
 
-            over5, under5 = self.calculate_over_under_5(province_cases)
+                female, male = self.calculate_male_female(province_cases)
+                total_females += female
+                total_males += male
 
-            total_over5 += over5
-            total_under5 += under5
-            provinces.append({'province': p_name,
-                              'cases': province_cases.count(),
-                              'females': female, 'males': male,
-                              'under5': under5,
-                              'over5': over5,
-                              'week': week})
-            if province_cases:
-                start_date = province_cases \
-                    .first().create_date_time.strftime(
-                        "%d %B %Y"
-                    )
-                end_date = province_cases \
-                    .last().create_date_time.strftime(
-                        "%d %B %Y"
-                    )
-                week = "{0} to {1}".format(start_date, end_date)
+                over5, under5 = self.calculate_over_under_5(province_cases)
+                somalia, ethiopia, mozambique, zambia, zimbabwe, other = \
+                    self.calculate_travelhistory(province_cases)
+                no_international_travel = \
+                    self.noInternationalTravel(province_cases)
+
+                total_over5 += over5
+                total_under5 += under5
+
+                total_somalia += somalia
+                total_ethiopia += ethiopia
+                total_mozambique += mozambique
+                total_zambia += zambia
+                total_zimbabwe += zimbabwe
+                total_other += other
+                total_no_international_travel += no_international_travel
+
+                provinces.append({
+                    'province': p_name,
+                    'district': district,
+                    'cases': province_cases.count(),
+                    'females': female, 'males': male,
+                    'under5': under5,
+                    'over5': over5,
+                    'no_international_travel': no_international_travel,
+                    'week': week,
+                    'somalia': somalia,
+                    'ethiopia': ethiopia,
+                    'mozambique': mozambique,
+                    'zambia': zambia,
+                    'zimbabwe': zimbabwe,
+                    'other': other
+                })
+
+                if province_cases:
+                    start_date = province_cases \
+                        .first().create_date_time.strftime(
+                            "%d %B %Y"
+                        )
+                    end_date = province_cases \
+                        .last().create_date_time.strftime(
+                            "%d %B %Y"
+                        )
+                    week = "{0} to {1}".format(start_date, end_date)
+
         totals = {}
         totals['total_cases'] = total_cases
         totals['total_females'] = total_females
         totals['total_males'] = total_males
         totals['total_under5'] = total_under5
         totals['total_over5'] = total_over5
+
+        totals['total_no_international_travel'] = \
+            total_no_international_travel
+        totals['total_somalia'] = total_somalia
+        totals['total_ethiopia'] = total_ethiopia
+        totals['total_mozambique'] = total_mozambique
+        totals['total_zambia'] = total_zambia
+        totals['total_zimbabwe'] = total_zimbabwe
+        totals['total_other'] = total_other
+
         return {
             'digest': self,
             'provinces': provinces,
