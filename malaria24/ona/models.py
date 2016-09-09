@@ -254,6 +254,9 @@ class ProvincialDigest(models.Model, CalculationsMixin):
             'district', flat=True).distinct().order_by("district")
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
+        total_somalia = total_ethiopia = total_no_international_travel = \
+            total_mozambique = total_zambia = total_zimbabwe = 0
+        total_other = 0
 
         for district in districts:
             district_fac_codes = Facility.objects.filter(
@@ -269,16 +272,37 @@ class ProvincialDigest(models.Model, CalculationsMixin):
             total_males += male
 
             over5, under5 = self.calculate_over_under_5(district_cases)
+            somalia, ethiopia, mozambique, zambia, zimbabwe, other = \
+                self.calculate_travelhistory(district_cases)
+            no_international_travel = \
+                self.noInternationalTravel(district_cases)
 
             total_over5 += over5
             total_under5 += under5
+
+            total_somalia += somalia
+            total_ethiopia += ethiopia
+            total_mozambique += mozambique
+            total_zambia += zambia
+            total_zimbabwe += zimbabwe
+            total_other += other
+            total_no_international_travel += no_international_travel
+
             district_list.append({
                 'district': district,
                 'cases': district_cases.count(),
                 'females': female, 'males': male,
                 'under5': under5,
                 'over5': over5,
-                'week': week})
+                'week': week,
+                'no_international_travel': no_international_travel,
+                'somalia': somalia,
+                'ethiopia': ethiopia,
+                'mozambique': mozambique,
+                'zambia': zambia,
+                'zimbabwe': zimbabwe,
+                'other': other
+            })
             if district_cases:
                 start_date = district_cases \
                     .first().create_date_time.strftime(
@@ -295,6 +319,16 @@ class ProvincialDigest(models.Model, CalculationsMixin):
         totals['total_males'] = total_males
         totals['total_under5'] = total_under5
         totals['total_over5'] = total_over5
+
+        totals['total_no_international_travel'] = \
+            total_no_international_travel
+        totals['total_somalia'] = total_somalia
+        totals['total_ethiopia'] = total_ethiopia
+        totals['total_mozambique'] = total_mozambique
+        totals['total_zambia'] = total_zambia
+        totals['total_zimbabwe'] = total_zimbabwe
+        totals['total_other'] = total_other
+
         return {
             'digest': self,
             'districts': district_list,
@@ -375,6 +409,10 @@ class DistrictDigest(models.Model, CalculationsMixin):
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
 
+        total_somalia = total_ethiopia = total_no_international_travel = \
+            total_mozambique = total_zambia = total_zimbabwe = 0
+        total_other = 0
+
         for fac in facilities:
             facility_name = 'Unknown (district: %s)' % (district,)
             if fac:
@@ -393,8 +431,22 @@ class DistrictDigest(models.Model, CalculationsMixin):
 
             over5, under5 = self.calculate_over_under_5(fac_cases)
 
+            somalia, ethiopia, mozambique, zambia, zimbabwe, other = \
+                self.calculate_travelhistory(fac_cases)
+            no_international_travel = \
+                self.noInternationalTravel(fac_cases)
+
             total_over5 += over5
             total_under5 += under5
+
+            total_somalia += somalia
+            total_ethiopia += ethiopia
+            total_mozambique += mozambique
+            total_zambia += zambia
+            total_zimbabwe += zimbabwe
+            total_other += other
+            total_no_international_travel += no_international_travel
+
             fac_list.append({
                 'facility': facility_name,
                 'district': district_name,
@@ -402,13 +454,31 @@ class DistrictDigest(models.Model, CalculationsMixin):
                 'females': female, 'males': male,
                 'under5': under5,
                 'over5': over5,
-                'week': week})
+                'week': week,
+                'no_international_travel': no_international_travel,
+                'somalia': somalia,
+                'ethiopia': ethiopia,
+                'mozambique': mozambique,
+                'zambia': zambia,
+                'zimbabwe': zimbabwe,
+                'other': other
+            })
         totals = {}
         totals['total_cases'] = total_cases
         totals['total_females'] = total_females
         totals['total_males'] = total_males
         totals['total_under5'] = total_under5
         totals['total_over5'] = total_over5
+
+        totals['total_no_international_travel'] = \
+            total_no_international_travel
+        totals['total_somalia'] = total_somalia
+        totals['total_ethiopia'] = total_ethiopia
+        totals['total_mozambique'] = total_mozambique
+        totals['total_zambia'] = total_zambia
+        totals['total_zimbabwe'] = total_zimbabwe
+        totals['total_other'] = total_other
+
         return {
             'digest': self,
             'facility': fac_list,

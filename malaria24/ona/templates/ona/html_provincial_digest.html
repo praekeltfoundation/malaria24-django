@@ -15,21 +15,32 @@
 <body>
   <table border="1" style="width: 100%; border: 1px #DEDFDE solid;" cellspacing="0" cellpadding="2">
     <tr>
-      <td colspan="8" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
+      <td colspan="15" style="text-align: center;"><strong>National Department of Health: Malaria Elimination Programme</strong></td>
     </tr>
     <tr>
-      <td colspan="8" style="text-align: center;"><strong>Provincial MalariaConnect Report</strong></td>
+      <td colspan="15" style="text-align: center;"><strong>Provincial MalariaConnect Report</strong></td>
     </tr>
     <tr>
-      <td colspan="8" style="text-align: center;"><strong>{{week}}</strong></td>
+      <td colspan="15" style="text-align: center;"><strong>{{week}}</strong></td>
     </tr>
     <tr>
-      <th>District</th>
-      <th>No. of Cases</th>
-      <th>Male</th>
-      <th>Female</th>
-      <th>Under 5</th>
-      <th>Over 5</th>
+      <td colspan="7" style="text-align: center;"></td>
+      <td colspan="7" style="text-align: center;"><strong>International Travel History</strong></td>
+    </tr>
+    <tr>
+      <th style="width: 22%;">District</th>
+      <th style="width: 6.5%;">All Cases</th>
+      <th style="width: 6.5%;">Male</th>
+      <th style="width: 6.5%;">Female</th>
+      <th style="width: 6.5%;">Under 5</th>
+      <th style="width: 6.5%;">Over 5</th>
+      <th style="width: 6.5%;">No intl travel</th>
+      <th style="width: 6.5%;">Somalia</th>
+      <th style="width: 6.5%;">Ethiopia</th>
+      <th style="width: 6.5%;">Moz</th>
+      <th style="width: 6.5%;">Zambia</th>
+      <th style="width: 6.5%;">Zimbabwe</th>
+      <th style="width: 6.5%;">Other</th>
     </tr>
     {% for district in districts %}
       {% if district.cases %}
@@ -40,6 +51,14 @@
           <td style="text-align: right;">{{district.females}}</td>
           <td style="text-align: right;">{{district.under5}}</td>
           <td style="text-align: right;">{{district.over5}}</td>
+
+          <td style="text-align: right;">{{district.no_international_travel}}</td>
+          <td style="text-align: right;">{{district.somalia}}</td>
+          <td style="text-align: right;">{{district.ethiopia}}</td>
+          <td style="text-align: right;">{{district.mozambique}}</td>
+          <td style="text-align: right;">{{district.zambia}}</td>
+          <td style="text-align: right;">{{district.zimbabwe}}</td>
+          <td style="text-align: right;">{{district.other}}</td>
         </tr>
       {% endif %}
     {% endfor %}
@@ -50,6 +69,15 @@
       <td style="text-align: right;"><strong>{{totals.total_females}}</strong></td>
       <td style="text-align: right;"><strong>{{totals.total_under5}}</strong></td>
       <td style="text-align: right;"><strong>{{totals.total_over5}}</strong></td>
+
+      <td style="text-align: right;"><strong>{{totals.total_no_international_travel}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_somalia}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_ethiopia}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_mozambique}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_zambia}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_zimbabwe}}</strong></td>
+      <td style="text-align: right;"><strong>{{totals.total_other}}</strong></td>
+
     </tr>
   </table>
 </body>
