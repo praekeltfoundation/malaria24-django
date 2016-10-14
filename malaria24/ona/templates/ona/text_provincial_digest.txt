@@ -1,9 +1,9 @@
 National Department of Health: Malaria Elimination Programme {{week}}
 =====================================================================
 
-District, No. of Cases, Males, Females, Under 5, Over 5
+District, No. of Cases, Males, Females, Under 5, Over 5, No intl travel, Somalia, Ethiopia, Moz, Zambia, Zimbabwe, Other
 
 {% for district in districts %}
-{{district.district}},{{district.cases}},{{district.males}},{{district.females}},{{district.under5}},{{district.over5}}
+{{district.district}},{{district.cases}},{{district.males}},{{district.females}},{{district.under5}},{{district.over5}},{{province.over5}},{{district.no_international_travel}},{{district.somalia}},{{district.ethiopa}},{{district.mozambique}},{{district.zambia}},{{district.zimbabwe}},{{district.other}}
 {% endfor %}
-{{totals.total_province}},{{totals.total_cases}},{{totals.total_males}},{{totals.total_females}},{{totals.total_under5}},{{totals.total_over5}}
+{{totals.total_province}},{{totals.total_cases}},{{totals.total_males}},{{totals.total_females}},{{totals.total_under5}},{{totals.total_over5}},{{totals.total_over5}},{{totals.total_no_international_travel}},{{totals.total_somalia}},{{totals.total_ethiopa}},{{totals.total_mozambique}},{{totals.total_zambia}},{{totals.total_zimbabwe}},{{totals.total_other}}

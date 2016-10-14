@@ -1,7 +1,7 @@
 National Department of Health: Malaria Elimination Programme {{week}}
 =====================================================================
 
-Province, No. of Cases, Males, Females, Under 5, Over 5
+Province, No. of Cases, Males, Females, Under 5, Over 5, No intl travel, Somalia, Ethiopia, Moz, Zambia, Zimbabwe, Other
 
 {% for province in provinces %}
 {{province.province}},{{province.cases}},{{province.males}},{{province.females}},{{province.under5}},{{province.over5}}
