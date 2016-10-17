@@ -108,7 +108,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'send-weekly-digest': {
         'task': 'malaria24.ona.tasks.compile_and_send_digest_email',
-        'schedule': crontab(hour=8, minute=15, day_of_week='fri'),
+        'schedule': crontab(hour=8, minute=15, day_of_week='mon'),
     },
 }
 
