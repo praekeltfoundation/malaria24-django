@@ -399,6 +399,17 @@ class DigestTest(MalariaTestCase):
         post_save.connect(
             new_case_alert_case_investigators, sender=ReportedCase)
 
+    def get_week(self, cases):
+        start_date = cases \
+            .first().create_date_time.strftime(
+                "%d %B %Y"
+            )
+        end_date = cases \
+            .last().create_date_time.strftime(
+                "%d %B %Y"
+            )
+        return "{0} to {1}".format(start_date, end_date)
+
     @responses.activate
     def test_compile_digest(self):
         manager1 = self.mk_actor(role='MIS')
@@ -472,6 +483,8 @@ class DigestTest(MalariaTestCase):
         [alternative] = message.alternatives
         html_content, content_type = alternative
         data = digest.get_digest_email_data()
+        self.assertEqual(
+            data['week'], self.get_week(ReportedCase.objects.all()))
         self.assertEqual(data['provinces'][1]['females'], 10)
         self.assertEqual(data['provinces'][1]['males'], 0)
         self.assertEqual(data['provinces'][0]['males'], 10)
@@ -536,6 +549,8 @@ class DigestTest(MalariaTestCase):
         [alternative] = message.alternatives
         html_content, content_type = alternative
         data = digest.get_digest_email_data(manager1.province, None)
+        self.assertEqual(
+            data['week'], self.get_week(ReportedCase.objects.all()))
         self.assertEqual(data['districts'][0]['district'], u'Example1')
         self.assertEqual(data['districts'][0]['females'], 10)
         self.assertEqual(data['districts'][0]['males'], 0)
@@ -614,6 +629,8 @@ class DigestTest(MalariaTestCase):
         html_content, content_type = alternative
         data = digest.get_digest_email_data(
             manager1.district, None)
+        self.assertEqual(
+            data['week'], self.get_week(ReportedCase.objects.all()))
         self.assertEqual(data['facility'][0]['facility'], 'Facility 1')
         self.assertEqual(data['facility'][0]['females'], 10)
         self.assertEqual(data['facility'][0]['males'], 0)

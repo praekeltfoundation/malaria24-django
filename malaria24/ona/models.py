@@ -155,6 +155,17 @@ class NationalDigest(models.Model, CalculationsMixin):
                 total_other += other
                 total_no_international_travel += no_international_travel
 
+                if province_cases:
+                    start_date = province_cases \
+                        .first().create_date_time.strftime(
+                            "%d %B %Y"
+                        )
+                    end_date = province_cases \
+                        .last().create_date_time.strftime(
+                            "%d %B %Y"
+                        )
+                    week = "{0} to {1}".format(start_date, end_date)
+
                 provinces.append({
                     'province': p_name,
                     'district': district,
@@ -171,17 +182,6 @@ class NationalDigest(models.Model, CalculationsMixin):
                     'zimbabwe': zimbabwe,
                     'other': other
                 })
-
-                if province_cases:
-                    start_date = province_cases \
-                        .first().create_date_time.strftime(
-                            "%d %B %Y"
-                        )
-                    end_date = province_cases \
-                        .last().create_date_time.strftime(
-                            "%d %B %Y"
-                        )
-                    week = "{0} to {1}".format(start_date, end_date)
 
         totals = {}
         totals['total_cases'] = total_cases
@@ -287,7 +287,16 @@ class ProvincialDigest(models.Model, CalculationsMixin):
             total_zimbabwe += zimbabwe
             total_other += other
             total_no_international_travel += no_international_travel
-
+            if district_cases:
+                start_date = district_cases \
+                    .first().create_date_time.strftime(
+                        "%d %B %Y"
+                    )
+                end_date = district_cases \
+                    .last().create_date_time.strftime(
+                        "%d %B %Y"
+                    )
+                week = "{0} to {1}".format(start_date, end_date)
             district_list.append({
                 'district': district,
                 'cases': district_cases.count(),
@@ -303,16 +312,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                 'zimbabwe': zimbabwe,
                 'other': other
             })
-            if district_cases:
-                start_date = district_cases \
-                    .first().create_date_time.strftime(
-                        "%d %B %Y"
-                    )
-                end_date = district_cases \
-                    .last().create_date_time.strftime(
-                        "%d %B %Y"
-                    )
-                week = "{0} to {1}".format(start_date, end_date)
+
         totals = {}
         totals['total_cases'] = total_cases
         totals['total_females'] = total_females
@@ -446,7 +446,16 @@ class DistrictDigest(models.Model, CalculationsMixin):
             total_zimbabwe += zimbabwe
             total_other += other
             total_no_international_travel += no_international_travel
-
+            if fac_cases:
+                start_date = fac_cases \
+                    .first().create_date_time.strftime(
+                        "%d %B %Y"
+                    )
+                end_date = fac_cases \
+                    .last().create_date_time.strftime(
+                        "%d %B %Y"
+                    )
+                week = "{0} to {1}".format(start_date, end_date)
             fac_list.append({
                 'facility': facility_name,
                 'district': district_name,
