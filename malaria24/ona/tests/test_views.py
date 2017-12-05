@@ -2,13 +2,14 @@ import json
 from StringIO import StringIO
 
 from django.core import mail
+from django.test import TestCase
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 from mock import patch
 
-from malaria24.ona.models import Facility
+from malaria24.ona.models import Facility, InboundSMS
 from malaria24.ona import tasks
 from .base import MalariaTestCase
 
@@ -138,3 +139,58 @@ class FacilityTest(MalariaTestCase):
             'facility_code': 'foo',
         }))
         self.assertEqual(response.status_code, 404)
+
+
+class InboundSMSTest(TestCase):
+    def setUp(self):
+        User.objects.create_user('user', 'user@example.org', 'pass')
+        self.client.login(username='user', password='pass')
+
+    def test_inbound_view_requires_authentication(self):
+        self.client.logout()
+
+        response = self.client.post('/api/v1/inbound/', data={
+            "channel_data": {}, "from": "+27111111111",
+            "channel_id": "test_channel",
+            "timestamp": "2017-12-05 12:32:15.899992",
+            "content": "test message", "to": "+27222222222",
+            "reply_to": None, "group": None,
+            "message_id": "c2c5a129da554bd2b799e391883d893d"})
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_inbound_sms_created(self):
+        self.assertEqual(InboundSMS.objects.all().count(), 0)
+
+        response = self.client.post('/api/v1/inbound/', data={
+            "channel_data": {}, "from": "+27111111111",
+            "channel_id": "test_channel",
+            "timestamp": "2017-12-05 12:32:15.899992",
+            "content": "test message", "to": "+27222222222",
+            "reply_to": None, "group": None,
+            "message_id": "c2c5a129da554bd2b799e391883d893d"})
+
+        self.assertEqual(response.status_code, 201)
+
+        inbounds = InboundSMS.objects.all()
+        self.assertEqual(inbounds.count(), 1)
+        self.assertEqual(inbounds[0].sender, "+27111111111")
+        self.assertEqual(inbounds[0].message_id,
+                         "c2c5a129da554bd2b799e391883d893d")
+        self.assertEqual(inbounds[0].content, "test message")
+
+    def test_inbound_view_throws_error(self):
+        self.assertEqual(InboundSMS.objects.all().count(), 0)
+
+        response = self.client.post('/api/v1/inbound/', data={
+            "channel_data": {}, "from": "+27111111111",
+            "channel_id": "test_channel",
+            "timestamp": "2017-12-05 12:32:15.899992",
+            "to": "+27222222222",
+            "reply_to": None, "group": None,
+            "message_id": "c2c5a129da554bd2b799e391883d893d"})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data,
+                         {"content": ["This field is required."]})
+        self.assertEqual(InboundSMS.objects.all().count(), 0)
