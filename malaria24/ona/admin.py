@@ -54,9 +54,8 @@ class SMSAdmin(admin.ModelAdmin):
 
 
 class InboundSMSAdmin(admin.ModelAdmin):
-    date_hierarchy = 'created_at'
-    list_display = ('sender', 'content', 'timestamp', 'message_id',
-                    'reply_to')
+    date_hierarchy = 'timestamp'
+    list_display = ('message_id', 'sender', 'content', 'timestamp', 'reply_to')
     list_filter = ('timestamp',)
     search_fields = ('sender', 'content', 'timestamp')
 
