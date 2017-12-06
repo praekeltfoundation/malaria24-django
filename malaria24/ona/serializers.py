@@ -4,7 +4,8 @@ from .models import SMS, InboundSMS
 
 
 class InboundSMSSerializer(serializers.ModelSerializer):
-    reply_to = serializers.CharField(max_length=255, required=False)
+    reply_to = serializers.CharField(max_length=255, required=False,
+                                     allow_null=True, default=None)
 
     class Meta:
         model = InboundSMS
