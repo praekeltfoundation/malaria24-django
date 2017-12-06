@@ -764,6 +764,7 @@ class InboundSMS(models.Model):
     message_id = models.UUIDField(primary_key=True)
     sender = models.CharField(max_length=255)
     content = models.TextField(blank=True)
+    timestamp = models.DateTimeField("sent at")
     created_at = models.DateTimeField(auto_now_add=True)
     reply_to = models.ForeignKey('SMS', null=True)
 

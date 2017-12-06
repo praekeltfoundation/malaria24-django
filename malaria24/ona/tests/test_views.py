@@ -166,7 +166,7 @@ class InboundSMSTest(TestCase):
         response = self.client.post('/api/v1/inbound/', data={
             "channel_data": {}, "from": "+27111111111",
             "channel_id": "test_channel",
-            "timestamp": "2017-12-05 12:32:15.899992",
+            "timestamp": "2017-12-05 12:00:00.000000",
             "content": "test message", "to": "+27222222222",
             "reply_to": None, "group": None,
             "message_id": "c2c5a129da554bd2b799e391883d893d"})
@@ -179,6 +179,8 @@ class InboundSMSTest(TestCase):
         self.assertEqual(inbounds[0].message_id,
                          UUID("c2c5a129da554bd2b799e391883d893d"))
         self.assertEqual(inbounds[0].content, "test message")
+        self.assertEqual(inbounds[0].timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                         "2017-12-05 12:00:00")
 
     def test_inbound_view_accepts_blank_content(self):
         self.assertEqual(InboundSMS.objects.all().count(), 0)
