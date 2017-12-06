@@ -1,5 +1,6 @@
 import json
 from StringIO import StringIO
+from uuid import UUID
 
 from django.core import mail
 from django.test import TestCase
@@ -176,7 +177,7 @@ class InboundSMSTest(TestCase):
         self.assertEqual(inbounds.count(), 1)
         self.assertEqual(inbounds[0].sender, "+27111111111")
         self.assertEqual(inbounds[0].message_id,
-                         "c2c5a129da554bd2b799e391883d893d")
+                         UUID("c2c5a129da554bd2b799e391883d893d"))
         self.assertEqual(inbounds[0].content, "test message")
 
     def test_inbound_view_accepts_blank_content(self):
