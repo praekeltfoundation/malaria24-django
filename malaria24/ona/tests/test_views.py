@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 
 from mock import patch
 
-from malaria24.ona.models import Facility, InboundSMS
+from malaria24.ona.models import Facility, InboundSMS, SMS
 from malaria24.ona import tasks
 from .base import MalariaTestCase
 
@@ -191,6 +191,20 @@ class InboundSMSTest(TestCase):
             "message_id": "c2c5a129da554bd2b799e391883d893d"})
         self.assertEqual(response.status_code, 201)
         self.assertEqual(InboundSMS.objects.all()[0].content, "")
+
+    def test_inbound_view_finds_reply_to(self):
+        sms = SMS.objects.create(to='+27111111111', content='test message',
+                                 message_id="b2b5a129da554bd2b799e391883d893d")
+
+        response = self.client.post('/api/v1/inbound/', data={
+            "channel_data": {}, "from": "+27111111111",
+            "channel_id": "test_channel",
+            "timestamp": "2017-12-05 12:32:15.899992",
+            "to": "+27222222222", "content": "test response",
+            "reply_to": "b2b5a129da554bd2b799e391883d893d", "group": None,
+            "message_id": "c2c5a129da554bd2b799e391883d893d"})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(InboundSMS.objects.all()[0].reply_to, sms)
 
     def test_inbound_view_throws_error(self):
         self.assertEqual(InboundSMS.objects.all().count(), 0)

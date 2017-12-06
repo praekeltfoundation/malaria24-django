@@ -765,7 +765,7 @@ class InboundSMS(models.Model):
     sender = models.CharField(max_length=255)
     content = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    reply_to = models.CharField(max_length=255, null=True)
+    reply_to = models.ForeignKey('SMS', null=True)
 
 
 def new_case_alert_ehps(sender, instance, created, **kwargs):
