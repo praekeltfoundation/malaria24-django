@@ -762,7 +762,7 @@ class InboundSMS(models.Model):
     An SMS sent to the system.
     """
     sender = models.CharField(max_length=255)
-    content = models.CharField(max_length=255)
+    content = models.TextField(blank=True)
     message_id = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     reply_to = models.CharField(max_length=255, null=True)

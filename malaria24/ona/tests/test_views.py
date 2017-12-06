@@ -179,6 +179,18 @@ class InboundSMSTest(TestCase):
                          "c2c5a129da554bd2b799e391883d893d")
         self.assertEqual(inbounds[0].content, "test message")
 
+    def test_inbound_view_accepts_blank_content(self):
+        self.assertEqual(InboundSMS.objects.all().count(), 0)
+        response = self.client.post('/api/v1/inbound/', data={
+            "channel_data": {}, "from": "+27111111111",
+            "channel_id": "test_channel",
+            "timestamp": "2017-12-05 12:32:15.899992",
+            "to": "+27222222222",
+            "reply_to": None, "group": None,
+            "message_id": "c2c5a129da554bd2b799e391883d893d"})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(InboundSMS.objects.all()[0].content, "")
+
     def test_inbound_view_throws_error(self):
         self.assertEqual(InboundSMS.objects.all().count(), 0)
 
@@ -187,10 +199,9 @@ class InboundSMSTest(TestCase):
             "channel_id": "test_channel",
             "timestamp": "2017-12-05 12:32:15.899992",
             "to": "+27222222222",
-            "reply_to": None, "group": None,
-            "message_id": "c2c5a129da554bd2b799e391883d893d"})
+            "reply_to": None, "group": None})
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data,
-                         {"content": ["This field is required."]})
+                         {"message_id": ["This field is required."]})
         self.assertEqual(InboundSMS.objects.all().count(), 0)
