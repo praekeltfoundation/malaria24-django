@@ -48,7 +48,7 @@ def ona_fetch_reported_case_for_form(form_id):
             form=OnaForm.objects.get(form_id=form_id),
             first_name=data['first_name'],
             last_name=data['last_name'],
-            locality=data['locality'],
+            locality=data.get('locality', '_other'),
             date_of_birth=data['date_of_birth'],
             create_date_time=data['create_date_time'],
             sa_id_number=data.get('sa_id_number'),
