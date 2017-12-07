@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from StringIO import StringIO
 from uuid import UUID
 
@@ -246,7 +247,8 @@ class InboundSMSTest(TestCase):
 
 class SMSEventTest(TestCase):
     def setUp(self):
-        User.objects.create_user('user', 'user@example.org', 'pass')
+        self.user = User.objects.create_user('user', 'user@example.org',
+                                             'pass')
         self.client.login(username='user', password='pass')
 
     def test_event_view_requires_authentication(self):
@@ -327,3 +329,23 @@ class SMSEventTest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data,
                          {'message_id': [u'This field may not be blank.']})
+
+    def test_event_displayed_in_admin(self):
+        self.user.is_staff = True
+        self.user.is_superuser = True
+        self.user.save()
+
+        sms = SMS.objects.create(to='+27111111111', content='test message',
+                                 message_id="b2b5a129da554bd2b799e391883d893d")
+        response = self.client.get(reverse('admin:ona_sms_changelist'))
+        self.assertContains(response, '<td class="field-status">(None)</td>')
+
+        SMSEvent.objects.create(event_type='sent',
+                                timestamp=datetime.now(), sms=sms)
+
+        response = self.client.get(reverse('admin:ona_sms_changelist'))
+        self.assertContains(response, '<td class="field-status">sent</td>')
+
+        self.user.is_staff = False
+        self.user.is_superuser = False
+        self.user.save()
