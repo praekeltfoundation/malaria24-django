@@ -66,7 +66,7 @@
         "landmark_description": "Quite pretty",
         "case_number": "20150101-11111-2",
         "last_name": "KLM",
-        "locality": "NOP",
+        "locality": null,
         "msisdn": "+27012345678",
         "reported_by": "+27123456789",
         "sa_id_number": "0000000000000"
