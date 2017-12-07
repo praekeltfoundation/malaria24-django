@@ -300,7 +300,7 @@ class SMSEventTest(TestCase):
                          {"event_type": ["This field is required."]})
         self.assertEqual(InboundSMS.objects.all().count(), 0)
 
-    def test_event_view_requires_message_id(self):
+    def test_event_view_requires_known_message_id(self):
         self.assertEqual(InboundSMS.objects.all().count(), 0)
 
         data = {"channel_id": "9c1ffad2-257b-4915-9fff-762fe9018b8c",
@@ -314,21 +314,31 @@ class SMSEventTest(TestCase):
         self.assertEqual(response.data,
                          {'message_id': [u'This field may not be blank.']})
 
-        data['messsage_id'] = None
+        data['message_id'] = None
         response = self.client.post('/api/v1/event/', json.dumps(data),
                                     content_type='application/json')
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data,
-                         {'message_id': [u'This field may not be blank.']})
+                         {'message_id': [u'This field may not be null.']})
 
-        del data['messsage_id']
+        del data['message_id']
         response = self.client.post('/api/v1/event/', json.dumps(data),
                                     content_type='application/json')
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data,
-                         {'message_id': [u'This field may not be blank.']})
+                         {'message_id': [u'This field is required.']})
+
+        # message_id doesn't match any existing sms
+        data['message_id'] = "b2b5a129da554bd2b799e391883d893d"
+        response = self.client.post('/api/v1/event/', json.dumps(data),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data, {'message_id': [
+                u'Unknown message_id: b2b5a129da554bd2b799e391883d893d']})
 
     def test_event_displayed_in_admin(self):
         self.user.is_staff = True
