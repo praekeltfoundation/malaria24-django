@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from StringIO import StringIO
 from uuid import UUID
 
@@ -10,7 +11,7 @@ from django.contrib.auth.models import User
 
 from mock import patch
 
-from malaria24.ona.models import Facility, InboundSMS, SMS
+from malaria24.ona.models import Facility, InboundSMS, SMS, SMSEvent
 from malaria24.ona import tasks
 from .base import MalariaTestCase
 
@@ -242,3 +243,119 @@ class InboundSMSTest(TestCase):
         self.assertEqual(response.data,
                          {"message_id": ["This field is required."]})
         self.assertEqual(InboundSMS.objects.all().count(), 0)
+
+
+class SMSEventTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user('user', 'user@example.org',
+                                             'pass')
+        self.client.login(username='user', password='pass')
+
+    def test_event_view_requires_authentication(self):
+        self.client.logout()
+
+        response = self.client.post('/api/v1/event/', json.dumps({
+            "channel_id": "9c1ffad2-257b-4915-9fff-762fe9018b8c",
+            "event_type": "submitted", "event_details": {},
+            "timestamp": "2017-12-06 12:34:38.456727",
+            "message_id": "1c0aea5e68cc4e1b9e054d2f1bda1ad7"}),
+            content_type='application/json')
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_sms_event_created(self):
+        sms = SMS.objects.create(to='+27111111111', content='test message',
+                                 message_id="b2b5a129da554bd2b799e391883d893d")
+        self.assertEqual(SMSEvent.objects.all().count(), 0)
+
+        response = self.client.post('/api/v1/event/', json.dumps({
+            "channel_id": "9c1ffad2-257b-4915-9fff-762fe9018b8c",
+            "event_type": "submitted", "event_details": {},
+            "timestamp": "2017-12-05 12:00:00.000000",
+            "message_id": "b2b5a129da554bd2b799e391883d893d"}),
+            content_type='application/json')
+
+        self.assertEqual(response.status_code, 201)
+
+        events = SMSEvent.objects.all()
+        self.assertEqual(events.count(), 1)
+        self.assertEqual(events[0].event_type, "submitted")
+        self.assertEqual(events[0].timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                         "2017-12-05 12:00:00")
+        self.assertEqual(events[0].sms, sms)
+
+    def test_event_view_throws_error(self):
+        SMS.objects.create(to='+27111111111', content='test message',
+                           message_id="b2b5a129da554bd2b799e391883d893d")
+        self.assertEqual(InboundSMS.objects.all().count(), 0)
+
+        response = self.client.post('/api/v1/event/', json.dumps({
+            "channel_id": "9c1ffad2-257b-4915-9fff-762fe9018b8c",
+            "event_details": {}, "timestamp": "2017-12-06 12:34:38.456727",
+            "message_id": "b2b5a129da554bd2b799e391883d893d"}),
+            content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data,
+                         {"event_type": ["This field is required."]})
+        self.assertEqual(InboundSMS.objects.all().count(), 0)
+
+    def test_event_view_requires_known_message_id(self):
+        self.assertEqual(InboundSMS.objects.all().count(), 0)
+
+        data = {"channel_id": "9c1ffad2-257b-4915-9fff-762fe9018b8c",
+                "event_type": "submitted", "event_details": {},
+                "timestamp": "2017-12-06 12:34:38.456727",
+                "message_id": ""}
+        response = self.client.post('/api/v1/event/', json.dumps(data),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data,
+                         {'message_id': [u'This field may not be blank.']})
+
+        data['message_id'] = None
+        response = self.client.post('/api/v1/event/', json.dumps(data),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data,
+                         {'message_id': [u'This field may not be null.']})
+
+        del data['message_id']
+        response = self.client.post('/api/v1/event/', json.dumps(data),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data,
+                         {'message_id': [u'This field is required.']})
+
+        # message_id doesn't match any existing sms
+        data['message_id'] = "b2b5a129da554bd2b799e391883d893d"
+        response = self.client.post('/api/v1/event/', json.dumps(data),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data, {'message_id': [
+                u'Unknown message_id: b2b5a129da554bd2b799e391883d893d']})
+
+    def test_event_displayed_in_admin(self):
+        self.user.is_staff = True
+        self.user.is_superuser = True
+        self.user.save()
+
+        sms = SMS.objects.create(to='+27111111111', content='test message',
+                                 message_id="b2b5a129da554bd2b799e391883d893d")
+        response = self.client.get(reverse('admin:ona_sms_changelist'))
+        self.assertContains(response, '<td class="field-status">(None)</td>')
+
+        SMSEvent.objects.create(event_type='sent',
+                                timestamp=datetime.now(), sms=sms)
+
+        response = self.client.get(reverse('admin:ona_sms_changelist'))
+        self.assertContains(response, '<td class="field-status">sent</td>')
+
+        self.user.is_staff = False
+        self.user.is_superuser = False
+        self.user.save()

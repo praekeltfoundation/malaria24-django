@@ -1,8 +1,8 @@
 from django.http import JsonResponse, Http404
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
-from .models import Facility, InboundSMS
-from .serializers import InboundSMSSerializer
+from .models import Facility, InboundSMS, SMSEvent
+from .serializers import InboundSMSSerializer, SMSEventSerializer
 
 
 def facilities(request, facility_code):
@@ -38,3 +38,9 @@ class InboundSMSViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             request.data['content'] = ""
 
         return super(InboundSMSViewSet, self).create(request, *args, **kwargs)
+
+
+class SMSEventViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SMSEventSerializer
+    queryset = SMSEvent.objects.all()

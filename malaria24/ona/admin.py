@@ -48,9 +48,15 @@ class ReportedCaseAdmin(admin.ModelAdmin):
 
 class SMSAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
-    list_display = ('to', 'content', 'created_at', 'message_id')
+    list_display = ('to', 'content', 'created_at', 'status', 'message_id')
     list_filter = ('created_at',)
     search_fields = ('to', 'content')
+
+    def status(self, sms):
+        event = sms.smsevent_set.latest('timestamp')
+        if event is None:
+            return
+        return event.event_type
 
 
 class InboundSMSAdmin(admin.ModelAdmin):

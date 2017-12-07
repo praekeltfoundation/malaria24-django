@@ -1,11 +1,12 @@
 from django.conf.urls import patterns, url, include
 from rest_framework import routers
 
-from views import facilities, localities, InboundSMSViewSet
+from views import facilities, localities, InboundSMSViewSet, SMSEventViewSet
 
 
 router = routers.DefaultRouter()
 router.register(r'inbound', InboundSMSViewSet)
+router.register(r'event', SMSEventViewSet)
 
 urlpatterns = patterns(
     '',

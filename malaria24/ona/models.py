@@ -769,6 +769,15 @@ class InboundSMS(models.Model):
     reply_to = models.ForeignKey('SMS', null=True)
 
 
+class SMSEvent(models.Model):
+    """
+    An event for a message sent from the system.
+    """
+    event_type = models.CharField(max_length=255)
+    timestamp = models.DateTimeField()
+    sms = models.ForeignKey('SMS')
+
+
 def new_case_alert_ehps(sender, instance, created, **kwargs):
     if not created:
         return
