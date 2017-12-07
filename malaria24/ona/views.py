@@ -33,4 +33,8 @@ class InboundSMSViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         # Rename the 'from' field because we can't use that as a variable name
         request.data['sender'] = request.data['from']
 
+        # Coerce null values to an empty string
+        if 'content' in request.data and request.data['content'] is None:
+            request.data['content'] = ""
+
         return super(InboundSMSViewSet, self).create(request, *args, **kwargs)

@@ -186,16 +186,31 @@ class InboundSMSTest(TestCase):
 
     def test_inbound_view_accepts_blank_content(self):
         self.assertEqual(InboundSMS.objects.all().count(), 0)
-        response = self.client.post('/api/v1/inbound/', json.dumps({
-            "channel_data": {}, "from": "+27111111111",
-            "channel_id": "test_channel",
-            "timestamp": "2017-12-05 12:32:15.899992",
-            "to": "+27222222222",
-            "reply_to": None, "group": None,
-            "message_id": "c2c5a129da554bd2b799e391883d893d"}),
-            content_type='application/json')
+        data = {"channel_data": {}, "from": "+27111111111",
+                "channel_id": "test_channel",
+                "timestamp": "2017-12-05 12:32:15.899992",
+                "to": "+27222222222",
+                "reply_to": None, "group": None,
+                "message_id": "c2c5a129da554bd2b799e391883d893d"}
+
+        response = self.client.post('/api/v1/inbound/', json.dumps(data),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(InboundSMS.objects.all()[0].content, "")
+        self.assertEqual(InboundSMS.objects.latest('created_at').content, "")
+
+        data['content'] = ""
+        data['message_id'] = "d2c5a129da554bd2b799e391883d893d"
+        response = self.client.post('/api/v1/inbound/', json.dumps(data),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(InboundSMS.objects.latest('created_at').content, "")
+
+        data['content'] = None
+        data['message_id'] = "e2c5a129da554bd2b799e391883d893d"
+        response = self.client.post('/api/v1/inbound/', json.dumps(data),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(InboundSMS.objects.latest('created_at').content, "")
 
     def test_inbound_view_finds_reply_to(self):
         sms = SMS.objects.create(to='+27111111111', content='test message',
