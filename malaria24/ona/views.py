@@ -1,5 +1,8 @@
-from .models import Facility
 from django.http import JsonResponse, Http404
+from rest_framework import viewsets, mixins
+from rest_framework.permissions import IsAuthenticated
+from .models import Facility, InboundSMS
+from .serializers import InboundSMSSerializer
 
 
 def facilities(request, facility_code):
@@ -19,3 +22,19 @@ def localities(request, facility_code):
         return JsonResponse(list(localities), safe=False)
     except Facility.DoesNotExist:
         raise Http404()
+
+
+class InboundSMSViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = InboundSMSSerializer
+    queryset = InboundSMS.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        # Rename the 'from' field because we can't use that as a variable name
+        request.data['sender'] = request.data['from']
+
+        # Coerce null values to an empty string
+        if 'content' in request.data and request.data['content'] is None:
+            request.data['content'] = ""
+
+        return super(InboundSMSViewSet, self).create(request, *args, **kwargs)

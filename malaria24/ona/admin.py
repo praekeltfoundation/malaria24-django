@@ -5,7 +5,8 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
-from .models import ReportedCase, Actor, SMS, Email, Digest, Facility, OnaForm
+from .models import (ReportedCase, Actor, SMS, InboundSMS, Email, Digest,
+                     Facility, OnaForm)
 from .tasks import import_facilities, ona_fetch_reported_case_for_form
 
 
@@ -50,6 +51,13 @@ class SMSAdmin(admin.ModelAdmin):
     list_display = ('to', 'content', 'created_at', 'message_id')
     list_filter = ('created_at',)
     search_fields = ('to', 'content')
+
+
+class InboundSMSAdmin(admin.ModelAdmin):
+    date_hierarchy = 'timestamp'
+    list_display = ('message_id', 'sender', 'content', 'timestamp', 'reply_to')
+    list_filter = ('timestamp',)
+    search_fields = ('sender', 'content', 'timestamp')
 
 
 class EmailAdmin(admin.ModelAdmin):
@@ -232,6 +240,7 @@ class OnaFormAdmin(admin.ModelAdmin):
 admin.site.register(ReportedCase, ReportedCaseAdmin)
 admin.site.register(Actor, ActorAdmin)
 admin.site.register(SMS, SMSAdmin)
+admin.site.register(InboundSMS, InboundSMSAdmin)
 admin.site.register(Email, EmailAdmin)
 admin.site.register(Digest, DigestAdmin)
 admin.site.register(Facility, FacilityAdmin)

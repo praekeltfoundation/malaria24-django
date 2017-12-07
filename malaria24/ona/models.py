@@ -757,6 +757,18 @@ class Actor(models.Model):
         return u'%s (%s)' % (self.name, self.role)
 
 
+class InboundSMS(models.Model):
+    """
+    An SMS sent to the system.
+    """
+    message_id = models.UUIDField(primary_key=True)
+    sender = models.CharField(max_length=255)
+    content = models.TextField(blank=True)
+    timestamp = models.DateTimeField("sent at")
+    created_at = models.DateTimeField(auto_now_add=True)
+    reply_to = models.ForeignKey('SMS', null=True)
+
+
 def new_case_alert_ehps(sender, instance, created, **kwargs):
     if not created:
         return
