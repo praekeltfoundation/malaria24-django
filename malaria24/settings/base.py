@@ -73,6 +73,9 @@ INSTALLED_APPS = (
     'djcelery',
 
     'raven.contrib.django.raven_compat',
+
+    'rest_framework',
+    'rest_framework.authtoken',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -267,3 +270,14 @@ WAGTAIL_SITE_NAME = "base"
 # Whether to use face/feature detection to improve image
 # cropping - requires OpenCV
 WAGTAILIMAGES_FEATURE_DETECTION_ENABLED = False
+
+# REST Framework conf defaults
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
