@@ -1,9 +1,13 @@
 import json
+import requests
 import os
 
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
+from rest_framework.authtoken.models import Token
+from urlparse import urlunparse
 
 from malaria24 import celery_app
 from malaria24.ona.models import (ReportedCase, SMS, Digest, Facility, OnaForm,
@@ -70,12 +74,36 @@ def ona_fetch_reported_case_for_form(form_id):
 
 @celery_app.task(ignore_result=True)
 def send_sms(to, content):
-    sender = HttpApiSender(
-        settings.VUMI_GO_ACCOUNT_KEY,
-        settings.VUMI_GO_CONVERSATION_KEY,
-        settings.VUMI_GO_API_TOKEN,
-        api_url='http://go.vumi.org/api/v1/go/http_api_nostream')
-    sms = sender.send_text(to, content)
+    channel = getattr(settings, 'SMS_CHANNEL', None)
+    # Send with VumiGo
+    if (channel is None or channel == 'VUMI_GO'):
+        sender = HttpApiSender(
+            settings.VUMI_GO_ACCOUNT_KEY,
+            settings.VUMI_GO_CONVERSATION_KEY,
+            settings.VUMI_GO_API_TOKEN,
+            api_url='http://go.vumi.org/api/v1/go/http_api_nostream')
+        sms = sender.send_text(to, content)
+    # Send with Junebug
+    elif channel == 'JUNEBUG':
+        jb_url = getattr(settings, 'JUNEBUG_CHANNEL_URL')
+        jb_auth = (getattr(settings, 'JUNEBUG_USERNAME', None),
+                   getattr(settings, 'JUNEBUG_PASSWORD', None))
+
+        headers = {'content-type': 'application/json'}
+        # Get the url and token for endpoint to send events to
+        site = get_current_site(None)
+        event_url = urlunparse(
+            ('http', site.domain, '/api/v1/event/', '', '', ''))
+        event_token = Token.objects.get(user__username='junebug')
+        data = {'to': to, 'content': content, 'event_url': event_url,
+                'event_auth_token': event_token.key}
+
+        data = json.dumps(data)
+        r = requests.post(
+            '%s/messages/' % jb_url, auth=jb_auth,
+            data=data, headers=headers)
+        r.raise_for_status()
+        sms = json.loads(r.content)['result']
     SMS.objects.create(to=to, content=content, message_id=sms['message_id'])
 
 

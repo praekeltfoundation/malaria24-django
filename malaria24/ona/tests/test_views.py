@@ -10,6 +10,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 from mock import patch
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient
 
 from malaria24.ona.models import Facility, InboundSMS, SMS, SMSEvent
 from malaria24.ona import tasks
@@ -145,11 +147,13 @@ class FacilityTest(MalariaTestCase):
 
 class InboundSMSTest(TestCase):
     def setUp(self):
-        User.objects.create_user('user', 'user@example.org', 'pass')
-        self.client.login(username='user', password='pass')
+        user = User.objects.create_user('user', 'user@example.org', 'pass')
+        token = Token.objects.create(user=user)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
     def test_inbound_view_requires_authentication(self):
-        self.client.logout()
+        self.client.credentials()
 
         response = self.client.post('/api/v1/inbound/', json.dumps({
             "channel_data": {}, "from": "+27111111111",
@@ -160,7 +164,7 @@ class InboundSMSTest(TestCase):
             "message_id": "c2c5a129da554bd2b799e391883d893d"}),
             content_type='application/json')
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
     def test_inbound_sms_created(self):
         self.assertEqual(InboundSMS.objects.all().count(), 0)
@@ -249,10 +253,12 @@ class SMSEventTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user('user', 'user@example.org',
                                              'pass')
-        self.client.login(username='user', password='pass')
+        token = Token.objects.create(user=self.user)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
     def test_event_view_requires_authentication(self):
-        self.client.logout()
+        self.client.credentials()
 
         response = self.client.post('/api/v1/event/', json.dumps({
             "channel_id": "9c1ffad2-257b-4915-9fff-762fe9018b8c",
@@ -261,7 +267,7 @@ class SMSEventTest(TestCase):
             "message_id": "1c0aea5e68cc4e1b9e054d2f1bda1ad7"}),
             content_type='application/json')
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
     def test_sms_event_created(self):
         sms = SMS.objects.create(to='+27111111111', content='test message',
@@ -344,16 +350,18 @@ class SMSEventTest(TestCase):
         self.user.is_staff = True
         self.user.is_superuser = True
         self.user.save()
+        client = Client()
+        client.login(username='user', password='pass')
 
         sms = SMS.objects.create(to='+27111111111', content='test message',
                                  message_id="b2b5a129da554bd2b799e391883d893d")
-        response = self.client.get(reverse('admin:ona_sms_changelist'))
+        response = client.get(reverse('admin:ona_sms_changelist'))
         self.assertContains(response, '<td class="field-status">(None)</td>')
 
         SMSEvent.objects.create(event_type='sent',
                                 timestamp=datetime.now(), sms=sms)
 
-        response = self.client.get(reverse('admin:ona_sms_changelist'))
+        response = client.get(reverse('admin:ona_sms_changelist'))
         self.assertContains(response, '<td class="field-status">sent</td>')
 
         self.user.is_staff = False
