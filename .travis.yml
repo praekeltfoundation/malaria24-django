@@ -16,6 +16,10 @@ install:
 
 script:
   - flake8 malaria24
+
+   # check for model changes not reflected in a migration
+  - python manage.py makemigrations --dry-run | grep 'No changes detected' || (echo 'There are changes which require migrations.' && exit 1)
+
   - py.test
 after_success:
   - coveralls
