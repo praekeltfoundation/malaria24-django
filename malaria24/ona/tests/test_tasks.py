@@ -1,15 +1,20 @@
 from django.db.models.signals import post_save
+from django.contrib.auth.models import User
 from django.core import mail
+from django.test import override_settings
 from datetime import *
+import json
 import pkg_resources
 import responses
 
+from rest_framework.authtoken.models import Token
+
 from malaria24.ona.models import (
     ReportedCase, new_case_alert_ehps, MIS, MANAGER_DISTRICT, MANAGER_NATIONAL,
-    MANAGER_PROVINCIAL, OnaForm, Facility)
+    MANAGER_PROVINCIAL, OnaForm, Facility, SMS)
 from malaria24.ona.tasks import (
     ona_fetch_reported_cases, compile_and_send_digest_email,
-    ona_fetch_forms)
+    ona_fetch_forms, send_sms)
 
 from .base import MalariaTestCase
 
@@ -180,3 +185,93 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(form.title, 'the-form-title')
         self.assertEqual(form.form_id, '12345')
         self.assertEqual(form.active, False)
+
+    @responses.activate
+    def test_sms_vumi_go_if_channel_empty(self):
+        """
+        Checks vumi go is the default channel
+        """
+        send_sms(to='+27111111111', content='test message')
+
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(responses.calls[0].request.url,
+                         "http://go.vumi.org/api/v1/go/http_api_nostream"
+                         "/VUMI_GO_CONVERSATION_KEY/messages.json")
+        [sms] = SMS.objects.all()
+        self.assertEqual(sms.content, "test message")
+
+    @responses.activate
+    @override_settings(
+        SMS_CHANNEL='VUMI_GO')
+    def test_sms_vumi_go_if_set(self):
+        """
+        Checks sms sent via vumi go if that's what the setting specifies
+        """
+        send_sms(to='+27111111111', content='test message')
+
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(responses.calls[0].request.url,
+                         "http://go.vumi.org/api/v1/go/http_api_nostream"
+                         "/VUMI_GO_CONVERSATION_KEY/messages.json")
+        [sms] = SMS.objects.all()
+        self.assertEqual(sms.content, "test message")
+
+    @responses.activate
+    @override_settings(
+        SMS_CHANNEL='JUNEBUG')
+    def test_sms_junebug_fails_if_settings_missing(self):
+        """
+        Checks sending via Junebug requires extra settings
+        """
+        with self.assertRaises(AttributeError):
+            send_sms(to='+27111111111', content='test message')
+
+        with self.settings(JUNEBUG_URL='http://junebug.qa.malariaconnect.org'):
+            with self.assertRaises(AttributeError):
+                send_sms(to='+27111111111', content='test message')
+
+    @responses.activate
+    @override_settings(
+        SMS_CHANNEL='JUNEBUG',
+        JUNEBUG_CHANNEL_URL='http://jb.qa.malariaconnect.org/CHANNEL_ID')
+    def test_sms_junebug_if_set(self):
+        """
+        Checks sms sent via Junebug if that's what the setting specifies
+        """
+
+        jb_user = User.objects.create_user('junebug')
+        jb_token = Token.objects.create(user=jb_user)
+
+        responses.add(
+            responses.POST,
+            ('http://jb.qa.malariaconnect.org/CHANNEL_ID/messages/'),
+            status=201, content_type='application/json',
+            body=json.dumps({
+                "status": 201,
+                "code": "Created",
+                "description": "message submitted",
+                "result": {
+                    "channel_data": {},
+                    "from": None,
+                    "channel_id": "9c1ffad2-257b-4915-9fff-762fe9018b8c",
+                    "timestamp": "2017-12-07 15:31:28.783794",
+                    "content": "test message",
+                    "to": "+27722660353",
+                    "reply_to": None,
+                    "group": None,
+                    "message_id": "the-message-id"
+                }
+            })
+        )
+
+        send_sms(to='+27111111111', content='test message')
+
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(
+            responses.calls[0].request.url,
+            "http://jb.qa.malariaconnect.org/CHANNEL_ID/messages/")
+        data = json.loads(responses.calls[0].request.body)
+        self.assertEqual(data['event_url'], 'http://example.com/api/v1/event/')
+        self.assertEqual(data['event_auth_token'], jb_token.key)
+        [sms] = SMS.objects.all()
+        self.assertEqual(sms.content, "test message")
