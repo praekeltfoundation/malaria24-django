@@ -233,7 +233,7 @@ class OnaTest(MalariaTestCase):
     @responses.activate
     @override_settings(
         SMS_CHANNEL='JUNEBUG',
-        JUNEBUG_CHANNEL_URL='http://jb.qa.malariaconnect.org/CHANNEL_ID')
+        JUNEBUG_CHANNEL_URL='http://example.com/junebug/CHANNEL_ID')
     def test_sms_junebug_if_set(self):
         """
         Checks sms sent via Junebug if that's what the setting specifies
@@ -244,7 +244,7 @@ class OnaTest(MalariaTestCase):
 
         responses.add(
             responses.POST,
-            ('http://jb.qa.malariaconnect.org/CHANNEL_ID/messages/'),
+            ('http://example.com/junebug/CHANNEL_ID/messages/'),
             status=201, content_type='application/json',
             body=json.dumps({
                 "status": 201,
@@ -256,7 +256,7 @@ class OnaTest(MalariaTestCase):
                     "channel_id": "9c1ffad2-257b-4915-9fff-762fe9018b8c",
                     "timestamp": "2017-12-07 15:31:28.783794",
                     "content": "test message",
-                    "to": "+27722660353",
+                    "to": "+27111111111",
                     "reply_to": None,
                     "group": None,
                     "message_id": "the-message-id"
@@ -269,7 +269,7 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(len(responses.calls), 1)
         self.assertEqual(
             responses.calls[0].request.url,
-            "http://jb.qa.malariaconnect.org/CHANNEL_ID/messages/")
+            "http://example.com/junebug/CHANNEL_ID/messages/")
         data = json.loads(responses.calls[0].request.body)
         self.assertEqual(data['event_url'], 'http://example.com/api/v1/event/')
         self.assertEqual(data['event_auth_token'], jb_token.key)
