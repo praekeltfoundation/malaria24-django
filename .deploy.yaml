@@ -15,5 +15,7 @@ dependencies:
   - gettext
   - wkhtmltopdf
   - xvfb
+  - python-dev
+  - libssl-dev
 
   
