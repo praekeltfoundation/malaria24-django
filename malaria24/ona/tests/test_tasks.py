@@ -226,14 +226,16 @@ class OnaTest(MalariaTestCase):
         with self.assertRaises(AttributeError):
             send_sms(to='+27111111111', content='test message')
 
-        with self.settings(JUNEBUG_URL='http://junebug.qa.malariaconnect.org'):
+        with self.settings(
+                JUNEBUG_CHANNEL_URL='http://junebug.qa.malariaconnect.org'):
             with self.assertRaises(AttributeError):
                 send_sms(to='+27111111111', content='test message')
 
     @responses.activate
     @override_settings(
         SMS_CHANNEL='JUNEBUG',
-        JUNEBUG_CHANNEL_URL='https://example.com/junebug/CHANNEL_ID')
+        JUNEBUG_CHANNEL_URL='https://example.com/junebug/CHANNEL_ID',
+        SMS_CODE='*11111')
     def test_sms_junebug_if_set(self):
         """
         Checks sms sent via Junebug if that's what the setting specifies

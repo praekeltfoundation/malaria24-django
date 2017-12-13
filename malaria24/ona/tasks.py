@@ -85,6 +85,7 @@ def send_sms(to, content):
         sms = sender.send_text(to, content)
     # Send with Junebug
     elif channel == 'JUNEBUG':
+        long_code = (getattr(settings, 'SMS_CODE'))
         jb_url = getattr(settings, 'JUNEBUG_CHANNEL_URL')
         jb_auth = (getattr(settings, 'JUNEBUG_USERNAME', None),
                    getattr(settings, 'JUNEBUG_PASSWORD', None))
@@ -96,7 +97,7 @@ def send_sms(to, content):
             ('http', site.domain, '/api/v1/event/', '', '', ''))
         event_token = Token.objects.get(user__username='junebug')
         data = {'to': to, 'content': content, 'event_url': event_url,
-                'event_auth_token': event_token.key, 'from': '*25388'}
+                'event_auth_token': event_token.key, 'from': long_code}
 
         data = json.dumps(data)
         r = requests.post(
