@@ -96,7 +96,7 @@ def send_sms(to, content):
             ('http', site.domain, '/api/v1/event/', '', '', ''))
         event_token = Token.objects.get(user__username='junebug')
         data = {'to': to, 'content': content, 'event_url': event_url,
-                'event_auth_token': event_token.key}
+                'event_auth_token': event_token.key, 'from': '*25388'}
 
         data = json.dumps(data)
         r = requests.post(
