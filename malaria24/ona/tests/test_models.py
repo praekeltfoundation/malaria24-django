@@ -385,7 +385,7 @@ class EhpReportedCaseTest(MalariaTestCase):
         self.assertEqual(case2.facility_names, 'Unknown')
 
 
-class DigestTest(MalariaTestCase):
+class DigestTest(MalariaTestCase): #py.test -k DigestTest
 
     def setUp(self):
         super(DigestTest, self).setUp()
@@ -409,6 +409,7 @@ class DigestTest(MalariaTestCase):
                 "%d %B %Y"
             )
         return "{0} to {1}".format(start_date, end_date)
+
 
     @responses.activate
     def test_compile_digest(self):
