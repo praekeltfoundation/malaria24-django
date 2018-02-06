@@ -1,11 +1,16 @@
 import pkg_resources
 import random
+from time import *
 from datetime import datetime
+from datetime import *
+import pytz
 
 import responses
 
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from django.db import models
+from django.db.models import Func, F
 
 from malaria24.ona.models import (
     ReportedCase, Actor, EHP, CASE_INVESTIGATOR, MIS, Facility)
@@ -13,6 +18,10 @@ from malaria24.ona.models import (
 
 @override_settings(CELERY_ALWAYS_EAGER=True)
 class MalariaTestCase(TestCase):
+
+    posted = models.DateTimeField()
+
+
 
     def setUp(self):
         responses.add(
@@ -52,13 +61,45 @@ class MalariaTestCase(TestCase):
     def mk_facility(self, **kwargs):
         return Facility.objects.create(**kwargs)
 
+
+    def start_randomDate(self):
+        random_year = timezone.now().year
+        e_month = random.choice(range(1, 2))
+        e_day = random.choice(range(1, 8))
+        e_hour = random.choice(range(0,24))
+        e_minute = random.choice(range(0,60))
+        e_second = random.choice(range(0,60))
+
+        s_month = random.choice(range(1, 2))
+        s_day = random.choice(range(1, 8))
+        s_hour = random.choice(range(0,24))
+        s_minute = random.choice(range(0,60))
+        s_second = random.choice(range(0,60))
+
+        first_date = datetime(random_year, 2, random.choice(range(1, 8)), 11, 30, 30, 0, pytz.timezone('US/Pacific') ).strftime('%Y-%m-%d %H:%M:%S.%f%z')
+        last_date = datetime(random_year, 2, random.choice(range(1, 8)), 11, 30, 30, 0, pytz.timezone('US/Pacific') ).strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+        return datetime(random_year, 2, random.choice(range(1, 8)), 11, 30, 30, 0, pytz.timezone('US/Pacific') ).strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+
+    def mk_create_date(self):
+        random_year = timezone.now().year
+        e_month = random.choice(range(1, 13))
+        e_day = random.choice(range(1, 29))
+        e_hour = random.choice(range(0,24))
+        e_minute = random.choice(range(0,60))
+        e_second = random.choice(range(0,60))
+
+        return datetime(random_year, e_month, e_day, e_hour, e_minute, e_second, 0, pytz.timezone('US/Pacific') ).strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+
     def mk_case(self, **kwargs):
         defaults = {
             'first_name': 'first_name',
             'last_name': 'last_name',
             'locality': 'locality',
             'date_of_birth': self.mk_random_date(),
-            'create_date_time': timezone.now(),
+            'create_date_time': self.start_randomDate(),
             'sa_id_number': 'sa_id_number',
             'msisdn': 'msisdn',
             'id_type': 'id_type',
