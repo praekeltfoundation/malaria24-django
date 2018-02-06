@@ -18,7 +18,7 @@ class Digest(models.Model):
 
     @classmethod
     def compile_digest(cls):
-        new_cases = ReportedCase.objects.filter(digest__isnull=True)
+        new_cases = ReportedCase.objects.filter(digest__isnull=True).order_by("create_date_time")
         if not new_cases.exists():
             return
 
@@ -46,7 +46,7 @@ class Digest(models.Model):
                     "%d %B %Y"
             )
             week = "{0} to {1}".format(start_date, end_date)
-
+            print week
         context = {
             'digest': self,
             'week': week,
@@ -123,12 +123,12 @@ class NationalDigest(models.Model, CalculationsMixin):
 
         for p, p_name in PROVINCES:
             districts = Facility.objects.filter(province=p).values_list(
-                'district', flat=True).distinct().order_by("district")
+                'district', flat=True).distinct().order_by("district", "created_at")
             for district in districts:
                 district_fac_codes = Facility.objects.filter(
                     district=district).values_list(
                     'facility_code',
-                    flat=True).distinct().order_by("district")
+                    flat=True).distinct().order_by("district", "created_at")
                 province_cases = ReportedCase.objects.filter(
                     facility_code__in=district_fac_codes, digest__isnull=True)
 
@@ -165,6 +165,7 @@ class NationalDigest(models.Model, CalculationsMixin):
                             "%d %B %Y"
                         )
                     week = "{0} to {1}".format(start_date, end_date)
+                    print week
 
                 provinces.append({
                     'province': p_name,
@@ -242,8 +243,8 @@ class ProvincialDigest(models.Model, CalculationsMixin):
 
     def get_digest_email_data(self, province, facility_code):
         district_list = []
-        date = datetime.today()
-        week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
+        date2 = datetime.today()
+        week = 'Week ' + str(date2.strftime("%U")) + ' ' + str(date2.year)
         if not province:
             try:
                 province = Facility.objects.get(
@@ -251,7 +252,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
             except Facility.DoesNotExist:
                 return {}
         districts = Facility.objects.filter(province=province).values_list(
-            'district', flat=True).distinct().order_by("district")
+            'district', flat=True).distinct().order_by("district", "created_at")
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
         total_somalia = total_ethiopia = total_no_international_travel = \
@@ -262,7 +263,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
             district_fac_codes = Facility.objects.filter(
                 district=district).values_list(
                     'facility_code',
-                    flat=True).distinct().order_by("district")
+                    flat=True).distinct().order_by("district", "created_at")
             district_cases = ReportedCase.objects.filter(
                 facility_code__in=district_fac_codes, digest__isnull=True)
             total_cases += district_cases.count()
@@ -296,7 +297,10 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                     .last().create_date_time.strftime(
                         "%d %B %Y"
                     )
+
                 week = "{0} to {1}".format(start_date, end_date)
+                print week
+
             district_list.append({
                 'district': district,
                 'cases': district_cases.count(),
@@ -388,23 +392,20 @@ class DistrictDigest(models.Model, CalculationsMixin):
         district_fac_codes = Facility.objects.filter(
             district=district).values_list(
                 'facility_code',
-                flat=True).distinct().order_by("district")
+                flat=True).distinct().order_by("district", "created_at")
 
         district_cases = ReportedCase.objects.filter(
-            facility_code__in=district_fac_codes, digest__isnull=True)
-        date = datetime.today()
-        week = 'Week ' + str(
-            date.strftime("%U")) + ' ' + str(date.year)
-        if district_cases:
-            start_date = district_cases.first().create_date_time.strftime(
-                "%d %B %Y"
-            )
-            end_date = district_cases.last().create_date_time.strftime(
-                "%d %B %Y"
-            )
-            week = "{0} to {1}".format(start_date, end_date)
+            facility_code__in=district_fac_codes, digest__isnull=True).order_by("created_at")
 
-        facilities = Facility.objects.filter(district=district)
+
+        date3 = datetime.today()
+
+        week = 'Week ' + str(
+            date3.strftime("%U")) + ' ' + str(date3.year)
+        range_week = week
+
+
+        facilities = Facility.objects.filter(district=district).order_by("created_at")
         fac_list = []
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
@@ -412,6 +413,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
         total_somalia = total_ethiopia = total_no_international_travel = \
             total_mozambique = total_zambia = total_zimbabwe = 0
         total_other = 0
+
 
         for fac in facilities:
             facility_name = 'Unknown (district: %s)' % (district,)
@@ -446,16 +448,23 @@ class DistrictDigest(models.Model, CalculationsMixin):
             total_zimbabwe += zimbabwe
             total_other += other
             total_no_international_travel += no_international_travel
+
+
             if fac_cases:
                 start_date = fac_cases \
                     .first().create_date_time.strftime(
                         "%d %B %Y"
                     )
+
                 end_date = fac_cases \
                     .last().create_date_time.strftime(
                         "%d %B %Y"
                     )
+
                 week = "{0} to {1}".format(start_date, end_date)
+                print week
+
+
             fac_list.append({
                 'facility': facility_name,
                 'district': district_name,
@@ -472,6 +481,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
                 'zimbabwe': zimbabwe,
                 'other': other
             })
+
         totals = {}
         totals['total_cases'] = total_cases
         totals['total_females'] = total_females
