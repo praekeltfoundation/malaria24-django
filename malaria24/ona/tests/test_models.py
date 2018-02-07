@@ -1,6 +1,6 @@
 from django.core import mail
 from django.db.models.signals import post_save
-from datetime import *
+from datetime import datetime
 from testfixtures import LogCapture
 from mock import patch
 
@@ -385,7 +385,7 @@ class EhpReportedCaseTest(MalariaTestCase):
         self.assertEqual(case2.facility_names, 'Unknown')
 
 
-class DigestTest(MalariaTestCase): #py.test -k DigestTest
+class DigestTest(MalariaTestCase):
 
     def setUp(self):
         super(DigestTest, self).setUp()
@@ -409,7 +409,6 @@ class DigestTest(MalariaTestCase): #py.test -k DigestTest
                 "%d %B %Y"
             )
         return "{0} to {1}".format(start_date, end_date)
-
 
     @responses.activate
     def test_compile_digest(self):
