@@ -47,7 +47,6 @@ class Digest(models.Model):
                     "%d %B %Y"
             )
             week = "{0} to {1}".format(start_date, end_date)
-            print week
         context = {
             'digest': self,
             'week': week,
@@ -113,6 +112,10 @@ class NationalDigest(models.Model, CalculationsMixin):
         return digest
 
     def get_digest_email_data(self):
+        min_start_day = 31
+        max_start_day = 1
+        start_week_day = datetime.today().strftime("%d %B %Y")
+        end_week_day = datetime.today().strftime("%d %B %Y")
         provinces = []
         date = datetime.today()
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
@@ -162,12 +165,19 @@ class NationalDigest(models.Model, CalculationsMixin):
                         .first().create_date_time.strftime(
                             "%d %B %Y"
                         )
+                    now_start_day = int(start_date.split(' ', 1)[0])
+                    if now_start_day < min_start_day:
+                        min_start_day = now_start_day
+                        start_week_day = start_date
                     end_date = province_cases \
                         .last().create_date_time.strftime(
                             "%d %B %Y"
                         )
-                    week = "{0} to {1}".format(start_date, end_date)
-                    print week
+                    now_end_day = int(end_date.split(' ', 1)[0])
+                    if now_end_day > max_start_day:
+                        max_start_day = now_end_day
+                        end_week_day = end_date
+                    week = "{0} to {1}".format(start_week_day, end_week_day)
 
                 provinces.append({
                     'province': p_name,
@@ -244,6 +254,10 @@ class ProvincialDigest(models.Model, CalculationsMixin):
         return digest
 
     def get_digest_email_data(self, province, facility_code):
+        min_start_day = 31
+        max_start_day = 1
+        start_week_day = datetime.today().strftime("%d %B %Y")
+        end_week_day = datetime.today().strftime("%d %B %Y")
         district_list = []
         date2 = datetime.today()
         week = 'Week ' + str(date2.strftime("%U")) + ' ' + str(date2.year)
@@ -296,13 +310,19 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                     .first().create_date_time.strftime(
                         "%d %B %Y"
                     )
+                now_start_day = int(start_date.split(' ', 1)[0])
+                if now_start_day < min_start_day:
+                    min_start_day = now_start_day
+                    start_week_day = start_date
                 end_date = district_cases \
                     .last().create_date_time.strftime(
                         "%d %B %Y"
                     )
-
-                week = "{0} to {1}".format(start_date, end_date)
-                print week
+                now_end_day = int(end_date.split(' ', 1)[0])
+                if now_end_day > max_start_day:
+                    max_start_day = now_end_day
+                    end_week_day = end_date
+                week = "{0} to {1}".format(start_week_day, end_week_day)
 
             district_list.append({
                 'district': district,
@@ -385,6 +405,10 @@ class DistrictDigest(models.Model, CalculationsMixin):
         return digest
 
     def get_digest_email_data(self, district, facility_code):
+        min_start_day = 31
+        max_start_day = 1
+        start_week_day = datetime.today().strftime("%d %B %Y")
+        end_week_day = datetime.today().strftime("%d %B %Y")
         if not district:
             try:
                 district = Facility.objects.get(
@@ -453,14 +477,20 @@ class DistrictDigest(models.Model, CalculationsMixin):
                     .first().create_date_time.strftime(
                         "%d %B %Y"
                     )
+                now_start_day = int(start_date.split(' ', 1)[0])
+                if now_start_day < min_start_day:
+                    min_start_day = now_start_day
+                    start_week_day = start_date
 
                 end_date = fac_cases \
                     .last().create_date_time.strftime(
                         "%d %B %Y"
                     )
-
-                week = "{0} to {1}".format(start_date, end_date)
-                print week
+                now_end_day = int(end_date.split(' ', 1)[0])
+                if now_end_day > max_start_day:
+                    max_start_day = now_end_day
+                    end_week_day = end_date
+                week = "{0} to {1}".format(start_week_day, end_week_day)
 
             fac_list.append({
                 'facility': facility_name,
