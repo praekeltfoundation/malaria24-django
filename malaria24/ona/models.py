@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.template.loader import render_to_string
 from django.utils import timezone
-from datetime import *
+from datetime import datetime
 
 
 class Digest(models.Model):
@@ -18,7 +18,8 @@ class Digest(models.Model):
 
     @classmethod
     def compile_digest(cls):
-        new_cases = ReportedCase.objects.filter(digest__isnull=True).order_by("create_date_time")
+        new_cases = (ReportedCase.objects.filter(digest__isnull=True)
+                     .order_by("create_date_time"))
         if not new_cases.exists():
             return
 
@@ -122,8 +123,9 @@ class NationalDigest(models.Model, CalculationsMixin):
         total_other = 0
 
         for p, p_name in PROVINCES:
-            districts = Facility.objects.filter(province=p).values_list(
-                'district', flat=True).distinct().order_by("district", "created_at")
+            districts = (Facility.objects.filter(province=p).values_list(
+                'district', flat=True).distinct()
+                .order_by("district", "created_at"))
             for district in districts:
                 district_fac_codes = Facility.objects.filter(
                     district=district).values_list(
@@ -251,8 +253,9 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                     facility_code=facility_code).province
             except Facility.DoesNotExist:
                 return {}
-        districts = Facility.objects.filter(province=province).values_list(
-            'district', flat=True).distinct().order_by("district", "created_at")
+        districts = (Facility.objects.filter(province=province).values_list(
+            'district', flat=True).distinct()
+            .order_by("district", "created_at"))
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
         total_somalia = total_ethiopia = total_no_international_travel = \
@@ -394,18 +397,15 @@ class DistrictDigest(models.Model, CalculationsMixin):
                 'facility_code',
                 flat=True).distinct().order_by("district", "created_at")
 
-        district_cases = ReportedCase.objects.filter(
-            facility_code__in=district_fac_codes, digest__isnull=True).order_by("created_at")
-
-
+        district_cases = (ReportedCase.objects.filter(
+            facility_code__in=district_fac_codes, digest__isnull=True)
+            .order_by("created_at"))
         date3 = datetime.today()
 
         week = 'Week ' + str(
             date3.strftime("%U")) + ' ' + str(date3.year)
-        range_week = week
-
-
-        facilities = Facility.objects.filter(district=district).order_by("created_at")
+        facilities = (Facility.objects.filter(district=district)
+                      .order_by("created_at"))
         fac_list = []
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
@@ -413,7 +413,6 @@ class DistrictDigest(models.Model, CalculationsMixin):
         total_somalia = total_ethiopia = total_no_international_travel = \
             total_mozambique = total_zambia = total_zimbabwe = 0
         total_other = 0
-
 
         for fac in facilities:
             facility_name = 'Unknown (district: %s)' % (district,)
@@ -449,7 +448,6 @@ class DistrictDigest(models.Model, CalculationsMixin):
             total_other += other
             total_no_international_travel += no_international_travel
 
-
             if fac_cases:
                 start_date = fac_cases \
                     .first().create_date_time.strftime(
@@ -463,7 +461,6 @@ class DistrictDigest(models.Model, CalculationsMixin):
 
                 week = "{0} to {1}".format(start_date, end_date)
                 print week
-
 
             fac_list.append({
                 'facility': facility_name,
@@ -637,6 +634,7 @@ class ReportedCase(models.Model):
         # use attachment file
         return render_to_string(
             'ona/email_attachment.html', self.get_email_context())
+
 
 EHP = 'EHP'
 CASE_INVESTIGATOR = 'CASE_INVESTIGATOR'
