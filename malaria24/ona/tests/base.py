@@ -75,13 +75,15 @@ class MalariaTestCase(TestCase):
                 e_second, 0, pytz.timezone('US/Pacific'))
                 .strftime('%Y-%m-%d %H:%M:%S.%f%z'))
 
+    '''in order to view differents dates for testing, change create_date_time
+    to self.start_randomDate()'''
     def mk_case(self, **kwargs):
         defaults = {
             'first_name': 'first_name',
             'last_name': 'last_name',
             'locality': 'locality',
             'date_of_birth': self.mk_random_date(),
-            'create_date_time': self.start_randomDate(),
+            'create_date_time': timezone.now(),
             'sa_id_number': 'sa_id_number',
             'msisdn': 'msisdn',
             'id_type': 'id_type',
