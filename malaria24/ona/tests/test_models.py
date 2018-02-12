@@ -3,6 +3,8 @@ from django.db.models.signals import post_save
 from datetime import datetime
 from testfixtures import LogCapture
 from mock import patch
+import random
+import pytz
 
 import responses
 
@@ -400,15 +402,56 @@ class DigestTest(MalariaTestCase):
             new_case_alert_case_investigators, sender=ReportedCase)
 
     def get_week(self, cases):
-        start_date = cases \
+        test_cases = ReportedCase.objects.all().order_by("create_date_time")
+        start_date = test_cases \
             .first().create_date_time.strftime(
                 "%d %B %Y"
             )
-        end_date = cases \
+        end_date = test_cases \
             .last().create_date_time.strftime(
                 "%d %B %Y"
             )
         return "{0} to {1}".format(start_date, end_date)
+
+    @responses.activate
+    def test_overall_week_ranges(self):
+        self.mk_actor(role=MANAGER_NATIONAL,
+                      email_address='manager@example.org')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+        self.mk_mis(name='MIS', email_address='mis@example.org')
+
+        for i in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.create_date_time = (datetime(2018, 2,
+                                              random.choice(range(1, 5)),
+                                              11, 30, 30, 0,
+                                              pytz.timezone('US/Pacific'))
+                                     .strftime('%Y-%m-%d %H:%M:%S.%f%z'))
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.create_date_time = (datetime(2018, 2,
+                                              random.choice(range(4, 8)),
+                                              11, 30, 30, 0,
+                                              pytz.timezone('US/Pacific'))
+                                     .strftime('%Y-%m-%d %H:%M:%S.%f%z'))
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = NationalDigest.compile_digest()
+        digest.send_digest_email()
+        [message] = mail.outbox
+        [alternative] = message.alternatives
+        html_content, content_type = alternative
+        week_range = "01 February 2018 to 07 February 2018"
+        self.assertEqual(self.get_week(ReportedCase.objects.all()), week_range)
 
     @responses.activate
     def test_compile_digest(self):
