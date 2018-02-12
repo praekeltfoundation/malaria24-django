@@ -7,7 +7,6 @@ import responses
 
 from django.test import TestCase, override_settings
 from django.utils import timezone
-from django.db import models
 
 from malaria24.ona.models import (
     ReportedCase, Actor, EHP, CASE_INVESTIGATOR, MIS, Facility)
@@ -15,9 +14,6 @@ from malaria24.ona.models import (
 
 @override_settings(CELERY_ALWAYS_EAGER=True)
 class MalariaTestCase(TestCase):
-
-    posted = models.DateTimeField()
-
     def setUp(self):
         responses.add(
             responses.PUT,
@@ -56,10 +52,10 @@ class MalariaTestCase(TestCase):
     def mk_facility(self, **kwargs):
         return Facility.objects.create(**kwargs)
 
-    def start_randomDate(self):
+    def mk_create_random_week_range(self):
         random_year = timezone.now().year
 
-        return (datetime(random_year, 2, random.choice(range(1, 8)), 11, 30,
+        return (datetime(random_year, 2, random.choice(range(3, 8)), 11, 30,
                          30, 0, pytz.timezone('US/Pacific'))
                 .strftime('%Y-%m-%d %H:%M:%S.%f%z'))
 
@@ -76,7 +72,7 @@ class MalariaTestCase(TestCase):
                 .strftime('%Y-%m-%d %H:%M:%S.%f%z'))
 
     '''in order to view differents dates for testing, change create_date_time
-    to self.start_randomDate()'''
+    to self.mk_create_random_week_range()'''
     def mk_case(self, **kwargs):
         defaults = {
             'first_name': 'first_name',
