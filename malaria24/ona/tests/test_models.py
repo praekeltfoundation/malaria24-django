@@ -1,8 +1,9 @@
 from django.core import mail
 from django.db.models.signals import post_save
-from datetime import *
+from datetime import datetime
 from testfixtures import LogCapture
 from mock import patch
+
 
 import responses
 
@@ -400,11 +401,12 @@ class DigestTest(MalariaTestCase):
             new_case_alert_case_investigators, sender=ReportedCase)
 
     def get_week(self, cases):
-        start_date = cases \
+        test_cases = ReportedCase.objects.all().order_by("create_date_time")
+        start_date = test_cases \
             .first().create_date_time.strftime(
                 "%d %B %Y"
             )
-        end_date = cases \
+        end_date = test_cases \
             .last().create_date_time.strftime(
                 "%d %B %Y"
             )

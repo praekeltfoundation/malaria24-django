@@ -1,6 +1,7 @@
 import pkg_resources
 import random
 from datetime import datetime
+import pytz
 
 import responses
 
@@ -13,7 +14,6 @@ from malaria24.ona.models import (
 
 @override_settings(CELERY_ALWAYS_EAGER=True)
 class MalariaTestCase(TestCase):
-
     def setUp(self):
         responses.add(
             responses.PUT,
@@ -52,6 +52,27 @@ class MalariaTestCase(TestCase):
     def mk_facility(self, **kwargs):
         return Facility.objects.create(**kwargs)
 
+    def mk_create_random_week_range(self):
+        random_year = timezone.now().year
+
+        return (datetime(random_year, 2, random.choice(range(3, 8)), 11, 30,
+                         30, 0, pytz.timezone('US/Pacific'))
+                .strftime('%Y-%m-%d %H:%M:%S.%f%z'))
+
+    def mk_create_date(self):
+        random_year = timezone.now().year
+        e_month = random.choice(range(1, 13))
+        e_day = random.choice(range(1, 29))
+        e_hour = random.choice(range(0, 24))
+        e_minute = random.choice(range(0, 60))
+        e_second = random.choice(range(0, 60))
+
+        return (datetime(random_year, e_month, e_day, e_hour, e_minute,
+                e_second, 0, pytz.timezone('US/Pacific'))
+                .strftime('%Y-%m-%d %H:%M:%S.%f%z'))
+
+    '''in order to view differents dates for testing, change create_date_time
+    to self.mk_create_random_week_range()'''
     def mk_case(self, **kwargs):
         defaults = {
             'first_name': 'first_name',
