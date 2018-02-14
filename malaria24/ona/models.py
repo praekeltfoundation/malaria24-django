@@ -48,6 +48,7 @@ class Digest(models.Model):
                     "%d %B %Y"
             )
             week = "{0} to {1}".format(start_date, end_date)
+
         context = {
             'digest': self,
             'week': week,
@@ -114,24 +115,26 @@ class NationalDigest(models.Model, CalculationsMixin):
 
     def get_digest_email_data(self):
         utc = pytz.UTC
-        min_date = datetime.min.replace(tzinfo=utc)
-        temp_min_date = datetime.min.replace(tzinfo=utc)
-        max_date = datetime.max.replace(tzinfo=utc)
-        temp_max_date = datetime.max.replace(tzinfo=utc)
-        provinces = []
         date = datetime.today()
         week = 'Week ' + str(date.strftime("%U")) + ' ' + str(date.year)
+        provinces = []
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
         total_somalia = total_ethiopia = total_no_international_travel = \
             total_mozambique = total_zambia = total_zimbabwe = 0
         total_other = 0
 
+        all_case_ids = []
+
         for p, p_name in PROVINCES:
             districts = (Facility.objects.filter(province=p).values_list(
                 'district', flat=True).distinct()
                 .order_by("district", "created_at"))
+
             for district in districts:
+                min_date = datetime.max.replace(tzinfo=utc)
+                max_date = datetime(1991, 1, 1, 0, 0,
+                                    0, 0, pytz.timezone('US/Pacific'))
                 district_fac_codes = Facility.objects.filter(
                     district=district).values_list(
                     'facility_code',
@@ -141,6 +144,7 @@ class NationalDigest(models.Model, CalculationsMixin):
                     .order_by("create_date_time"))
 
                 total_cases += province_cases.count()
+                all_case_ids += province_cases.values_list('pk', flat=True)
 
                 female, male = self.calculate_male_female(province_cases)
                 total_females += female
@@ -166,20 +170,14 @@ class NationalDigest(models.Model, CalculationsMixin):
                 if province_cases:
                     start_date = province_cases \
                         .first().create_date_time
-                    if min_date == temp_min_date:
-                        min_date = start_date
-                    else:
-                        if start_date < min_date:
+                    if start_date < min_date:
                             min_date = start_date
 
                     end_date = province_cases \
                         .last().create_date_time
-                    if max_date == temp_max_date:
-                        max_date = end_date
-                    else:
-                        if end_date > max_date:
+                    if end_date > max_date:
                             max_date = end_date
-                    week = "{0} to {1}".format(min_date.strftime(
+                    province_week = "{0} to {1}".format(min_date.strftime(
                         "%d %B %Y"
                     ), max_date.strftime(
                         "%d %B %Y"
@@ -193,7 +191,7 @@ class NationalDigest(models.Model, CalculationsMixin):
                     'under5': under5,
                     'over5': over5,
                     'no_international_travel': no_international_travel,
-                    'week': week,
+                    'week': province_week,
                     'somalia': somalia,
                     'ethiopia': ethiopia,
                     'mozambique': mozambique,
@@ -201,6 +199,21 @@ class NationalDigest(models.Model, CalculationsMixin):
                     'zimbabwe': zimbabwe,
                     'other': other
                 })
+        all_cases = ReportedCase.objects.filter(
+            pk__in=all_case_ids).order_by('create_date_time')
+        if all_cases.exists():
+            min_week = all_cases.first().create_date_time
+            max_week = all_cases.last().create_date_time
+
+            week = "{0} to {1}".format(min_week.strftime(
+                "%d %B %Y"
+            ), max_week.strftime(
+                "%d %B %Y"
+            ))
+        else:
+            date = datetime.today()
+            week = 'Week ' + str(
+                date.strftime("%U")) + ' ' + str(date.year)
 
         totals = {}
         totals['total_cases'] = total_cases
@@ -261,13 +274,10 @@ class ProvincialDigest(models.Model, CalculationsMixin):
 
     def get_digest_email_data(self, province, facility_code):
         utc = pytz.UTC
-        min_date = datetime.min.replace(tzinfo=utc)
-        temp_min_date = datetime.min.replace(tzinfo=utc)
-        max_date = datetime.max.replace(tzinfo=utc)
-        temp_max_date = datetime.max.replace(tzinfo=utc)
-        district_list = []
         date2 = datetime.today()
         week = 'Week ' + str(date2.strftime("%U")) + ' ' + str(date2.year)
+        district_list = []
+        all_case_ids = []
         if not province:
             try:
                 province = Facility.objects.get(
@@ -284,6 +294,9 @@ class ProvincialDigest(models.Model, CalculationsMixin):
         total_other = 0
 
         for district in districts:
+            min_date = datetime.max.replace(tzinfo=utc)
+            max_date = datetime(1991, 1, 1, 0, 0,
+                                0, 0, pytz.timezone('US/Pacific'))
             district_fac_codes = Facility.objects.filter(
                 district=district).values_list(
                     'facility_code',
@@ -292,6 +305,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                 facility_code__in=district_fac_codes, digest__isnull=True)
                 .order_by("create_date_time"))
             total_cases += district_cases.count()
+            all_case_ids += district_cases.values_list('pk', flat=True)
 
             female, male = self.calculate_male_female(district_cases)
             total_females += female
@@ -313,23 +327,18 @@ class ProvincialDigest(models.Model, CalculationsMixin):
             total_zimbabwe += zimbabwe
             total_other += other
             total_no_international_travel += no_international_travel
+
             if district_cases:
                 start_date = district_cases \
                     .first().create_date_time
-                if min_date == temp_min_date:
-                    min_date = start_date
-                else:
-                    if start_date < min_date:
+                if start_date < min_date:
                         min_date = start_date
 
                 end_date = district_cases \
                     .last().create_date_time
-                if max_date == temp_max_date:
-                    max_date = end_date
-                else:
-                    if end_date > max_date:
+                if end_date > max_date:
                         max_date = end_date
-                week = "{0} to {1}".format(min_date.strftime(
+                district_week = "{0} to {1}".format(min_date.strftime(
                     "%d %B %Y"
                 ), max_date.strftime(
                     "%d %B %Y"
@@ -341,7 +350,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                 'females': female, 'males': male,
                 'under5': under5,
                 'over5': over5,
-                'week': week,
+                'week': district_week,
                 'no_international_travel': no_international_travel,
                 'somalia': somalia,
                 'ethiopia': ethiopia,
@@ -350,6 +359,22 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                 'zimbabwe': zimbabwe,
                 'other': other
             })
+
+        all_cases = ReportedCase.objects.filter(
+            pk__in=all_case_ids).order_by('create_date_time')
+        if all_cases.exists():
+            min_week = all_cases.first().create_date_time
+            max_week = all_cases.last().create_date_time
+
+            week = "{0} to {1}".format(min_week.strftime(
+                "%d %B %Y"
+            ), max_week.strftime(
+                "%d %B %Y"
+            ))
+        else:
+            date = datetime.today()
+            week = 'Week ' + str(
+                date.strftime("%U")) + ' ' + str(date.year)
 
         totals = {}
         totals['total_cases'] = total_cases
@@ -417,10 +442,8 @@ class DistrictDigest(models.Model, CalculationsMixin):
 
     def get_digest_email_data(self, district, facility_code):
         utc = pytz.UTC
-        min_date = datetime.min.replace(tzinfo=utc)
-        temp_min_date = datetime.min.replace(tzinfo=utc)
-        max_date = datetime.max.replace(tzinfo=utc)
-        temp_max_date = datetime.max.replace(tzinfo=utc)
+        date3 = datetime.today()
+        week = 'Week ' + str(date3.strftime("%U")) + ' ' + str(date3.year)
         if not district:
             try:
                 district = Facility.objects.get(
@@ -443,6 +466,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
         facilities = (Facility.objects.filter(district=district)
                       .order_by("created_at"))
         fac_list = []
+        all_case_ids = []
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
 
@@ -450,7 +474,20 @@ class DistrictDigest(models.Model, CalculationsMixin):
             total_mozambique = total_zambia = total_zimbabwe = 0
         total_other = 0
 
+        if district_cases:
+            start_date = district_cases.first().create_date_time.strftime(
+                "%d %B %Y"
+            )
+            end_date = district_cases.last().create_date_time.strftime(
+                "%d %B %Y"
+            )
+
+            week = "{0} to {1}".format(start_date, end_date)
+
         for fac in facilities:
+            min_date = datetime.max.replace(tzinfo=utc)
+            max_date = datetime(1991, 1, 1, 0, 0,
+                                0, 0, pytz.timezone('US/Pacific'))
             facility_name = 'Unknown (district: %s)' % (district,)
             if fac:
                 facility_name = fac.facility_name
@@ -461,6 +498,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
 
             fac_cases = district_cases.filter(facility_code=fac.facility_code)
             total_cases += fac_cases.count()
+            all_case_ids += district_cases.values_list('pk', flat=True)
 
             female, male = self.calculate_male_female(fac_cases)
             total_females += female
@@ -487,20 +525,14 @@ class DistrictDigest(models.Model, CalculationsMixin):
             if fac_cases:
                 start_date = fac_cases \
                     .first().create_date_time
-                if min_date == temp_min_date:
-                    min_date = start_date
-                else:
-                    if start_date < min_date:
+                if start_date < min_date:
                         min_date = start_date
 
                 end_date = fac_cases \
                     .last().create_date_time
-                if max_date == temp_max_date:
-                    max_date = end_date
-                else:
-                    if end_date > max_date:
+                if end_date > max_date:
                         max_date = end_date
-                week = "{0} to {1}".format(min_date.strftime(
+                fac_week = "{0} to {1}".format(min_date.strftime(
                     "%d %B %Y"
                 ), max_date.strftime(
                     "%d %B %Y"
@@ -513,7 +545,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
                 'females': female, 'males': male,
                 'under5': under5,
                 'over5': over5,
-                'week': week,
+                'week': fac_week,
                 'no_international_travel': no_international_travel,
                 'somalia': somalia,
                 'ethiopia': ethiopia,
@@ -522,6 +554,22 @@ class DistrictDigest(models.Model, CalculationsMixin):
                 'zimbabwe': zimbabwe,
                 'other': other
             })
+
+        all_cases = ReportedCase.objects.filter(
+            pk__in=all_case_ids).order_by('create_date_time')
+        if all_cases.exists():
+            min_week = all_cases.first().create_date_time
+            max_week = all_cases.last().create_date_time
+
+            week = "{0} to {1}".format(min_week.strftime(
+                "%d %B %Y"
+            ), max_week.strftime(
+                "%d %B %Y"
+            ))
+        else:
+            date = datetime.today()
+            week = 'Week ' + str(
+                date.strftime("%U")) + ' ' + str(date.year)
 
         totals = {}
         totals['total_cases'] = total_cases
