@@ -10,7 +10,7 @@ import responses
 from malaria24.ona.models import (
     ReportedCase, SMS, Digest,
     new_case_alert_ehps, new_case_alert_case_investigators,
-    new_case_alert_mis,
+    new_case_alert_mis, new_case_alert_jembi,
     MANAGER_DISTRICT, MIS, MANAGER_NATIONAL, DistrictDigest,
     MANAGER_PROVINCIAL, Facility, NationalDigest, ProvincialDigest)
 from malaria24.ona import tasks
@@ -26,6 +26,8 @@ class CaseInvestigatorTest(MalariaTestCase):
             new_case_alert_ehps, sender=ReportedCase)
         post_save.disconnect(
             new_case_alert_mis, sender=ReportedCase)
+        post_save.disconnect(
+            new_case_alert_jembi, sender=ReportedCase)
 
     def tearDown(self):
         super(CaseInvestigatorTest, self).tearDown()
@@ -33,6 +35,8 @@ class CaseInvestigatorTest(MalariaTestCase):
             new_case_alert_ehps, sender=ReportedCase)
         post_save.connect(
             new_case_alert_mis, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_jembi, sender=ReportedCase)
 
     @responses.activate
     def test_capture_no_case_investigators(self):
@@ -88,6 +92,8 @@ class MISTest(MalariaTestCase):
             new_case_alert_ehps, sender=ReportedCase)
         post_save.disconnect(
             new_case_alert_case_investigators, sender=ReportedCase)
+        post_save.disconnect(
+            new_case_alert_jembi, sender=ReportedCase)
 
     def tearDown(self):
         super(MISTest, self).tearDown()
@@ -95,6 +101,8 @@ class MISTest(MalariaTestCase):
             new_case_alert_ehps, sender=ReportedCase)
         post_save.connect(
             new_case_alert_case_investigators, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_jembi, sender=ReportedCase)
 
     @responses.activate
     def test_capture_no_mis(self):
@@ -181,6 +189,8 @@ class EhpReportedCaseTest(MalariaTestCase):
             new_case_alert_case_investigators, sender=ReportedCase)
         post_save.disconnect(
             new_case_alert_mis, sender=ReportedCase)
+        post_save.disconnect(
+            new_case_alert_jembi, sender=ReportedCase)
 
     def tearDown(self):
         super(EhpReportedCaseTest, self).tearDown()
@@ -188,6 +198,8 @@ class EhpReportedCaseTest(MalariaTestCase):
             new_case_alert_case_investigators, sender=ReportedCase)
         post_save.connect(
             new_case_alert_mis, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_jembi, sender=ReportedCase)
 
     @responses.activate
     def test_capture_no_ehps(self):
@@ -384,6 +396,43 @@ class EhpReportedCaseTest(MalariaTestCase):
         case2 = self.mk_case(facility_code='0002')
         self.assertEqual(case1.facility_names, 'Facility 1')
         self.assertEqual(case2.facility_names, 'Unknown')
+
+
+class JembiReportedCaseTest(MalariaTestCase):
+
+    def setUp(self):
+        super(JembiReportedCaseTest, self).setUp()
+        post_save.disconnect(
+            new_case_alert_case_investigators, sender=ReportedCase)
+        post_save.disconnect(
+            new_case_alert_mis, sender=ReportedCase)
+        post_save.disconnect(
+            new_case_alert_ehps, sender=ReportedCase)
+        '''self.complete_url = ("{}?criteria=value:{}"
+                             .format('http://jembi.org/malaria24'))'''
+
+    def tearDown(self):
+        super(JembiReportedCaseTest, self).tearDown()
+        post_save.connect(
+            new_case_alert_case_investigators, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_mis, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_ehps, sender=ReportedCase)
+
+    @responses.activate
+    def test_compile_data(self):
+        case = self.mk_case(first_name="John", last_name="Day", gender="male",
+                            msisdn="0711111111", landmark_description="None",
+                            id_type="said", case_number="20171214-123456-42",
+                            abroad="No", locality="None",
+                            reported_by="+27721111111",
+                            sa_id_number="5608071111083",
+                            landmark="School", facility_code="123456")
+        case.save()
+        case.digest = None
+        d = case.get_data()
+        self.assertEqual(case.get_data(), d)
 
 
 class DigestTest(MalariaTestCase):
