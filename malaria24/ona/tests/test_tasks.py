@@ -2,7 +2,8 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test import override_settings
-from datetime import *
+from datetime import datetime
+from base64 import b64encode
 import json
 import pkg_resources
 import responses
@@ -17,6 +18,10 @@ from malaria24.ona.tasks import (
     ona_fetch_forms, send_sms)
 
 from .base import MalariaTestCase
+
+FAKE_URL = "http://jembi.org/malaria24"
+USER_NAME = 'fake@example.com'
+PASSWORD = 'not_a_real_password'
 
 
 class OnaTest(MalariaTestCase):
@@ -36,6 +41,9 @@ class OnaTest(MalariaTestCase):
                       body=pkg_resources.resource_string(
                           'malaria24', 'ona/fixtures/responses/forms.json'))
         post_save.disconnect(new_case_alert_ehps, sender=ReportedCase)
+        self.complete_url = FAKE_URL
+        self.username = USER_NAME
+        self.password = PASSWORD
 
     def tearDown(self):
         super(OnaTest, self).tearDown()
@@ -277,3 +285,38 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(data['event_auth_token'], jb_token.key)
         [sms] = SMS.objects.all()
         self.assertEqual(sms.content, "test message")
+
+    @responses.activate
+    @override_settings(FAKE_URL="http://jembi.org/malaria24",
+                       FAKE_USERNAME='fake@example.com',
+                       FAKE_PASSWORD='not_a_real_password')
+    def test_compile_Jembi(self):
+        case = self.mk_case(first_name="John", last_name="Day", gender="male",
+                            msisdn="0711111111", landmark_description="None",
+                            id_type="said", case_number="20171214-123456-42",
+                            abroad="No", locality="None",
+                            reported_by="+27721111111",
+                            sa_id_number="5608071111083",
+                            landmark="School", facility_code="123456")
+        case.save()
+        case.digest = None
+        responses.add(
+            responses.POST,
+            self.complete_url,
+            status=201, content_type='application/json',
+            body=json.dumps(
+                case.get_data()
+            )
+        )
+        auth_headers = ('Basic ' +
+                        b64encode("{0}:{1}".format(USER_NAME, PASSWORD)))
+        self.assertEqual(
+            responses.calls[0].request.headers['Authorization'],
+            auth_headers)
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(
+            responses.calls[0].request.url,
+            self.complete_url)
+        data = json.loads(responses.calls[0].request.body)
+        self.assertEqual(data,
+                         case.get_data())
