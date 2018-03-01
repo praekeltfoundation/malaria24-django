@@ -144,9 +144,9 @@ def make_pdf(html_content):  # pragma: no cover
 @celery_app.task(ignore_result=True)
 def compile_and_send_jembi(case_pk):
     case = ReportedCase.objects.get(pk=case_pk)
-    api_url = settings.URL
+    api_url = settings.JEMBI_URL
     case_dictionary = case.get_data()
-    auth = HTTPBasicAuth(settings.USERNAME, settings.PASSWORD)
+    auth = HTTPBasicAuth(settings.JEMBI_USERNAME, settings.JEMBI_PASSWORD)
     r = requests.post(api_url, json=case_dictionary, auth=auth)
     r.json()
 
