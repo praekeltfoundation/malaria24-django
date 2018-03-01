@@ -2,6 +2,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test import override_settings
+from django.conf import settings
 from datetime import datetime
 from base64 import b64encode
 import json
@@ -18,10 +19,6 @@ from malaria24.ona.tasks import (
     ona_fetch_forms, send_sms)
 
 from .base import MalariaTestCase
-
-FAKE_URL = "http://jembi.org/malaria24"
-USER_NAME = 'fake@example.com'
-PASSWORD = 'not_a_real_password'
 
 
 class OnaTest(MalariaTestCase):
@@ -41,9 +38,9 @@ class OnaTest(MalariaTestCase):
                       body=pkg_resources.resource_string(
                           'malaria24', 'ona/fixtures/responses/forms.json'))
         post_save.disconnect(new_case_alert_ehps, sender=ReportedCase)
-        self.complete_url = FAKE_URL
-        self.username = USER_NAME
-        self.password = PASSWORD
+        self.complete_url = settings.URL
+        self.username = settings.USERNAME
+        self.password = settings.PASSWORD
 
     def tearDown(self):
         super(OnaTest, self).tearDown()
@@ -287,9 +284,6 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(sms.content, "test message")
 
     @responses.activate
-    @override_settings(FAKE_URL="http://jembi.org/malaria24",
-                       FAKE_USERNAME='fake@example.com',
-                       FAKE_PASSWORD='not_a_real_password')
     def test_compile_Jembi(self):
         case = self.mk_case(first_name="John", last_name="Day", gender="male",
                             msisdn="0711111111", landmark_description="None",
@@ -302,21 +296,33 @@ class OnaTest(MalariaTestCase):
         case.digest = None
         responses.add(
             responses.POST,
-            self.complete_url,
+            settings.URL,
             status=201, content_type='application/json',
             body=json.dumps(
                 case.get_data()
             )
         )
         auth_headers = ('Basic ' +
-                        b64encode("{0}:{1}".format(USER_NAME, PASSWORD)))
+                        b64encode("{0}:{1}".format(settings.USERNAME,
+                                                   settings.PASSWORD)))
         self.assertEqual(
             responses.calls[0].request.headers['Authorization'],
             auth_headers)
         self.assertEqual(len(responses.calls), 1)
         self.assertEqual(
             responses.calls[0].request.url,
-            self.complete_url)
+            settings.URL)
         data = json.loads(responses.calls[0].request.body)
-        self.assertEqual(data,
-                         case.get_data())
+        self.assertEqual(data['first_name'], 'John')
+        self.assertEqual(data['last_name'], 'Day')
+        self.assertEqual(data['gender'], 'male')
+        self.assertEqual(data['msisdn'], '0711111111')
+        self.assertEqual(data['case_number'], '20171214-123456-42')
+        self.assertEqual(data['sa_id_number'], '5608071111083')
+        self.assertEqual(data['reported_by'], '+27721111111')
+        self.assertEqual(data['id_type'], 'said')
+        self.assertEqual(data['abroad'], 'No')
+        self.assertEqual(data['landmark_description'], 'None')
+        self.assertEqual(data['locality'], 'None')
+        self.assertEqual(data['landmark'], 'School')
+        self.assertEqual(data['facility_code'], '123456')
