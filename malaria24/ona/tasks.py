@@ -19,9 +19,6 @@ from onapie.client import Client
 from go_http.send import HttpApiSender
 from requests.auth import HTTPBasicAuth
 
-USER_NAME = 'fake@example.com'
-PASSWORD = 'not_a_real_password'
-
 
 @celery_app.task(ignore_result=True)
 def ona_fetch_forms():
@@ -147,11 +144,11 @@ def make_pdf(html_content):  # pragma: no cover
 @celery_app.task(ignore_result=True)
 def compile_and_send_jembi(case_pk):
     case = ReportedCase.objects.get(pk=case_pk)
-    api_url = 'http://jembi.org/malaria24'
+    api_url = settings.URL
     case_dictionary = case.get_data()
-    auth = HTTPBasicAuth(USER_NAME, PASSWORD)
+    auth = HTTPBasicAuth(settings.USERNAME, settings.PASSWORD)
     r = requests.post(api_url, json=case_dictionary, auth=auth)
-    print r.json
+    r.json()
 
 
 @celery_app.task(ignore_result=True)
