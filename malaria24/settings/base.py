@@ -119,9 +119,9 @@ CELERYBEAT_SCHEDULE = {
 DEFAULT_FROM_EMAIL = 'MalariaConnect <malaria24@praekelt.com>'
 
 # JEMBI settings
-URL = 'http://jembi.org/malaria24'
-USERNAME = 'fake@example.com'
-PASSWORD = 'not_a_real_password'
+JEMBI_URL = 'http://jembi.org/malaria24'
+JEMBI_USERNAME = 'fake@example.com'
+JEMBI_PASSWORD = 'not_a_real_password'
 
 # Logging
 LOGGING = {
