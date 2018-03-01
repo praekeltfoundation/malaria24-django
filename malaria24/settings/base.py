@@ -12,6 +12,7 @@ from os.path import abspath, dirname, join
 from django.conf import global_settings
 from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta
+import dj_database_url
 
 from celery.schedules import crontab
 
@@ -117,6 +118,11 @@ CELERYBEAT_SCHEDULE = {
 
 DEFAULT_FROM_EMAIL = 'MalariaConnect <malaria24@praekelt.com>'
 
+# JEMBI settings
+URL = 'http://jembi.org/malaria24'
+USERNAME = 'fake@example.com'
+PASSWORD = 'not_a_real_password'
+
 # Logging
 LOGGING = {
     'version': 1,
@@ -166,7 +172,6 @@ LOGGING = {
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
 # SQLite (simplest install)
-import dj_database_url
 DATABASES = {'default': dj_database_url.config(
     default='sqlite:///%s' % (join(PROJECT_ROOT, 'db.sqlite3'),))}
 
