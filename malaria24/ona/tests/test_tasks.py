@@ -38,9 +38,9 @@ class OnaTest(MalariaTestCase):
                       body=pkg_resources.resource_string(
                           'malaria24', 'ona/fixtures/responses/forms.json'))
         post_save.disconnect(new_case_alert_ehps, sender=ReportedCase)
-        self.complete_url = settings.URL
-        self.username = settings.USERNAME
-        self.password = settings.PASSWORD
+        self.complete_url = settings.JEMBI_URL
+        self.username = settings.JEMBI_USERNAME
+        self.password = settings.JEMBI_PASSWORD
 
     def tearDown(self):
         super(OnaTest, self).tearDown()
@@ -296,22 +296,22 @@ class OnaTest(MalariaTestCase):
         case.digest = None
         responses.add(
             responses.POST,
-            settings.URL,
+            settings.JEMBI_URL,
             status=201, content_type='application/json',
             body=json.dumps(
                 case.get_data()
             )
         )
         auth_headers = ('Basic ' +
-                        b64encode("{0}:{1}".format(settings.USERNAME,
-                                                   settings.PASSWORD)))
+                        b64encode("{0}:{1}".format(settings.JEMBI_USERNAME,
+                                                   settings.JEMBI_PASSWORD)))
         self.assertEqual(
             responses.calls[0].request.headers['Authorization'],
             auth_headers)
         self.assertEqual(len(responses.calls), 1)
         self.assertEqual(
             responses.calls[0].request.url,
-            settings.URL)
+            settings.JEMBI_URL)
         data = json.loads(responses.calls[0].request.body)
         self.assertEqual(data['first_name'], 'John')
         self.assertEqual(data['last_name'], 'Day')
