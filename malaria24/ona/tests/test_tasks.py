@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test import override_settings
-from datetime import *
+from datetime import datetime
 import json
 import pkg_resources
 import responses
