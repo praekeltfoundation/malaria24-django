@@ -177,7 +177,7 @@ class NationalDigest(models.Model, CalculationsMixin):
                         .last().create_date_time
                     if end_date > max_date:
                             max_date = end_date
-                    province_week = "{0} to {1}".format(min_date.strftime(
+                    week = "{0} to {1}".format(min_date.strftime(
                         "%d %B %Y"
                     ), max_date.strftime(
                         "%d %B %Y"
@@ -191,7 +191,7 @@ class NationalDigest(models.Model, CalculationsMixin):
                     'under5': under5,
                     'over5': over5,
                     'no_international_travel': no_international_travel,
-                    'week': province_week,
+                    'week': week,
                     'somalia': somalia,
                     'ethiopia': ethiopia,
                     'mozambique': mozambique,
@@ -338,7 +338,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                     .last().create_date_time
                 if end_date > max_date:
                         max_date = end_date
-                district_week = "{0} to {1}".format(min_date.strftime(
+                week = "{0} to {1}".format(min_date.strftime(
                     "%d %B %Y"
                 ), max_date.strftime(
                     "%d %B %Y"
@@ -350,7 +350,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                 'females': female, 'males': male,
                 'under5': under5,
                 'over5': over5,
-                'week': district_week,
+                'week': week,
                 'no_international_travel': no_international_travel,
                 'somalia': somalia,
                 'ethiopia': ethiopia,
@@ -532,7 +532,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
                     .last().create_date_time
                 if end_date > max_date:
                         max_date = end_date
-                fac_week = "{0} to {1}".format(min_date.strftime(
+                week = "{0} to {1}".format(min_date.strftime(
                     "%d %B %Y"
                 ), max_date.strftime(
                     "%d %B %Y"
@@ -545,7 +545,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
                 'females': female, 'males': male,
                 'under5': under5,
                 'over5': over5,
-                'week': fac_week,
+                'week': week,
                 'no_international_travel': no_international_travel,
                 'somalia': somalia,
                 'ethiopia': ethiopia,
