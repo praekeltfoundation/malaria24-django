@@ -201,7 +201,6 @@ class OnaTest(MalariaTestCase):
             case.ehps.add(ehp1)
             case.ehps.add(ehp2)
             case.save()
-            case.digest = None
 
         for i in range(10):
             case = self.mk_case(gender='male', facility_code='222222')
@@ -209,7 +208,6 @@ class OnaTest(MalariaTestCase):
             case.ehps.add(ehp1)
             case.ehps.add(ehp2)
             case.save()
-            case.digest = None
 
         for i in range(10):
             case = self.mk_case(gender='male', facility_code='333333')
@@ -217,17 +215,10 @@ class OnaTest(MalariaTestCase):
             case.ehps.add(ehp1)
             case.ehps.add(ehp2)
             case.save()
-            case.digest = None
+
         self.mk_case()
         compile_and_send_digest_email()
         NationalDigest.compile_digest().send_digest_email()
-        digest = NationalDigest.compile_digest()
-        context = digest.get_digest_email_data()
-        week = context['week']
-        try:
-            context['week'] is week
-        except ValueError:
-            print "variable not known"
 
     @responses.activate
     def test_provincial_digest_week_variable(self):
@@ -243,9 +234,6 @@ class OnaTest(MalariaTestCase):
                                 facility_name='Facility 2',
                                 province='The Eastern Cape',
                                 district=u'Example2')
-        manager1 = self.mk_actor(role=MANAGER_PROVINCIAL,
-                                 email_address='manager@example.org',
-                                 province='Limpopo', facility_code='342315')
         self.mk_actor(role=MIS,
                       email_address='mis@example.org',
                       facility_code='342315')
@@ -258,7 +246,6 @@ class OnaTest(MalariaTestCase):
             case.ehps.add(ehp1)
             case.ehps.add(ehp2)
             case.save()
-            case.digest = None
 
         for i in range(10):
             case = self.mk_case(gender='male', facility_code='222222')
@@ -266,7 +253,6 @@ class OnaTest(MalariaTestCase):
             case.ehps.add(ehp1)
             case.ehps.add(ehp2)
             case.save()
-            case.digest = None
 
         for i in range(10):
             case = self.mk_case(gender='male', facility_code='333333')
@@ -274,17 +260,10 @@ class OnaTest(MalariaTestCase):
             case.ehps.add(ehp1)
             case.ehps.add(ehp2)
             case.save()
-            case.digest = None
+
         self.mk_case()
         compile_and_send_digest_email()
         ProvincialDigest.compile_digest().send_digest_email()
-        digest = ProvincialDigest.compile_digest()
-        context = digest.get_digest_email_data(manager1.province, None)
-        week = context['districts'][1]['week']
-        try:
-            context['districts'][1]['week'] is week
-        except ValueError:
-            print "variable not known"
 
     @responses.activate
     def test_district_digest_week_variable(self):
@@ -300,9 +279,6 @@ class OnaTest(MalariaTestCase):
                                 facility_name='Facility 3',
                                 province='The Eastern Cape',
                                 district=u'Example3')
-        manager1 = self.mk_actor(role=MANAGER_DISTRICT,
-                                 email_address='manager@example.org',
-                                 district=u'Example1', facility_code='342315')
         self.mk_actor(role=MIS,
                       email_address='mis@example.org',
                       facility_code='342315', district=u'Example1')
@@ -318,7 +294,6 @@ class OnaTest(MalariaTestCase):
             case.ehps.add(ehp1)
             case.ehps.add(ehp2)
             case.save()
-            case.digest = None
 
         for i in range(10):
             case = self.mk_case(gender='male', facility_code='222222')
@@ -326,7 +301,6 @@ class OnaTest(MalariaTestCase):
             case.ehps.add(ehp1)
             case.ehps.add(ehp2)
             case.save()
-            case.digest = None
 
         for i in range(10):
             case = self.mk_case(gender='male', facility_code='333333')
@@ -334,17 +308,10 @@ class OnaTest(MalariaTestCase):
             case.ehps.add(ehp1)
             case.ehps.add(ehp2)
             case.save()
-            case.digest = None
+
         self.mk_case()
         compile_and_send_digest_email()
         DistrictDigest.compile_digest().send_digest_email()
-        digest = DistrictDigest.compile_digest()
-        context = digest.get_digest_email_data(manager1.district, None)
-        week = context['facility'][1]['week']
-        try:
-            context['facility'][1]['week'] is week
-        except ValueError:
-            print "variable not known"
 
     @responses.activate
     def test_ona_fetch_forms(self):
