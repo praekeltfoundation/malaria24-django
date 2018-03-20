@@ -17,6 +17,7 @@ from malaria24.ona.models import (ReportedCase, SMS, Digest, Facility, OnaForm,
 from onapie.client import Client
 
 from go_http.send import HttpApiSender
+from requests.auth import HTTPBasicAuth
 
 
 @celery_app.task(ignore_result=True)
@@ -138,6 +139,16 @@ def make_pdf(html_content):  # pragma: no cover
     os.close(fd)
     os.unlink(output_file)
     return value
+
+
+@celery_app.task(ignore_result=True)
+def compile_and_send_jembi(case_pk):
+    case = ReportedCase.objects.get(pk=case_pk)
+    api_url = settings.JEMBI_URL
+    case_dictionary = case.get_data()
+    auth = HTTPBasicAuth(settings.JEMBI_USERNAME, settings.JEMBI_PASSWORD)
+    r = requests.post(api_url, json=case_dictionary, auth=auth)
+    r.json()
 
 
 @celery_app.task(ignore_result=True)

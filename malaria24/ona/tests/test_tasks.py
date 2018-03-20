@@ -2,7 +2,9 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test import override_settings
+from django.conf import settings
 from datetime import datetime
+from base64 import b64encode
 import json
 import pkg_resources
 import responses
@@ -37,6 +39,9 @@ class OnaTest(MalariaTestCase):
                       body=pkg_resources.resource_string(
                           'malaria24', 'ona/fixtures/responses/forms.json'))
         post_save.disconnect(new_case_alert_ehps, sender=ReportedCase)
+        self.complete_url = settings.JEMBI_URL
+        self.username = settings.JEMBI_USERNAME
+        self.password = settings.JEMBI_PASSWORD
 
     def tearDown(self):
         super(OnaTest, self).tearDown()
@@ -416,3 +421,47 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(data['event_auth_token'], jb_token.key)
         [sms] = SMS.objects.all()
         self.assertEqual(sms.content, "test message")
+
+    @responses.activate
+    def test_compile_Jembi(self):
+        case = self.mk_case(first_name="John", last_name="Day", gender="male",
+                            msisdn="0711111111", landmark_description="None",
+                            id_type="said", case_number="20171214-123456-42",
+                            abroad="No", locality="None",
+                            reported_by="+27721111111",
+                            sa_id_number="5608071111083",
+                            landmark="School", facility_code="123456")
+        case.save()
+        case.digest = None
+        responses.add(
+            responses.POST,
+            settings.JEMBI_URL,
+            status=201, content_type='application/json',
+            body=json.dumps(
+                case.get_data()
+            )
+        )
+        auth_headers = ('Basic ' +
+                        b64encode("{0}:{1}".format(settings.JEMBI_USERNAME,
+                                                   settings.JEMBI_PASSWORD)))
+        self.assertEqual(
+            responses.calls[0].request.headers['Authorization'],
+            auth_headers)
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(
+            responses.calls[0].request.url,
+            settings.JEMBI_URL)
+        data = json.loads(responses.calls[0].request.body)
+        self.assertEqual(data['first_name'], 'John')
+        self.assertEqual(data['last_name'], 'Day')
+        self.assertEqual(data['gender'], 'male')
+        self.assertEqual(data['msisdn'], '0711111111')
+        self.assertEqual(data['case_number'], '20171214-123456-42')
+        self.assertEqual(data['sa_id_number'], '5608071111083')
+        self.assertEqual(data['reported_by'], '+27721111111')
+        self.assertEqual(data['id_type'], 'said')
+        self.assertEqual(data['abroad'], 'No')
+        self.assertEqual(data['landmark_description'], 'None')
+        self.assertEqual(data['locality'], 'None')
+        self.assertEqual(data['landmark'], 'School')
+        self.assertEqual(data['facility_code'], '123456')
