@@ -7,6 +7,7 @@ from django.db.models.signals import post_save
 from django.template.loader import render_to_string
 from django.utils import timezone
 from datetime import datetime
+
 import pytz
 
 
@@ -662,6 +663,28 @@ class ReportedCase(models.Model):
     ehps = models.ManyToManyField('Actor', blank=True)
     form = models.ForeignKey('OnaForm', null=True, blank=True)
 
+    def get_data(self):
+            '''JSON Formats need create_date_time & date_of_birth
+            to be overridden'''
+            birth_date = datetime.strptime(self.date_of_birth,
+                                           "%y%m%d")
+            return {"first_name": self.first_name,
+                    "last_name": self.last_name,
+                    "gender": self.gender,
+                    "msisdn": self.msisdn,
+                    "landmark_description": self.landmark_description,
+                    "id_type": self.id_type,
+                    "case_number": self.case_number,
+                    "abroad": self.abroad,
+                    "locality": self.locality,
+                    "reported_by": self.reported_by,
+                    "date_of_birth": birth_date.strftime("%Y-%m-%d"),
+                    "sa_id_number": self.sa_id_number,
+                    "create_date_time": self.create_date_time.strftime(
+                        "%Y%m%d%H%M%S"),
+                    "landmark": self.landmark,
+                    "facility_code": self.facility_code}
+
     def get_today(self):
         return datetime.today()
 
@@ -878,6 +901,13 @@ class SMSEvent(models.Model):
     sms = models.ForeignKey('SMS')
 
 
+def new_case_alert_jembi(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    alert_jembi(instance)
+
+
 def new_case_alert_ehps(sender, instance, created, **kwargs):
     if not created:
         return
@@ -897,6 +927,12 @@ def new_case_alert_mis(sender, instance, created, **kwargs):
         return
 
     alert_case_mis(instance)
+
+
+def alert_jembi(reported_case):
+    from malaria24.ona.tasks import compile_and_send_jembi
+
+    compile_and_send_jembi.delay(reported_case.pk)
 
 
 def alert_ehps(reported_case):
@@ -1026,3 +1062,4 @@ def alert_case_mis(reported_case):
 post_save.connect(new_case_alert_ehps, sender=ReportedCase)
 post_save.connect(new_case_alert_case_investigators, sender=ReportedCase)
 post_save.connect(new_case_alert_mis, sender=ReportedCase)
+post_save.connect(new_case_alert_jembi, sender=ReportedCase)

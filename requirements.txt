@@ -9,3 +9,4 @@ djangorestframework==3.3.2
 pyopenssl==17.5.0
 ndg-httpsclient==0.4.3
 pyasn1==0.4.2
+requests
