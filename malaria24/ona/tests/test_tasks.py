@@ -13,7 +13,8 @@ from rest_framework.authtoken.models import Token
 
 from malaria24.ona.models import (
     ReportedCase, new_case_alert_ehps, MIS, MANAGER_DISTRICT, MANAGER_NATIONAL,
-    MANAGER_PROVINCIAL, OnaForm, Facility, SMS)
+    MANAGER_PROVINCIAL, OnaForm, Facility, SMS, DistrictDigest,
+    NationalDigest, ProvincialDigest)
 from malaria24.ona.tasks import (
     ona_fetch_reported_cases, compile_and_send_digest_email,
     ona_fetch_forms, send_sms)
@@ -178,6 +179,144 @@ class OnaTest(MalariaTestCase):
             'm2@example.org',
             mis.email_address]))
         self.assertEqual(len(mail.outbox), 4)
+
+    @responses.activate
+    def test_national_digest_week_variable(self):
+        self.mk_actor(role=MIS,
+                      email_address='manager@example.org')
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        self.mk_actor(role=MANAGER_DISTRICT,
+                      email_address='manager@example.org',
+                      facility_code='342315')
+        self.mk_actor(role=MANAGER_PROVINCIAL,
+                      email_address='m2@example.org',
+                      facility_code='342315')
+        self.mk_actor(role=MANAGER_NATIONAL,
+                      email_address='m3@example.org',
+                      facility_code='342315')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for i in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='222222')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='333333')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+
+        self.mk_case()
+        compile_and_send_digest_email()
+        NationalDigest.compile_digest().send_digest_email()
+
+    @responses.activate
+    def test_provincial_digest_week_variable(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        Facility.objects.create(facility_code='222222',
+                                facility_name='Facility 2',
+                                province='Limpopo',
+                                district=u'Example2')
+        Facility.objects.create(facility_code='333333',
+                                facility_name='Facility 2',
+                                province='The Eastern Cape',
+                                district=u'Example2')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='342315')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for i in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='222222')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='333333')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+
+        self.mk_case()
+        compile_and_send_digest_email()
+        ProvincialDigest.compile_digest().send_digest_email()
+
+    @responses.activate
+    def test_district_digest_week_variable(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        Facility.objects.create(facility_code='222222',
+                                facility_name='Facility 2',
+                                province='Limpopo',
+                                district=u'Example1')
+        Facility.objects.create(facility_code='333333',
+                                facility_name='Facility 3',
+                                province='The Eastern Cape',
+                                district=u'Example3')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='342315', district=u'Example1')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='222222', district=u'Example1')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for i in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='222222')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='333333')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+
+        self.mk_case()
+        compile_and_send_digest_email()
+        DistrictDigest.compile_digest().send_digest_email()
 
     @responses.activate
     def test_ona_fetch_forms(self):
