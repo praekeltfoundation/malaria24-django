@@ -497,6 +497,145 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(message.to, [mis.email_address])
 
     @responses.activate
+    def test_print_district_digest_email_data(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        Facility.objects.create(facility_code='343434',
+                                facility_name='Facility 2',
+                                province='Limpopo',
+                                district=u'Example2')
+        Facility.objects.create(facility_code='333444',
+                                facility_name='Facility 3',
+                                province='Limpopo',
+                                district=u'Example3')
+        Facility.objects.create(facility_code='333333',
+                                facility_name='Facility 3',
+                                province='The Eastern Cape',
+                                district=u'Example4')
+        Facility.objects.create(facility_code='111111',
+                                facility_name='Facility 1',
+                                province='Gauteng',
+                                district=u'Example5')
+        Facility.objects.create(facility_code='333333',
+                                facility_name='Facility 3',
+                                province='The Eastern Cape',
+                                district=u'Example5')
+        manager1 = self.mk_actor(role=MANAGER_DISTRICT,
+                                 email_address='manager@example.org',
+                                 district=u'Example1', facility_code='342315')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='342315', district=u'Example1')
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.org',
+                      facility_code='222222', district=u'Example1')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for i in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='222222')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='333333')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = DistrictDigest.compile_digest()
+        data = digest.get_digest_email_data(
+            manager1.district, None)
+        # ADD PRINT DATA STATEMENT HERE TO VIEW DIGEST DATA
+        self.assertEqual(
+            data['week'], self.get_week(ReportedCase.objects.all()))
+
+    @responses.activate
+    def test_print_national_digest_email_data(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        Facility.objects.create(facility_code='343333',
+                                facility_name='Facility 2',
+                                province='Limpopo',
+                                district=u'Example2')
+        Facility.objects.create(facility_code='345555',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example6')
+        Facility.objects.create(facility_code='343333',
+                                facility_name='Facility 2',
+                                province='Limpopo',
+                                district=u'Example2')
+        Facility.objects.create(facility_code='333444',
+                                facility_name='Facility 3',
+                                province='Limpopo',
+                                district=u'Example3')
+        Facility.objects.create(facility_code='333441',
+                                facility_name='Facility 4',
+                                province='Limpopo',
+                                district=u'Example3')
+        Facility.objects.create(facility_code='333333',
+                                facility_name='Facility 3',
+                                province='The Eastern Cape',
+                                district=u'Example7')
+        Facility.objects.create(facility_code='111222',
+                                facility_name='Facility 2',
+                                province='Gauteng',
+                                district=u'Example5')
+        Facility.objects.create(facility_code='111111',
+                                facility_name='Facility 1',
+                                province='Gauteng',
+                                district=u'Example5')
+        Facility.objects.create(facility_code='333333',
+                                facility_name='Facility 3',
+                                province='The Eastern Cape',
+                                district=u'Example7')
+        self.mk_actor(role=MANAGER_NATIONAL,
+                      email_address='manager@example.org')
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+        self.mk_mis(name='MIS', email_address='mis@example.org')
+
+        for i in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        for i in range(10):
+            case = self.mk_case(gender='male', facility_code='222222')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = NationalDigest.compile_digest()
+        data = digest.get_digest_email_data()
+        # ADD PRINT DATA STATEMENT HERE TO VIEW DIGEST DATA
+        self.assertEqual(
+            data['week'], self.get_week(ReportedCase.objects.all()))
+
+    @responses.activate
     def test_send_national_digest_email(self):
         Facility.objects.create(facility_code='342315',
                                 facility_name='Facility 1',
