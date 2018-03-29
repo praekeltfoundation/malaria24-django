@@ -129,7 +129,8 @@ class NationalDigest(models.Model, CalculationsMixin):
 
         for p, p_name in PROVINCES:
             districts = (Facility.objects.filter(province=p).values_list(
-                'district', flat=True).distinct().order_by("district"))
+                'district', flat=True).distinct().order_by("district",
+                                                           "created_at"))
             for district in districts:
                 min_date = datetime.max.replace(tzinfo=utc)
                 max_date = datetime(1991, 1, 1, 0, 0,
@@ -137,9 +138,10 @@ class NationalDigest(models.Model, CalculationsMixin):
                 district_fac_codes = Facility.objects.filter(
                     district=district).values_list(
                     'facility_code',
-                    flat=True).distinct().order_by("district")
-                province_cases = ReportedCase.objects.filter(
+                    flat=True).distinct().order_by("district", "created_at")
+                province_cases = (ReportedCase.objects.filter(
                     facility_code__in=district_fac_codes, digest__isnull=True)
+                    .order_by("create_date_time"))
 
                 total_cases += province_cases.count()
                 all_case_ids += province_cases.values_list('pk', flat=True)
@@ -284,7 +286,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                 return {}
         districts = (Facility.objects.filter(province=province).values_list(
             'district', flat=True).distinct()
-            .order_by("district"))
+            .order_by("district", "created_at"))
         total_cases = total_females = total_males = 0
         total_under5 = total_over5 = 0
         total_somalia = total_ethiopia = total_no_international_travel = \
@@ -298,9 +300,10 @@ class ProvincialDigest(models.Model, CalculationsMixin):
             district_fac_codes = Facility.objects.filter(
                 district=district).values_list(
                     'facility_code',
-                    flat=True).distinct().order_by("district")
-            district_cases = ReportedCase.objects.filter(
+                    flat=True).distinct().order_by("district", "created_at")
+            district_cases = (ReportedCase.objects.filter(
                 facility_code__in=district_fac_codes, digest__isnull=True)
+                .order_by("create_date_time"))
 
             total_cases += district_cases.count()
             all_case_ids += district_cases.values_list('pk', flat=True)
@@ -452,11 +455,11 @@ class DistrictDigest(models.Model, CalculationsMixin):
         district_fac_codes = Facility.objects.filter(
             district=district).values_list(
                 'facility_code',
-                flat=True).distinct().order_by("district")
+                flat=True).distinct().order_by("district", "created_at")
 
-        district_cases = ReportedCase.objects.filter(
+        district_cases = (ReportedCase.objects.filter(
             facility_code__in=district_fac_codes, digest__isnull=True)
-
+            .order_by("create_date_time"))
         facilities = Facility.objects.filter(district=district)
         fac_list = []
         all_case_ids = []
