@@ -658,13 +658,13 @@ class ReportedCase(models.Model):
             '''JSON Formats need create_date_time & date_of_birth
             to be overridden'''
             try:
-                dob = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
+                birth_date = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
             except ValueError:
                 # NOTE: This is an unfortunate side-effect of changing how
                 #       date of birth is stored mid-way the data.
                 #       There is historical data in Ona that has this
                 #       old format.
-                dob = datetime.strptime(self.date_of_birth, '%y%m%d')
+                birth_date = datetime.strptime(self.date_of_birth, '%y%m%d')
 
             return {"first_name": self.first_name,
                     "last_name": self.last_name,
@@ -676,7 +676,7 @@ class ReportedCase(models.Model):
                     "abroad": self.abroad,
                     "locality": self.locality,
                     "reported_by": self.reported_by,
-                    "date_of_birth": dob.strftime("%Y-%m-%d"),
+                    "date_of_birth": birth_date.strftime("%Y-%m-%d"),
                     "sa_id_number": self.sa_id_number,
                     "create_date_time": self.create_date_time.strftime(
                         "%Y%m%d%H%M%S"),
