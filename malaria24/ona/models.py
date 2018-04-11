@@ -657,8 +657,15 @@ class ReportedCase(models.Model):
     def get_data(self):
             '''JSON Formats need create_date_time & date_of_birth
             to be overridden'''
-            birth_date = datetime.strptime(self.date_of_birth,
-                                           "%y%m%d")
+            try:
+                birth_date = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
+            except ValueError:
+                # NOTE: This is an unfortunate side-effect of changing how
+                #       date of birth is stored mid-way the data.
+                #       There is historical data in Ona that has this
+                #       old format.
+                birth_date = datetime.strptime(self.date_of_birth, '%y%m%d')
+
             return {"first_name": self.first_name,
                     "last_name": self.last_name,
                     "gender": self.gender,

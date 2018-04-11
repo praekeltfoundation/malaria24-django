@@ -423,14 +423,15 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(sms.content, "test message")
 
     @responses.activate
-    def test_compile_Jembi(self):
+    def test_compile_and_send_jembi(self):
         case = self.mk_case(first_name="John", last_name="Day", gender="male",
                             msisdn="0711111111", landmark_description="None",
                             id_type="said", case_number="20171214-123456-42",
                             abroad="No", locality="None",
                             reported_by="+27721111111",
                             sa_id_number="5608071111083",
-                            landmark="School", facility_code="123456")
+                            landmark="School", facility_code="123456",
+                            date_of_birth="1995-01-01")
         case.save()
         case.digest = None
         responses.add(
@@ -465,3 +466,4 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(data['locality'], 'None')
         self.assertEqual(data['landmark'], 'School')
         self.assertEqual(data['facility_code'], '123456')
+        self.assertEqual(data['date_of_birth'], '1995-01-01')
