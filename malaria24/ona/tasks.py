@@ -148,6 +148,7 @@ def compile_and_send_jembi(case_pk):
     case_dictionary = case.get_data()
     auth = HTTPBasicAuth(settings.JEMBI_USERNAME, settings.JEMBI_PASSWORD)
     r = requests.post(api_url, json=case_dictionary, auth=auth)
+    r.raise_for_status()
     r.json()
 
 
