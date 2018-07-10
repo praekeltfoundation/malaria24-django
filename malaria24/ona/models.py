@@ -657,8 +657,6 @@ class ReportedCase(models.Model):
     def get_data(self):
             '''JSON Formats need create_date_time & date_of_birth
             to be overridden'''
-            birth_date = datetime.strptime(self.date_of_birth,
-                                           "%y%m%d")
             try:
                 birth_date = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
             except ValueError:
