@@ -17,8 +17,8 @@ from malaria24.ona.models import (
     MANAGER_PROVINCIAL, OnaForm, Facility, SMS, DistrictDigest,
     NationalDigest, ProvincialDigest)
 from malaria24.ona.tasks import (
-    ona_fetch_reported_cases, compile_and_send_digest_email, compile_and_send_jembi,
-    ona_fetch_forms, send_sms)
+    ona_fetch_reported_cases, compile_and_send_digest_email,
+    compile_and_send_jembi, ona_fetch_forms, send_sms)
 
 from .base import MalariaTestCase
 
@@ -469,7 +469,7 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(data['facility_code'], '123456')
 
     @responses.activate
-    def test_send_Jembi(self):
+    def test_send_jembi(self):
         """
         Checks to see if status raised for errors
         """
@@ -482,7 +482,6 @@ class OnaTest(MalariaTestCase):
                             landmark="School", facility_code="123456")
         case.save()
         case.digest = None
-        case_dictionary = case.get_data()
         responses.add(
             responses.POST,
             settings.JEMBI_URL,
