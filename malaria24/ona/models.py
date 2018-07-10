@@ -667,7 +667,7 @@ class ReportedCase(models.Model):
                 #       There is historical data in Ona that has this
                 #       old format.
                 birth_date = datetime.strptime(self.date_of_birth, '%y%m%d')
-            print(birth_date.strftime("%Y-%m-%d"))
+                
             return {"first_name": self.first_name,
                     "last_name": self.last_name,
                     "gender": self.gender,
