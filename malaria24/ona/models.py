@@ -9,6 +9,7 @@ from django.utils import timezone
 from datetime import datetime
 
 import pytz
+import re
 
 
 class Digest(models.Model):
@@ -656,7 +657,16 @@ class ReportedCase(models.Model):
 
     def get_data(self):
             '''JSON Formats need create_date_time & date_of_birth
-            to be overridden'''
+            to be overridden
+
+            need to validate msisdn and reported_by fields are in
+            correct format'''
+
+            valid_prefixes = '+27'
+            msisdn_result = re.match('^' + valid_prefixes + '*([0-9]{9})$',
+                                     self.msisdn)
+            reported_by_result = re.match('^' + valid_prefixes +
+                                          '*([0-9]{9})$', self.reported_by)
             try:
                 birth_date = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
             except ValueError:
@@ -666,16 +676,26 @@ class ReportedCase(models.Model):
                 #       old format.
                 birth_date = datetime.strptime(self.date_of_birth, '%y%m%d')
 
+            try:
+                reported_by = '+27' + reported_by_result
+            except ValueError:
+                reported_by = None  # invalid format
+
+            try:
+                msisdn = '+27' + msisdn_result
+            except ValueError:
+                msisdn = None  # invalid format
+
             return {"first_name": self.first_name,
                     "last_name": self.last_name,
                     "gender": self.gender,
-                    "msisdn": self.msisdn,
+                    "msisdn": msisdn,
                     "landmark_description": self.landmark_description,
                     "id_type": self.id_type,
                     "case_number": self.case_number,
                     "abroad": self.abroad,
                     "locality": self.locality,
-                    "reported_by": self.reported_by,
+                    "reported_by": reported_by,
                     "date_of_birth": birth_date.strftime("%Y-%m-%d"),
                     "sa_id_number": self.sa_id_number,
                     "create_date_time": self.create_date_time.strftime(
