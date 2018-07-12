@@ -8,6 +8,7 @@ from base64 import b64encode
 import json
 import pkg_resources
 import responses
+import requests
 
 from rest_framework.authtoken.models import Token
 
@@ -17,7 +18,7 @@ from malaria24.ona.models import (
     NationalDigest, ProvincialDigest)
 from malaria24.ona.tasks import (
     ona_fetch_reported_cases, compile_and_send_digest_email,
-    ona_fetch_forms, send_sms)
+    compile_and_send_jembi, ona_fetch_forms, send_sms)
 
 from .base import MalariaTestCase
 
@@ -467,6 +468,7 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(
             responses.calls[0].request.url,
             settings.JEMBI_URL)
+
         data = json.loads(responses.calls[0].request.body)
         self.assertEqual(data['first_name'], 'John')
         self.assertEqual(data['last_name'], 'Day')
@@ -481,4 +483,28 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(data['locality'], 'None')
         self.assertEqual(data['landmark'], 'School')
         self.assertEqual(data['facility_code'], '123456')
-        self.assertEqual(data['date_of_birth'], '1995-01-01')
+
+    @responses.activate
+    def test_send_jembi(self):
+        """
+        Checks to see if status raised for errors
+        """
+        case = self.mk_case(first_name="John", last_name="Day", gender="male",
+                            msisdn="0711111111", landmark_description="None",
+                            id_type="said", case_number="20171214-123456-42",
+                            abroad="No", locality="None",
+                            reported_by="+27721111111",
+                            sa_id_number="5608071111083",
+                            landmark="School", facility_code="123456")
+        case.save()
+        case.digest = None
+        responses.add(
+            responses.POST,
+            settings.JEMBI_URL,
+            status=404, content_type='application/json',
+            body=json.dumps(
+                case.get_data()
+            )
+        )
+        with self.assertRaises(requests.HTTPError):
+            compile_and_send_jembi(case.pk)
