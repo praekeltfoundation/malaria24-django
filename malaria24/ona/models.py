@@ -655,6 +655,13 @@ class ReportedCase(models.Model):
     ehps = models.ManyToManyField('Actor', blank=True)
     form = models.ForeignKey('OnaForm', null=True, blank=True)
 
+    def normalize_msisdn(self, mobile_number):
+        valid_prefix = '[+27]'
+        if re.match('^' + valid_prefix + '*([0-9]{9})$', mobile_number):
+            return mobile_number
+        else:
+            return '+27' + mobile_number[1:]
+
     def get_data(self):
             '''JSON Formats need create_date_time & date_of_birth
             to be overridden
@@ -671,16 +678,8 @@ class ReportedCase(models.Model):
                 #       old format.
                 birth_date = datetime.strptime(self.date_of_birth, '%y%m%d')
 
-            valid_prefix = '[+27]'
-            if re.match('^' + valid_prefix + '*([0-9]{9})$', self.reported_by):
-                reported_by = self.reported_by
-            else:
-                reported_by = '+27' + self.reported_by[1:]
-
-            if re.match('^' + valid_prefix + '*([0-9]{9})$', self.msisdn):
-                msisdn = self.msisdn
-            else:
-                msisdn = '+27' + self.msisdn[1:]
+            reported_by = ReportedCase.normalize_msisdn(self, self.reported_by)
+            msisdn = ReportedCase.normalize_msisdn(self, self.msisdn)
 
             return {"first_name": self.first_name,
                     "last_name": self.last_name,
