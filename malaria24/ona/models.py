@@ -671,12 +671,13 @@ class ReportedCase(models.Model):
                 #       old format.
                 birth_date = datetime.strptime(self.date_of_birth, '%y%m%d')
 
-            if self.reported_by[:3] == "+27":
+            valid_prefix = '[+27]'
+            if re.match('^' + valid_prefix + '*([0-9]{9})$', self.reported_by):
                 reported_by = self.reported_by
             else:
                 reported_by = '+27' + self.reported_by[1:]
 
-            if self.msisdn[:3] == "+27":
+            if re.match('^' + valid_prefix + '*([0-9]{9})$', self.msisdn):
                 msisdn = self.msisdn
             else:
                 msisdn = '+27' + self.msisdn[1:]
