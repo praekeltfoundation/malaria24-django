@@ -656,8 +656,7 @@ class ReportedCase(models.Model):
     form = models.ForeignKey('OnaForm', null=True, blank=True)
 
     def normalize_msisdn(self, mobile_number):
-        valid_prefix = '[+27]'
-        if re.match('^' + valid_prefix + '*([0-9]{9})$', mobile_number):
+        if re.match('^[+27]*([0-9]{9})$', mobile_number):
             return mobile_number
         else:
             return '+27' + mobile_number[1:]
@@ -678,8 +677,8 @@ class ReportedCase(models.Model):
                 #       old format.
                 birth_date = datetime.strptime(self.date_of_birth, '%y%m%d')
 
-            reported_by = ReportedCase.normalize_msisdn(self, self.reported_by)
-            msisdn = ReportedCase.normalize_msisdn(self, self.msisdn)
+            reported_by = self.normalize_msisdn(self.reported_by)
+            msisdn = self.normalize_msisdn(self.msisdn)
 
             return {"first_name": self.first_name,
                     "last_name": self.last_name,
