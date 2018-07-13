@@ -9,6 +9,7 @@ from django.utils import timezone
 from datetime import datetime
 
 import pytz
+import re
 
 
 class Digest(models.Model):
@@ -654,9 +655,19 @@ class ReportedCase(models.Model):
     ehps = models.ManyToManyField('Actor', blank=True)
     form = models.ForeignKey('OnaForm', null=True, blank=True)
 
+    def normalize_msisdn(self, mobile_number):
+        if re.match('^[+27]*([0-9]{9})$', mobile_number):
+            return mobile_number
+        else:
+            return '+27' + mobile_number[1:]
+
     def get_data(self):
             '''JSON Formats need create_date_time & date_of_birth
-            to be overridden'''
+            to be overridden
+
+            need to validate msisdn and reported_by fields are in
+            correct format'''
+
             try:
                 birth_date = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
             except ValueError:
@@ -666,16 +677,19 @@ class ReportedCase(models.Model):
                 #       old format.
                 birth_date = datetime.strptime(self.date_of_birth, '%y%m%d')
 
+            reported_by = self.normalize_msisdn(self.reported_by)
+            msisdn = self.normalize_msisdn(self.msisdn)
+
             return {"first_name": self.first_name,
                     "last_name": self.last_name,
                     "gender": self.gender,
-                    "msisdn": self.msisdn,
+                    "msisdn": msisdn,
                     "landmark_description": self.landmark_description,
                     "id_type": self.id_type,
                     "case_number": self.case_number,
                     "abroad": self.abroad,
                     "locality": self.locality,
-                    "reported_by": self.reported_by,
+                    "reported_by": reported_by,
                     "date_of_birth": birth_date.strftime("%Y-%m-%d"),
                     "sa_id_number": self.sa_id_number,
                     "create_date_time": self.create_date_time.strftime(

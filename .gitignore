@@ -43,5 +43,5 @@ db.sqlite3
 docs/_build
 .DS_Store
 .cache
-.pytest_cache
-.vscode
+.pytest_cache/
+.vscode/
