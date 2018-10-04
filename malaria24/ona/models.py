@@ -657,7 +657,7 @@ class ReportedCase(models.Model):
 
     def normalize_msisdn(self, mobile_number):
         try:
-            msisdn = int(mobile_number)  # check if integer
+            int(mobile_number)  # check if integer
             if re.match('^[+27]*([0-9]{9})$', mobile_number):
                 return mobile_number
             else:
