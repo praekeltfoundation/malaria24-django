@@ -443,7 +443,7 @@ class OnaTest(MalariaTestCase):
                             msisdn="0711111111", landmark_description="None",
                             id_type="said", case_number="20171214-123456-42",
                             abroad="No", locality="None",
-                            reported_by="07722222222",
+                            reported_by="0722222222",
                             sa_id_number="5608071111083",
                             landmark="School", facility_code="123456",
                             date_of_birth="1995-01-01")
@@ -451,7 +451,22 @@ class OnaTest(MalariaTestCase):
         msisdn = case.normalize_msisdn(case.msisdn)
         reported_by = case.normalize_msisdn(case.reported_by)
         self.assertEqual(msisdn, '+27711111111')
-        self.assertEqual(reported_by, '+277722222222')
+        self.assertEqual(reported_by, '+27722222222')
+
+    @responses.activate
+    def test_none_type_msisdn_compile_data(self):
+        case = self.mk_case(first_name="John", last_name="Day", gender="male",
+                            msisdn="nONe", landmark_description="None",
+                            id_type="said", case_number="20171214-123456-42",
+                            abroad="No", locality="None",
+                            reported_by="0722222222",
+                            sa_id_number="5608071111083",
+                            landmark="School", facility_code="123456")
+        case.save()
+        msisdn = case.normalize_msisdn(case.msisdn)
+        reported_by = case.normalize_msisdn(case.reported_by)
+        self.assertEqual(msisdn, 'none')
+        self.assertEqual(reported_by, '+27722222222')
 
     @responses.activate
     def test_compile_and_send_jembi(self):

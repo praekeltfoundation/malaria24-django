@@ -656,10 +656,14 @@ class ReportedCase(models.Model):
     form = models.ForeignKey('OnaForm', null=True, blank=True)
 
     def normalize_msisdn(self, mobile_number):
-        if re.match('^[+27]*([0-9]{9})$', mobile_number):
-            return mobile_number
-        else:
-            return '+27' + mobile_number[1:]
+        try:
+            int(mobile_number)  # check if integer
+            if re.match('^[+27]*([0-9]{9})$', mobile_number):
+                return mobile_number
+            else:
+                return '+27' + mobile_number[1:]
+        except ValueError:
+            return mobile_number.lower()  # convert to lower case
 
     def get_data(self):
             '''JSON Formats need create_date_time & date_of_birth
