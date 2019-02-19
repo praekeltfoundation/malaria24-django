@@ -3,7 +3,8 @@
 FROM praekeltfoundation/django-bootstrap:py2.7-jessie
 
 COPY . /app
-RUN pip install -e git+git://github.com/onaio/onapie.git#egg=onapie &&\
+
+RUN pip install https://github.com/onaio/onapie/archive/develop.zip#egg=onapie &&\
     pip install -e .
 
 ENV DJANGO_SETTINGS_MODULE "malaria24.settings"
