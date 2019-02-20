@@ -9,4 +9,9 @@ RUN pip install https://github.com/onaio/onapie/archive/develop.zip#egg=onapie &
 
 ENV DJANGO_SETTINGS_MODULE "malaria24.settings"
 RUN python manage.py collectstatic --noinput
+
+RUN apt-get-install.sh wkhtmltopdf xvfb
+RUN printf '#!/bin/bash\nxvfb-run -a --server-args="-screen 0, 1024x768x24" /usr/bin/wkhtmltopdf -q $*' > /usr/local/bin/wkhtmltopdf.sh \
+  && chmod +x /usr/local/bin/wkhtmltopdf.sh
+
 CMD ["malaria24.wsgi:application"]
