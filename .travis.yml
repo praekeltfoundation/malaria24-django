@@ -24,3 +24,17 @@ script:
   - py.test
 after_success:
   - coveralls
+
+jobs:
+  include:
+    - stage: test
+    - stage: docker
+      services: [docker]
+      dist: xenial
+      python: "3.7"
+      install:
+        - pip install seaworthy[pytest]
+      script:
+        - docker build -t malaria .
+        - pytest seaworthy_docker_test.py
+
