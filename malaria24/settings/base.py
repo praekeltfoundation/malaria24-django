@@ -238,6 +238,7 @@ MEDIA_URL = '/media/'
 
 # Django compressor settings
 # http://django-compressor.readthedocs.org/en/latest/settings/
+COMPRESS_ENABLED = True
 
 COMPRESS_PRECOMPILERS = (
     ('text/x-scss', 'django_libsass.SassCompiler'),
@@ -288,3 +289,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     )
 }
+
+ONAPIE_ACCESS_TOKEN='foo'
