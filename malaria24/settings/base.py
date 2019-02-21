@@ -28,7 +28,7 @@ PROJECT_ROOT = dirname(dirname(dirname(abspath(__file__))))
 # SECURITY WARNING: keep the secret key used in production secret!
 
 DEFAULT_SECRET_KEY = 'please-change-me'
-SECRET_KEY = environ.get('SECRET_KEY') or DEFAULT_SECRET_KEY
+SECRET_KEY = environ.get('SECRET_KEY') or DEFAULT_SECRET_KEY + "-"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
