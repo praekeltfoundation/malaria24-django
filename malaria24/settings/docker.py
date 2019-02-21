@@ -24,7 +24,7 @@ COMPRESS_OFFLINE = True
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///%s' % (join(PROJECT_ROOT, 'gemmolo.db'),))}
+        default='sqlite:///%s' % (join(PROJECT_ROOT, 'malaria24.db'),))}
 
 MEDIA_ROOT = join(PROJECT_ROOT, 'media')
 
