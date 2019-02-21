@@ -290,3 +290,4 @@ REST_FRAMEWORK = {
 }
 
 ONAPIE_ACCESS_TOKEN = 'onei-pie-access-token'
+VUMI_GO_ACCOUNT_KEY = 'vumi-go-account-key'
