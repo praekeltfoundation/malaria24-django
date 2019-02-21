@@ -7,7 +7,7 @@ COPY . /app
 RUN pip install https://github.com/onaio/onapie/archive/develop.zip#egg=onapie &&\
     pip install -e .
 
-ENV DJANGO_SETTINGS_MODULE "malaria24.settings"
+ENV DJANGO_SETTINGS_MODULE "malaria24.settings.docker"
 RUN python manage.py collectstatic --noinput
 
 RUN apt-get-install.sh wkhtmltopdf xvfb
