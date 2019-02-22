@@ -37,5 +37,5 @@ jobs:
       script:
         - docker build -t malaria .
         - cd seaworthy/
-        - pytest tests.py --nomigrations --reuse-db
+        - pytest tests.py
 
