@@ -5,8 +5,6 @@ from django.core.exceptions import ImproperlyConfigured
 from os import environ
 from os.path import abspath, dirname, join
 
-import dj_database_url
-
 from .production import *  # noqa: F401, F403
 
 
