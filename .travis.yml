@@ -36,5 +36,6 @@ jobs:
         - pip install seaworthy[pytest]
       script:
         - docker build -t malaria .
-        - pytest seaworthy_docker.py
+        - cd seaworthy/
+        - pytest
 
