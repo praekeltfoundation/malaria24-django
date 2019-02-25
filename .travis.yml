@@ -1,35 +1,40 @@
-sudo: false
 language: python
 python:
   - "2.7"
-  - "pypy"
+
 cache:
-  directories:
-    - $HOME/.pip-cache/
+  - pip
+
+before_install:
+  - pip install --upgrade pip
+
 install:
   - pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
-  - pip install django-modelcluster==3.1
-  - pip install --upgrade pip --cache-dir $HOME/.pip-cache/
-  - pip install coveralls --cache-dir $HOME/.pip-cache/
-  - pip install flake8 --cache-dir $HOME/.pip-cache/
-  - pip install -r requirements-dev.txt --cache-dir $HOME/.pip-cache/
-  - pip install -e . --cache-dir $HOME/.pip-cache/
+  - pip install coveralls
+  - pip install flake8
+  - pip install -r requirements-dev.txt
+  - pip install -e .
 
 script:
   - flake8 malaria24
 
    # check for model changes not reflected in a migration
   - python manage.py makemigrations --dry-run | grep 'No changes detected' || (echo 'There are changes which require migrations.' && exit 1)
-
   - py.test
 after_success:
   - coveralls
-deploy:
-  provider: pypi
-  user: Praekelt
-  password:
-    # NOTE: See http://docs.travis-ci.com/user/encryption-keys/ for more info.
-    secure: "insert encrypted pypi password here"
-  on:
-    tags: true
-    all_branches: true
+
+jobs:
+  include:
+    - stage: test
+    - stage: docker
+      services: [docker]
+      dist: xenial
+      python: "3.7"
+      install:
+        - pip install seaworthy[pytest]
+      script:
+        - docker build -t malaria .
+        - cd seaworthy/
+        - pytest tests.py
+

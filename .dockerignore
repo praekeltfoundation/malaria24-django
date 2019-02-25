@@ -1,0 +1,13 @@
+.git
+.gitignore
+
+.dockerignore
+Dockerfile
+
+ve/
+ve3/
+build
+dist
+*.egg-info
+*.egg
+**/*.pyc
