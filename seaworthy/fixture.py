@@ -1,5 +1,5 @@
 import pytest
-from seaworthy.definitions import ContainerDefinition, VolumeDefinition
+from seaworthy.definitions import ContainerDefinition
 from seaworthy.containers.postgresql import PostgreSQLContainer
 from seaworthy.logs import output_lines
 
