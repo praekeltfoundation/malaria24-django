@@ -1,4 +1,5 @@
 django-compressor<1.6
+django-modelcluster==3.1
 django-taggit==0.18.0
 molo.core==2.4.4
 celery==3.1.18
