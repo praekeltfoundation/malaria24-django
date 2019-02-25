@@ -10,9 +10,7 @@ import dj_database_url
 from .production import *  # noqa: F401, F403
 
 
-if SECRET_KEY == DEFAULT_SECRET_KEY:  # noqa: F405
-    raise ImproperlyConfigured('SECRET_KEY is set to default value')
-
+SECRET_KEY = environ.get('DOCKER_SECRET_KEY') or DEFAULT_SECRET_KEY
 # Disable debug mode
 
 DEBUG = False
