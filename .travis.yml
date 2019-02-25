@@ -25,17 +25,17 @@ script:
 after_success:
   - coveralls
 
-# jobs:
-#   include:
-#     - stage: test
-#     - stage: docker
-#       services: [docker]
-#       dist: xenial
-#       python: "3.7"
-#       install:
-#         - pip install seaworthy[pytest]
-#       script:
-#         - docker build -t malaria .
-#         - cd seaworthy/
-#         - pytest tests.py
+jobs:
+  include:
+    - stage: test
+    - stage: docker
+      services: [docker]
+      dist: xenial
+      python: "3.7"
+      install:
+        - pip install seaworthy[pytest]
+      script:
+        - docker build -t malaria .
+        - cd seaworthy/
+        - pytest tests.py
 
