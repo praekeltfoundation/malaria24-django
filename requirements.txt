@@ -13,3 +13,4 @@ ndg-httpsclient==0.4.3
 pyasn1==0.4.2
 requests
 django-taggit==0.22.2
+psycopg2
