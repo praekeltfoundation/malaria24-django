@@ -1,5 +1,3 @@
-# This is a development Dockerfile. For versioned Dockerfiles see:
-# https://github.com/praekeltfoundation/docker-seed
 FROM praekeltfoundation/django-bootstrap:py2.7-jessie
 RUN apt-get-install.sh wkhtmltopdf xvfb
 
