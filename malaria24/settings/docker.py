@@ -8,7 +8,7 @@ import dj_database_url
 from .production import *  # noqa: F401, F403
 
 
-SECRET_KEY = environ.get('DOCKER_SECRET_KEY') or DEFAULT_SECRET_KEY
+SECRET_KEY = environ.get('SECRET_KEY') or DEFAULT_SECRET_KEY
 # Disable debug mode
 
 DEBUG = False
