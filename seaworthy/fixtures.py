@@ -1,17 +1,14 @@
-import pytest
 from seaworthy.definitions import ContainerDefinition
 from seaworthy.containers.postgresql import PostgreSQLContainer
-from seaworthy.logs import output_lines
-
-DJANGO_IMAGE = pytest.config.getoption("--django-image")
+from seaworthy.utils import output_lines
 
 
 class DjangoContainer(ContainerDefinition):
     WAIT_PATTERNS = (r"Booting worker",)
 
     def __init__(self, name, db_url,
-                 image=DJANGO_IMAGE):
-        super().__init__(name, image, self.WAIT_PATTERNS)
+                 image="malaria"):
+        super().__init__(name, image, self.WAIT_PATTERNS, wait_timeout=20)
         self.db_url = db_url
 
     def base_kwargs(self):
@@ -20,6 +17,9 @@ class DjangoContainer(ContainerDefinition):
                 "DATABASE_URL": self.db_url,
                 "ALLOWED_HOSTS": "0.0.0.0",
             },
+            "ports": {
+                "8000/tcp": ("127.0.0.1",),
+            }
         }
 
     def exec_django_admin(self, *args):
