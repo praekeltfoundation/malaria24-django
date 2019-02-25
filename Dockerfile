@@ -1,4 +1,4 @@
-FROM praekeltfoundation/django-bootstrap:py2.7-jessie
+FROM praekeltfoundation/django-bootstrap:py2.7
 RUN apt-get-install.sh wkhtmltopdf xvfb
 
 COPY . /app
