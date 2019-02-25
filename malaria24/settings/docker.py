@@ -1,7 +1,5 @@
 """Django settings for use within the docker container."""
 
-from django.core.exceptions import ImproperlyConfigured
-
 from os import environ
 from os.path import abspath, dirname, join
 
