@@ -1,23 +1,23 @@
 language: python
 python:
-- '2.7'
+  - '2.7'
 cache:
-- pip
+  - pip
 before_install:
-- pip install --upgrade pip
+  - pip install --upgrade pip
 install:
-- pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
-- pip install coveralls
-- pip install flake8
-- pip install -r requirements-dev.txt
-- pip install -e .
+  - pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
+  - pip install coveralls
+  - pip install flake8
+  - pip install -r requirements-dev.txt
+  - pip install -e .
 script:
-- flake8 malaria24
-- python manage.py makemigrations --dry-run | grep 'No changes detected' || (echo
-  'There are changes which require migrations.' && exit 1)
-- py.test
+  - flake8 malaria24
+  - python manage.py makemigrations --dry-run | grep 'No changes detected' || (echo
+    'There are changes which require migrations.' && exit 1)
+  - py.test
 after_success:
-- coveralls
+  - coveralls
 jobs:
   include:
   - stage: test
@@ -28,20 +28,20 @@ jobs:
     python: '3.7'
     env:
       global:
-      - IMAGE_NAME=praekeltfoundation/malariaconnect
-      - REGISTRY_USER=praekeltorgdeploy
-      - secure: "XYnl1GQpsMDZsktGcHQLzfSxpsOyJeCDAbV0fOYeMXsKQgVO80S1ZyNE5G8uOcEojtETDUI0jNvi5am5Y4wQ7BQqJPsIt0avXekbLs0FVTN2ZvpgKV+NacBHwsaW8V68L2NMVyx47TRXFguaigjzWG+QX/8XP56LUFUDUomWHnEc8yP6L3A2KK2yVC8WmeuGk6y1X1SqEvhUTMGvs6fUJn4CgyHuBP3NwFRcXF7wQWQElaaw6UTmbxHtwTrAdJjyf9lUmOPHboGUThe0YnS2T5cQc6Yf9tIH94ExyXSVAIfJUU3TTXkMxKCgYZxhvLKaizqp3vxkPJz6crr2fVJXJQ/9TRNPltbdH5Z79osb/QSzgoufFsxR+w9wbEuzFgx+orzaDxW578yWtKLjt/qqANDUT+Xx+Cgg49RzfVl6Vc16wr3jQRKcGXbzCtaDWjrmFXjBgQvWCGd+seVdT3Cw5tvi5tigzlWR1kLNRHoMRW3MuJFCyYQ27VpGEAUUo5mlj3vbmMA/caqZKaEdxYlgDN8Z+YzM646FeDwCmF4zGL0ClSvQZmrMTjRtaBPiMM6j6Wo9g5UxTFLdajjIrFID+VEwb26nAGQliWHY6YaT8H6ENEcjhYaqW21sRJyHTH5SBxaKXTD5V5TTAgqFinb2ZwJDavSABHQj8ESnB2GxugY="
+        - IMAGE_NAME=praekeltfoundation/malariaconnect
+        - REGISTRY_USER=praekeltorgdeploy
+        - secure: "XYnl1GQpsMDZsktGcHQLzfSxpsOyJeCDAbV0fOYeMXsKQgVO80S1ZyNE5G8uOcEojtETDUI0jNvi5am5Y4wQ7BQqJPsIt0avXekbLs0FVTN2ZvpgKV+NacBHwsaW8V68L2NMVyx47TRXFguaigjzWG+QX/8XP56LUFUDUomWHnEc8yP6L3A2KK2yVC8WmeuGk6y1X1SqEvhUTMGvs6fUJn4CgyHuBP3NwFRcXF7wQWQElaaw6UTmbxHtwTrAdJjyf9lUmOPHboGUThe0YnS2T5cQc6Yf9tIH94ExyXSVAIfJUU3TTXkMxKCgYZxhvLKaizqp3vxkPJz6crr2fVJXJQ/9TRNPltbdH5Z79osb/QSzgoufFsxR+w9wbEuzFgx+orzaDxW578yWtKLjt/qqANDUT+Xx+Cgg49RzfVl6Vc16wr3jQRKcGXbzCtaDWjrmFXjBgQvWCGd+seVdT3Cw5tvi5tigzlWR1kLNRHoMRW3MuJFCyYQ27VpGEAUUo5mlj3vbmMA/caqZKaEdxYlgDN8Z+YzM646FeDwCmF4zGL0ClSvQZmrMTjRtaBPiMM6j6Wo9g5UxTFLdajjIrFID+VEwb26nAGQliWHY6YaT8H6ENEcjhYaqW21sRJyHTH5SBxaKXTD5V5TTAgqFinb2ZwJDavSABHQj8ESnB2GxugY="
     install:
-    - pip install seaworthy[pytest]
+      - pip install seaworthy[pytest]
     before_script:
-    - docker pull "$IMAGE_NAME" || true
+      - docker pull "$IMAGE_NAME" || true
     script:
-    - docker build --pull --cache-from "$IMAGE_NAME" -t "$IMAGE_NAME" .
-    - cd seaworthy/
-    - pytest tests.py
+      - docker build -t "$IMAGE_NAME" .
+      - cd seaworthy/
+      - pytest tests.py
     before_deploy:
-    - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
-    - pip install docker-ci-deploy==0.3.0
+      - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
+      - pip install docker-ci-deploy==0.3.0
     deploy:
       provider: script
       script: dcd -V $(git rev-parse --short HEAD) -L "$IMAGE_NAME"
