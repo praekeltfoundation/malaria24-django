@@ -1,18 +1,23 @@
 language: python
 python:
   - '2.7'
+
 cache:
   - pip
+
 before_install:
   - pip install --upgrade pip
+
 install:
   - pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
   - pip install coveralls
   - pip install flake8
   - pip install -r requirements-dev.txt
   - pip install -e .
+
 script:
   - flake8 malaria24
+  # check for model changes not reflected in a migration
   - python manage.py makemigrations --dry-run | grep 'No changes detected' || (echo
     'There are changes which require migrations.' && exit 1)
   - py.test
@@ -25,6 +30,7 @@ env:
 
 after_success:
   - coveralls
+
 jobs:
   include:
   - stage: test
