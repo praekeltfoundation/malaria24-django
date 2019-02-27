@@ -36,7 +36,7 @@ jobs:
     before_script:
     - docker pull "$IMAGE_NAME" || true
     script:
-    - docker build --pull --cache-from "$IMAGE_NAME" -t .
+    - docker build --pull --cache-from "$IMAGE_NAME" -t "$IMAGE_NAME" .
     - cd seaworthy/
     - pytest tests.py
     before_deploy:
