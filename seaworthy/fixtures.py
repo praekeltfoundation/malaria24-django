@@ -5,7 +5,8 @@ from seaworthy.containers.postgresql import PostgreSQLContainer
 class DjangoContainer(ContainerDefinition):
     WAIT_PATTERNS = (r"Booting worker",)
 
-    def __init__(self, name, db_url, image="malaria"):
+    def __init__(self, name, db_url,
+                 image="praekeltfoundation/malariaconnect"):
         super().__init__(name, image, self.WAIT_PATTERNS, wait_timeout=20)
         self.db_url = db_url
 
