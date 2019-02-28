@@ -23,3 +23,14 @@ class TestDjangoContainer:
         response = django_container.http_client().get('/')
         assert response.status_code == 200
         assert django_container.status() == 'running'
+
+    def test_static_file(self, django_container):
+        """
+        When a static file is requested, Nginx should serve the file with the
+        correct mime type.
+        """
+        response = django_container.http_client().get(
+            '/static/admin/css/base.css')
+
+        assert_that(response.headers['Content-Type'], Equals('text/css'))
+        assert_that(response.text, Contains('DJANGO Admin styles'))
