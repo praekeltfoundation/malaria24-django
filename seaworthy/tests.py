@@ -1,5 +1,7 @@
 import pytest
 from fixtures import *
+from testtools.assertions import assert_that
+from testtools.matchers import Contains, Equals
 
 
 class TestDjangoContainer:
