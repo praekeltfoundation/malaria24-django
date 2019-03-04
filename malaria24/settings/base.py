@@ -126,19 +126,6 @@ JEMBI_URL = environ.get('JEMBI_URL') or 'http://jembi.org/malaria24'
 JEMBI_USERNAME = environ.get('JEMBI_USERNAME') or 'fake@example.com'
 JEMBI_PASSWORD = environ.get('JEMBI_PASSWORD') or 'not_a_real_password'
 
-# Onapie settings
-ONAPIE_FORM_PK = environ.get('ONAPIE_FORM_PK') or None
-ONAPIE_ACCESS_TOKEN = environ.get('ONAPIE_ACCESS_TOKEN') or None
-
-RAVEN_DSN = environ.get('RAVEN_DSN') or None
-
-# JUNEBUG Settings
-JUNEBUG_CHANNEL_URL = environ.get('JUNEBUG_CHANNEL_URL') or None
-JUNEBUG_USERNAME = environ.get('JUNEBUG_USERNAME') or None
-JUNEBUG_PASSWORD = environ.get('JUNEBUG_PASSWORD') or None
-SMS_CHANNEL = environ.get('SMS_CHANNEL') or None
-SMS_CODE = environ.get('SMS_CODE') or None
-
 # Logging
 LOGGING = {
     'version': 1,
