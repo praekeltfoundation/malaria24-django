@@ -12,6 +12,8 @@ DEBUG = False
 
 COMPRESS_OFFLINE = True
 
+BROKER_URL = environ.get('BROKER_URL') or BROKER_URL
+
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///%s' % (join(PROJECT_ROOT, 'malaria24.sqlite3'),))}
