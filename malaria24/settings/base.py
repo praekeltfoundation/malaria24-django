@@ -296,5 +296,3 @@ EMAIL_PORT = environ.get('EMAIL_PORT', 25)
 EMAIL_HOST_USER = environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = environ.get('EMAIL_USE_TLS', 'false').lower() == 'true'
-DEFAULT_FROM_EMAIL = environ.get(
-    'DEFAULT_FROM_EMAIL', 'no-reply@gehosting.org')
