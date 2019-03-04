@@ -15,7 +15,7 @@ RUN python manage.py collectstatic --noinput &&\
 	python manage.py compress
 
 RUN printf '#!/bin/bash\nxvfb-run -a --server-args="-screen 0, 1024x768x24" /usr/bin/wkhtmltopdf -q $*' > /usr/local/bin/wkhtmltopdf.sh \
-  && chmod +x /usr/local/bin/wkhtmltopdf.sh &&\
-  ln -s /usr/local/bin/wkhtmltopdf.sh /usr/local/bin/wkhtmltopdf
+  && chmod +x /usr/local/bin/wkhtmltopdf.sh \
+  && ln -s /usr/local/bin/wkhtmltopdf.sh /usr/local/bin/wkhtmltopdf
 
 CMD ["malaria24.wsgi:application"]
