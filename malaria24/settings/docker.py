@@ -33,3 +33,6 @@ JUNEBUG_USERNAME = environ.get('JUNEBUG_USERNAME')
 JUNEBUG_PASSWORD = environ.get('JUNEBUG_PASSWORD')
 SMS_CHANNEL = environ.get('SMS_CHANNEL')
 SMS_CODE = environ.get('SMS_CODE')
+
+RAVEN_DSN = environ.get('RAVEN_DSN')
+RAVEN_CONFIG = {'dsn': RAVEN_DSN} if RAVEN_DSN else {}
