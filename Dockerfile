@@ -1,5 +1,5 @@
 FROM praekeltfoundation/django-bootstrap:py2.7
-RUN apt-get-install.sh wkhtmltopdf xvfb
+RUN apt-get-install.sh wkhtmltopdf xvfb xauth
 
 COPY . /app
 
