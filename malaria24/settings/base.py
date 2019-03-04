@@ -132,10 +132,10 @@ ONAPIE_ACCESS_TOKEN = environ.get('ONAPIE_ACCESS_TOKEN') or ""
 
 # JUNEBUG Settings
 JUNEBUG_CHANNEL_URL = environ.get('JUNEBUG_CHANNEL_URL') or ""
-JUNEBUG_USERNAME = environ.get('JUNEBUG_USERNAME') or ""
-JUNEBUG_PASSWORD = environ.get('JUNEBUG_PASSWORD') or ""
-SMS_CHANNEL = environ.get('SMS_CHANNEL') or ""
-SMS_CODE = environ.get('SMS_CODE') or ""
+JUNEBUG_USERNAME = environ.get('JUNEBUG_USERNAME') or "junebug"
+JUNEBUG_PASSWORD = environ.get('JUNEBUG_PASSWORD') or "password"
+SMS_CHANNEL = environ.get('SMS_CHANNEL') or "junebug"
+SMS_CODE = environ.get('SMS_CODE') or "*31314"
 
 # Logging
 LOGGING = {
