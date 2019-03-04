@@ -21,3 +21,15 @@ DATABASES = {
 LOCALE_PATHS = (
     join(PROJECT_ROOT, "locale"),
 )
+
+ONAPIE_FORM_PK = environ.get('ONAPIE_FORM_PK')
+ONAPIE_ACCESS_TOKEN = environ.get('ONAPIE_ACCESS_TOKEN')
+
+RAVEN_DSN = environ.get('RAVEN_DSN')
+
+# JUNEBUG Settings
+JUNEBUG_CHANNEL_URL = environ.get('JUNEBUG_CHANNEL_URL')
+JUNEBUG_USERNAME = environ.get('JUNEBUG_USERNAME')
+JUNEBUG_PASSWORD = environ.get('JUNEBUG_PASSWORD')
+SMS_CHANNEL = environ.get('SMS_CHANNEL')
+SMS_CODE = environ.get('SMS_CODE')

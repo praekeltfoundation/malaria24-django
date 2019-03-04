@@ -41,7 +41,7 @@ ALLOWED_HOSTS = ['*']
 # Base URL to use when referring to full URLs within the Wagtail admin
 # backend - e.g. in notification emails. Don't include '/admin' or
 # a trailing slash
-BASE_URL = 'http://example.com'
+BASE_URL = environ.get("BASE_URL") or 'http://example.com'
 
 
 # Application definition
@@ -122,9 +122,9 @@ CELERYBEAT_SCHEDULE = {
 DEFAULT_FROM_EMAIL = 'MalariaConnect <malaria24@praekelt.com>'
 
 # JEMBI settings
-JEMBI_URL = 'http://jembi.org/malaria24'
-JEMBI_USERNAME = 'fake@example.com'
-JEMBI_PASSWORD = 'not_a_real_password'
+JEMBI_URL = environ.get('JEMBI_URL') or 'http://jembi.org/malaria24'
+JEMBI_USERNAME = environ.get('JEMBI_USERNAME') or 'fake@example.com'
+JEMBI_PASSWORD = environ.get('JEMBI_PASSWORD') or 'not_a_real_password'
 
 # Logging
 LOGGING = {
