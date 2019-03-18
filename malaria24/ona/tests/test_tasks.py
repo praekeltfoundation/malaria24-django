@@ -438,6 +438,22 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(data['msisdn'], '+27711111111')
         self.assertEqual(data['reported_by'], '+27722222222')
 
+    @responses.activate
+    def test_get_data_for_none_sa_id_number(self):
+        '''if id_type = none, and sa_id_number set as none,
+        sa_id_number need to be converted to empty string'''
+        case = self.mk_case(first_name="John", last_name="Day", gender="male",
+                            msisdn="0711111111", landmark_description="None",
+                            id_type="none", case_number="20171214-123456-42",
+                            abroad="No", locality="None",
+                            reported_by="+27722222222",
+                            sa_id_number="None",
+                            landmark="School", facility_code="123456",
+                            date_of_birth="1995-01-01")
+        case.save()
+        data = case.get_data()
+        self.assertEqual(data['sa_id_number'], '')
+
     def test_normalize_msisdn(self):
         case = self.mk_case(first_name="John", last_name="Day", gender="male",
                             msisdn="0711111111", landmark_description="None",
