@@ -670,7 +670,8 @@ class ReportedCase(models.Model):
             to be overridden
 
             need to validate msisdn and reported_by fields are in
-            correct format'''
+            correct format
+            if sa_id_number is None, needs to return empty string'''
 
             try:
                 birth_date = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
@@ -684,6 +685,12 @@ class ReportedCase(models.Model):
             reported_by = self.normalize_msisdn(self.reported_by)
             msisdn = self.normalize_msisdn(self.msisdn)
 
+            try:
+                int(self.sa_id_number)  # check if integer
+                sa_id_number = self.sa_id_number
+            except ValueError:
+                sa_id_number = ""
+
             return {"first_name": self.first_name,
                     "last_name": self.last_name,
                     "gender": self.gender,
@@ -695,7 +702,7 @@ class ReportedCase(models.Model):
                     "locality": self.locality,
                     "reported_by": reported_by,
                     "date_of_birth": birth_date.strftime("%Y-%m-%d"),
-                    "sa_id_number": self.sa_id_number,
+                    "sa_id_number": sa_id_number,
                     "create_date_time": self.create_date_time.strftime(
                         "%Y%m%d%H%M%S"),
                     "landmark": self.landmark,
