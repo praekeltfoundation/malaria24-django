@@ -6,10 +6,7 @@ COPY . /app
 RUN pip install https://github.com/onaio/onapie/archive/develop.zip#egg=onapie &&\
     pip install -e .
 
-ENV DJANGO_SETTINGS_MODULE="malaria24.settings.docker" \
-    CELERY_APP=malaria24 \
-    CELERY_WORKER=1 \
-    CELERY_BEAT=1
+ENV DJANGO_SETTINGS_MODULE="malaria24.settings.docker"
 
 RUN python manage.py collectstatic --noinput &&\
 	python manage.py compress
