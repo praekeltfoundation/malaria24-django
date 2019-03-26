@@ -36,3 +36,7 @@ SMS_CODE = environ.get('SMS_CODE')
 
 RAVEN_DSN = environ.get('RAVEN_DSN')
 RAVEN_CONFIG = {'dsn': RAVEN_DSN} if RAVEN_DSN else {}
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
