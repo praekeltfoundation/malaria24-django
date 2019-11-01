@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.core import mail
 from django.db.models.signals import post_save
+from django.test import override_settings
 from datetime import datetime
 from testfixtures import LogCapture
 from mock import patch
@@ -420,7 +422,6 @@ class JembiReportedCaseTest(MalariaTestCase):
         post_save.connect(
             new_case_alert_ehps, sender=ReportedCase)
 
-    @responses.activate
     def test_compile_data(self):
         case = self.mk_case(first_name="John", last_name="Day", gender="male",
                             msisdn="0711111111", landmark_description="None",
@@ -433,6 +434,33 @@ class JembiReportedCaseTest(MalariaTestCase):
         case.digest = None
         d = case.get_data()
         self.assertEqual(case.get_data(), d)
+
+    @override_settings(FORWARD_TO_JEMBI=False)
+    @patch('malaria24.ona.tasks.compile_and_send_jembi.delay')
+    def test_setting_prevents_task_call(self, mock_task):
+        case = self.mk_case(first_name="John", last_name="Day", gender="male",
+                            msisdn="0711111111", landmark_description="None",
+                            id_type="said", case_number="20171214-123456-42",
+                            abroad="No", locality="None",
+                            reported_by="+27721111111",
+                            sa_id_number="5608071111083",
+                            landmark="School", facility_code="123456")
+        case.save()
+        case.digest = None
+        mock_task.not_called()
+
+    @patch('malaria24.ona.tasks.compile_and_send_jembi.delay')
+    def test_case_creation_triggers_task(self, mock_task):
+        case = self.mk_case(first_name="John", last_name="Day", gender="male",
+                            msisdn="0711111111", landmark_description="None",
+                            id_type="said", case_number="20171214-123456-42",
+                            abroad="No", locality="None",
+                            reported_by="+27721111111",
+                            sa_id_number="5608071111083",
+                            landmark="School", facility_code="123456")
+        case.save()
+        case.digest = None
+        mock_task.assert_called_with(case.pk)
 
 
 class DigestTest(MalariaTestCase):

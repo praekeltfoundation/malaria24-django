@@ -122,6 +122,8 @@ CELERYBEAT_SCHEDULE = {
 DEFAULT_FROM_EMAIL = 'MalariaConnect <malaria24@praekelt.com>'
 
 # JEMBI settings
+# Send to them by default
+FORWARD_TO_JEMBI = environ.get('FORWARD_TO_JEMBI', 'true').lower() == 'true'
 JEMBI_URL = environ.get('JEMBI_URL') or 'http://jembi.org/malaria24'
 JEMBI_USERNAME = environ.get('JEMBI_USERNAME') or 'fake@example.com'
 JEMBI_PASSWORD = environ.get('JEMBI_PASSWORD') or 'not_a_real_password'

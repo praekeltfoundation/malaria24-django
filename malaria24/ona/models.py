@@ -928,6 +928,8 @@ class SMSEvent(models.Model):
 def new_case_alert_jembi(sender, instance, created, **kwargs):
     if not created:
         return
+    if not settings.FORWARD_TO_JEMBI:
+        return
 
     alert_jembi(instance)
 
