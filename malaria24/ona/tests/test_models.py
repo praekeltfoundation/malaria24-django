@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.core import mail
 from django.db.models.signals import post_save
 from django.test import override_settings
