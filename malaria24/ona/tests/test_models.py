@@ -442,12 +442,16 @@ class DigestTest(MalariaTestCase):
         post_save.disconnect(new_case_alert_ehps, sender=ReportedCase)
         post_save.disconnect(
             new_case_alert_case_investigators, sender=ReportedCase)
+        post_save.disconnect(
+            new_case_alert_jembi, sender=ReportedCase)
 
     def tearDown(self):
         super(DigestTest, self).tearDown()
         post_save.connect(new_case_alert_ehps, sender=ReportedCase)
         post_save.connect(
             new_case_alert_case_investigators, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_jembi, sender=ReportedCase)
 
     def get_week(self, cases):
         test_cases = ReportedCase.objects.all().order_by("create_date_time")
