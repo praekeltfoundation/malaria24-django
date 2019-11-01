@@ -499,6 +499,7 @@ class OnaTest(MalariaTestCase):
                             date_of_birth="1995-01-01")
         case.save()
         case.digest = None
+        self.assertFalse(case.jembi_alert_sent)
         responses.add(
             responses.POST,
             settings.JEMBI_URL,
@@ -535,6 +536,8 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(data['locality'], 'None')
         self.assertEqual(data['landmark'], 'School')
         self.assertEqual(data['facility_code'], '123456')
+        case.refresh_from_db()
+        self.assertTrue(case.jembi_alert_sent)
 
     @responses.activate
     def test_send_jembi(self):
@@ -550,6 +553,7 @@ class OnaTest(MalariaTestCase):
                             landmark="School", facility_code="123456")
         case.save()
         case.digest = None
+        self.assertFalse(case.jembi_alert_sent)
         responses.add(
             responses.POST,
             settings.JEMBI_URL,
@@ -560,3 +564,5 @@ class OnaTest(MalariaTestCase):
         )
         with self.assertRaises(requests.HTTPError):
             compile_and_send_jembi(case.pk)
+        case.refresh_from_db()
+        self.assertFalse(case.jembi_alert_sent)
