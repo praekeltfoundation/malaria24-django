@@ -9,7 +9,7 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
+  - pip install -e git+git://github.com/onaio/onapie.git@bf9b905b1dd7db980ab4f7966fdbedf3cf816b29#egg=onapie
   - pip install coveralls
   - pip install flake8
   - pip install -r requirements-dev.txt
