@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.contrib import admin, messages
 from django.conf.urls import url
 from django.http import HttpResponse
@@ -7,7 +8,8 @@ from django.template.response import TemplateResponse
 
 from .models import (ReportedCase, Actor, SMS, InboundSMS, Email, Digest,
                      Facility, OnaForm)
-from .tasks import import_facilities, ona_fetch_reported_case_for_form
+from .tasks import (import_facilities, ona_fetch_reported_case_for_form,
+                    compile_and_send_jembi)
 
 
 class ReportedCaseAdmin(admin.ModelAdmin):
@@ -24,8 +26,25 @@ class ReportedCaseAdmin(admin.ModelAdmin):
                     'create_date_time',
                     'form',
                     'ehp_report_link')
-    list_filter = ('facility_code', 'gender', 'create_date_time', 'form')
+    list_filter = ('facility_code', 'gender', 'create_date_time', 'form',
+                   'jembi_alert_sent')
     search_fields = ('case_number', 'first_name', 'last_name', 'sa_id_number')
+
+    actions = ['send_jembi_alert']
+
+    def send_jembi_alert(self, request, queryset):
+        if not settings.FORWARD_TO_JEMBI:
+            self.message_user(request, 'Sending to Jembi currently disabled.',
+                              level=messages.WARNING)
+            return
+        unsent_cases = queryset.filter(jembi_alert_sent=False)
+        for case in unsent_cases:
+            compile_and_send_jembi.delay(case.pk)
+        self.message_user(
+            request, 'Forwarding all unsent cases to Jembi (total %s). '
+            'This may take a few minutes.' % (
+                unsent_cases.count(),))
+    send_jembi_alert.short_description = 'Send selected unsent cases to Jembi.'
 
     def get_urls(self):
         urls = super(ReportedCaseAdmin, self).get_urls()

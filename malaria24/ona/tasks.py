@@ -149,6 +149,8 @@ def compile_and_send_jembi(case_pk):
     auth = HTTPBasicAuth(settings.JEMBI_USERNAME, settings.JEMBI_PASSWORD)
     r = requests.post(api_url, json=case_dictionary, auth=auth)
     r.raise_for_status()
+    case.jembi_alert_sent = True
+    case.save()
 
 
 @celery_app.task(ignore_result=True)

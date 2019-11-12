@@ -654,6 +654,7 @@ class ReportedCase(models.Model):
     digest = models.ForeignKey('Digest', null=True, blank=True)
     ehps = models.ManyToManyField('Actor', blank=True)
     form = models.ForeignKey('OnaForm', null=True, blank=True)
+    jembi_alert_sent = models.BooleanField(default=False)
 
     def normalize_msisdn(self, mobile_number):
         try:
@@ -926,6 +927,8 @@ class SMSEvent(models.Model):
 
 def new_case_alert_jembi(sender, instance, created, **kwargs):
     if not created:
+        return
+    if not settings.FORWARD_TO_JEMBI:
         return
 
     alert_jembi(instance)

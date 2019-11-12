@@ -15,7 +15,7 @@ from rest_framework.authtoken.models import Token
 from malaria24.ona.models import (
     ReportedCase, new_case_alert_ehps, MIS, MANAGER_DISTRICT, MANAGER_NATIONAL,
     MANAGER_PROVINCIAL, OnaForm, Facility, SMS, DistrictDigest,
-    NationalDigest, ProvincialDigest)
+    NationalDigest, ProvincialDigest, new_case_alert_jembi)
 from malaria24.ona.tasks import (
     ona_fetch_reported_cases, compile_and_send_digest_email,
     compile_and_send_jembi, ona_fetch_forms, send_sms)
@@ -40,6 +40,7 @@ class OnaTest(MalariaTestCase):
                       body=pkg_resources.resource_string(
                           'malaria24', 'ona/fixtures/responses/forms.json'))
         post_save.disconnect(new_case_alert_ehps, sender=ReportedCase)
+        post_save.disconnect(new_case_alert_jembi, sender=ReportedCase)
         self.complete_url = settings.JEMBI_URL
         self.username = settings.JEMBI_USERNAME
         self.password = settings.JEMBI_PASSWORD
@@ -48,6 +49,8 @@ class OnaTest(MalariaTestCase):
         super(OnaTest, self).tearDown()
         post_save.connect(
             new_case_alert_ehps, sender=ReportedCase)
+        post_save.connect(
+            new_case_alert_jembi, sender=ReportedCase)
 
     @responses.activate
     def test_ona_fetch_reported_cases_task(self):
@@ -496,6 +499,7 @@ class OnaTest(MalariaTestCase):
                             date_of_birth="1995-01-01")
         case.save()
         case.digest = None
+        self.assertFalse(case.jembi_alert_sent)
         responses.add(
             responses.POST,
             settings.JEMBI_URL,
@@ -504,6 +508,9 @@ class OnaTest(MalariaTestCase):
                 case.get_data()
             )
         )
+
+        compile_and_send_jembi(case.pk)
+
         auth_headers = ('Basic ' +
                         b64encode("{0}:{1}".format(settings.JEMBI_USERNAME,
                                                    settings.JEMBI_PASSWORD)))
@@ -529,6 +536,8 @@ class OnaTest(MalariaTestCase):
         self.assertEqual(data['locality'], 'None')
         self.assertEqual(data['landmark'], 'School')
         self.assertEqual(data['facility_code'], '123456')
+        case.refresh_from_db()
+        self.assertTrue(case.jembi_alert_sent)
 
     @responses.activate
     def test_send_jembi(self):
@@ -544,6 +553,7 @@ class OnaTest(MalariaTestCase):
                             landmark="School", facility_code="123456")
         case.save()
         case.digest = None
+        self.assertFalse(case.jembi_alert_sent)
         responses.add(
             responses.POST,
             settings.JEMBI_URL,
@@ -554,3 +564,5 @@ class OnaTest(MalariaTestCase):
         )
         with self.assertRaises(requests.HTTPError):
             compile_and_send_jembi(case.pk)
+        case.refresh_from_db()
+        self.assertFalse(case.jembi_alert_sent)
