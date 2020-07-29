@@ -22,7 +22,7 @@ from requests.auth import HTTPBasicAuth
 
 @celery_app.task(ignore_result=True)
 def ona_fetch_forms():
-    client = Client('https://ona.io', api_token=settings.ONAPIE_ACCESS_TOKEN,
+    client = Client(settings.ONA_API_URL, api_token=settings.ONAPIE_ACCESS_TOKEN,
                     api_entrypoint='/api/v1/')
     for ona_form in client.forms.list():
         form, _ = OnaForm.objects.get_or_create(uuid=ona_form['uuid'])
@@ -41,7 +41,7 @@ def ona_fetch_reported_cases():
 
 @celery_app.task(ignore_result=True)
 def ona_fetch_reported_case_for_form(form_id):
-    client = Client('https://ona.io', api_token=settings.ONAPIE_ACCESS_TOKEN,
+    client = Client(settings.ONA_API_URL, api_token=settings.ONAPIE_ACCESS_TOKEN,
                     api_entrypoint='/api/v1/')
     form_data_list = client.data.get(form_id)
     uuids = []
