@@ -27,15 +27,15 @@ class OnaTest(MalariaTestCase):
 
     def setUp(self):
         super(OnaTest, self).setUp()
-        responses.add(responses.GET, 'https://ona.io/api/v1/',
+        responses.add(responses.GET, 'https://odk.ona.io/api/v1/',
                       status=200, content_type='application/json',
                       body=pkg_resources.resource_string(
                           'malaria24', 'ona/fixtures/responses/catalog.json'))
-        responses.add(responses.GET, 'https://ona.io/api/v1/data/79925',
+        responses.add(responses.GET, 'https://odk.ona.io/api/v1/data/79925',
                       status=200, content_type='application/json',
                       body=pkg_resources.resource_string(
                           'malaria24', 'ona/fixtures/responses/data.json'))
-        responses.add(responses.GET, 'https://ona.io/api/v1/forms',
+        responses.add(responses.GET, 'https://odk.ona.io/api/v1/forms',
                       status=200, content_type='application/json',
                       body=pkg_resources.resource_string(
                           'malaria24', 'ona/fixtures/responses/forms.json'))
