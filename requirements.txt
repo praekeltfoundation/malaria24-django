@@ -1,3 +1,4 @@
+Django<1.9,>=1.8
 django-appconf==1.0.3
 django-compressor<1.6
 django-modelcluster==3.1

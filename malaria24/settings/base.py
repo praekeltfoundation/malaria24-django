@@ -208,7 +208,7 @@ USE_TZ = True
 # Native South African languages are currently not included in the default
 # list of languges in django
 # https://github.com/django/django/blob/master/django/conf/global_settings.py#L50
-LANGUAGES = global_settings.LANGUAGES + [
+LANGUAGES = global_settings.LANGUAGES + (
     ('zu', _('Zulu')),
     ('xh', _('Xhosa')),
     ('st', _('Sotho')),
@@ -217,7 +217,7 @@ LANGUAGES = global_settings.LANGUAGES + [
     ('ts', _('Tsonga')),
     ('ss', _('Swati')),
     ('nr', _('Ndebele')),
-]
+)
 
 LOCALE_PATHS = (
     join(PROJECT_ROOT, "locale"),
