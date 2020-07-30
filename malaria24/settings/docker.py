@@ -24,6 +24,7 @@ LOCALE_PATHS = (
 
 ONAPIE_FORM_PK = environ.get('ONAPIE_FORM_PK')
 ONAPIE_ACCESS_TOKEN = environ.get('ONAPIE_ACCESS_TOKEN')
+ONA_API_URL = environ.get('ONA_API_URL', 'https://odk.ona.io')
 
 RAVEN_DSN = environ.get('RAVEN_DSN')
 
