@@ -54,8 +54,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
-    # 'django.template',
-    # 'django.core',
 
     'compressor',
     'taggit',
@@ -242,12 +240,8 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
-                # list if you haven't customized them:
-                # 'molo.core.context_processors.locale',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                # 'django.core.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],

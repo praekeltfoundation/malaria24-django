@@ -1,7 +1,5 @@
 import json
 from datetime import datetime
-from os import name
-from unittest.main import main
 from StringIO import StringIO
 from uuid import UUID
 
