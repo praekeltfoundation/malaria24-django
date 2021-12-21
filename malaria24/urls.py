@@ -1,26 +1,21 @@
 import os
-
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
-
-from wagtail.wagtailadmin import urls as wagtailadmin_urls
-from wagtail.wagtailsearch import urls as wagtailsearch_urls
-from wagtail.wagtaildocs import urls as wagtaildocs_urls
-from wagtail.wagtailcore import urls as wagtail_urls
+from rest_framework import routers
+from ona.views import facilities, localities, InboundSMSViewSet, SMSEventViewSet
 
 
-urlpatterns = patterns(
-    '',
+router = routers.DefaultRouter()
+router.register(r'inbound', InboundSMSViewSet)
+router.register(r'event', SMSEventViewSet)
+
+urlpatterns = [
+    url(r'', include(router.urls)),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^admin/', include(wagtailadmin_urls)),
-    url(r'^search/', include(wagtailsearch_urls)),
-    url(r'^documents/', include(wagtaildocs_urls)),
     url(r'^api/v1/', include('malaria24.ona.urls', namespace='api_v1')),
-    url(r'', include('molo.core.urls')),
-    url(r'', include(wagtail_urls)),
-)
+]
 
 
 if settings.DEBUG:  # pragma: no cover

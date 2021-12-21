@@ -14,6 +14,9 @@ from django.conf import global_settings
 from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta
 import dj_database_url
+import os
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 from celery.schedules import crontab
 
@@ -33,12 +36,9 @@ SECRET_KEY = environ.get('SECRET_KEY') or DEFAULT_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = ['*']
 
 
-# Base URL to use when referring to full URLs within the Wagtail admin
 # backend - e.g. in notification emails. Don't include '/admin' or
 # a trailing slash
 BASE_URL = environ.get("BASE_URL") or 'http://example.com'
@@ -54,28 +54,15 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
+    # 'django.template',
+    # 'django.core',
 
     'compressor',
     'taggit',
     'modelcluster',
 
-    'wagtail.wagtailcore',
-    'wagtail.wagtailadmin',
-    'wagtail.wagtaildocs',
-    'wagtail.wagtailsnippets',
-    'wagtail.wagtailusers',
-    'wagtail.wagtailsites',
-    'wagtail.wagtailimages',
-    'wagtail.wagtailembeds',
-    'wagtail.wagtailsearch',
-    'wagtail.wagtailredirects',
-    'wagtail.wagtailforms',
-
-    'molo.core',
     'malaria24',
     'malaria24.ona',
-    'djcelery',
-
     'raven.contrib.django.raven_compat',
 
     'rest_framework',
@@ -90,9 +77,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'wagtail.wagtailcore.middleware.SiteMiddleware',
-    'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 )
 
 ROOT_URLCONF = 'malaria24.urls'
@@ -208,7 +192,7 @@ USE_TZ = True
 # Native South African languages are currently not included in the default
 # list of languges in django
 # https://github.com/django/django/blob/master/django/conf/global_settings.py#L50
-LANGUAGES = global_settings.LANGUAGES + (
+LANGUAGES = global_settings.LANGUAGES + [
     ('zu', _('Zulu')),
     ('xh', _('Xhosa')),
     ('st', _('Sotho')),
@@ -217,7 +201,7 @@ LANGUAGES = global_settings.LANGUAGES + (
     ('ts', _('Tsonga')),
     ('ss', _('Swati')),
     ('nr', _('Ndebele')),
-)
+]
 
 LOCALE_PATHS = (
     join(PROJECT_ROOT, "locale"),
@@ -249,37 +233,27 @@ COMPRESS_PRECOMPILERS = (
 
 # Template configuration
 
-TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
-    'django.core.context_processors.request',
-    'molo.core.context_processors.locale',
-)
-
-
-# Wagtail settings
-
-LOGIN_URL = 'wagtailadmin_login'
-LOGIN_REDIRECT_URL = 'wagtailadmin_home'
-
-WAGTAIL_SITE_NAME = "base"
-
-# Use Elasticsearch as the search backend for extra performance and better
-# search results:
-# http://wagtail.readthedocs.org/en/latest/howto/performance.html#search
-# http://wagtail.readthedocs.org/en/latest/core_components/
-#     search/backends.html#elasticsearch-backend
-#
-# WAGTAILSEARCH_BACKENDS = {
-#     'default': {
-#         'BACKEND': ('wagtail.wagtailsearch.backends.'
-#                     'elasticsearch.ElasticSearch'),
-#         'INDEX': 'base',
-#     },
-# }
-
-
-# Whether to use face/feature detection to improve image
-# cropping - requires OpenCV
-WAGTAILIMAGES_FEATURE_DETECTION_ENABLED = False
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        "DIRS": [
+            os.path.join(PROJECT_DIR, "templates"),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
+                # list if you haven't customized them:
+                # 'molo.core.context_processors.locale',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                # 'django.core.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 # REST Framework conf defaults
 REST_FRAMEWORK = {
