@@ -1,6 +1,4 @@
 
-{% load wagtailcore_tags compress static wagtailuserbar core_tags %}
-
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
@@ -14,11 +12,6 @@
         <meta name="description" content="" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        {% compress css %}
-
-            <link rel="stylesheet" type="text/x-scss" href="{% static 'css/style.scss' %}">
-            <link rel="stylesheet" type="text/x-scss" media="screen and (min-width: 20em)" href="{% static 'css/enhanced.scss' %}">
-        {% endcompress %}
 
         {% block extra_css %}
 
@@ -52,16 +45,10 @@
           return script;
         }
 
-        // cut the mustard
-        if('querySelector' in document && 'localStorage' in window && 'addEventListener' in window) {
-          loadJS( "{% static 'js/main.js' %}" );
-        }
         </script>
     </head>
 
     <body class="{% block body_class %}{% endblock %}">
-
-        {% wagtailuserbar %}
 
         {% if languages %}
         <ul>
@@ -70,9 +57,6 @@
             {% endfor %}
         </ul>
         {% endif %}
-
-
-        {% breadcrumbs %}
 
         {% block content %}{% endblock %}
 
@@ -83,7 +67,6 @@
         {% if language_page.footers %}
           <ul>
           {% for page in language_page.footers %}
-          <li><a href="{% pageurl page %}">{{page.title}}</a></li>
           {% endfor %}
           </ul>
         {% endif %}

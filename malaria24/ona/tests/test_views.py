@@ -356,7 +356,7 @@ class SMSEventTest(TestCase):
         sms = SMS.objects.create(to='+27111111111', content='test message',
                                  message_id="b2b5a129da554bd2b799e391883d893d")
         response = client.get(reverse('admin:ona_sms_changelist'))
-        self.assertContains(response, '<td class="field-status">(None)</td>')
+        self.assertContains(response, '<td class="field-status">-</td>')
 
         SMSEvent.objects.create(event_type='sent',
                                 timestamp=datetime.now(), sms=sms)
