@@ -38,12 +38,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
-# backend - e.g. in notification emails. Don't include '/admin' or
-# a trailing slash
-BASE_URL = environ.get("BASE_URL") or 'http://example.com'
-
-
 # Application definition
 
 INSTALLED_APPS = (
