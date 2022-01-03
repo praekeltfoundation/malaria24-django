@@ -223,7 +223,7 @@ class FacilityAdmin(admin.ModelAdmin):
             form = FacilityUploadForm(request.POST, request.FILES)
             if form.is_valid():
                 import_facilities.delay(
-                    form.cleaned_data['upload'].read(),
+                    form.cleaned_data['upload'].read().decode('utf-8'),
                     form.cleaned_data['wipe'],
                     request.user.email)
                 messages.info(

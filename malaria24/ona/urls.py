@@ -1,7 +1,6 @@
 from django.conf.urls import url, include
 from rest_framework import routers
-
-from views import facilities, localities, InboundSMSViewSet, SMSEventViewSet
+from malaria24.ona.views import InboundSMSViewSet, SMSEventViewSet, facilities, localities
 
 
 router = routers.DefaultRouter()
