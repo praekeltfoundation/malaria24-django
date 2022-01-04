@@ -170,12 +170,12 @@ class NationalDigest(models.Model, CalculationsMixin):
                     start_date = province_cases \
                         .first().create_date_time
                     if start_date < min_date:
-                            min_date = start_date
+                        min_date = start_date
 
                     end_date = province_cases \
                         .last().create_date_time
                     if end_date > max_date:
-                            max_date = end_date
+                        max_date = end_date
                     week = "{0} to {1}".format(min_date.strftime(
                         "%d %B %Y"
                     ), max_date.strftime(
@@ -331,12 +331,12 @@ class ProvincialDigest(models.Model, CalculationsMixin):
                 start_date = district_cases \
                     .first().create_date_time
                 if start_date < min_date:
-                        min_date = start_date
+                    min_date = start_date
 
                 end_date = district_cases \
                     .last().create_date_time
                 if end_date > max_date:
-                        max_date = end_date
+                    max_date = end_date
                 week = "{0} to {1}".format(min_date.strftime(
                     "%d %B %Y"
                 ), max_date.strftime(
@@ -520,12 +520,12 @@ class DistrictDigest(models.Model, CalculationsMixin):
                 start_date = fac_cases \
                     .first().create_date_time
                 if start_date < min_date:
-                        min_date = start_date
+                    min_date = start_date
 
                 end_date = fac_cases \
                     .last().create_date_time
                 if end_date > max_date:
-                        max_date = end_date
+                    max_date = end_date
                 week = "{0} to {1}".format(min_date.strftime(
                     "%d %B %Y"
                 ), max_date.strftime(
@@ -667,47 +667,47 @@ class ReportedCase(models.Model):
             return mobile_number.lower()  # convert to lower case
 
     def get_data(self):
-            '''JSON Formats need create_date_time & date_of_birth
-            to be overridden
+        '''JSON Formats need create_date_time & date_of_birth
+        to be overridden
 
-            need to validate msisdn and reported_by fields are in
-            correct format
-            if sa_id_number is None, needs to return empty string'''
+        need to validate msisdn and reported_by fields are in
+        correct format
+        if sa_id_number is None, needs to return empty string'''
 
-            try:
-                birth_date = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
-            except ValueError:
-                # NOTE: This is an unfortunate side-effect of changing how
-                #       date of birth is stored mid-way the data.
-                #       There is historical data in Ona that has this
-                #       old format.
-                birth_date = datetime.strptime(self.date_of_birth, '%y%m%d')
+        try:
+            birth_date = datetime.strptime(self.date_of_birth, '%Y-%m-%d')
+        except ValueError:
+            # NOTE: This is an unfortunate side-effect of changing how
+            #       date of birth is stored mid-way the data.
+            #       There is historical data in Ona that has this
+            #       old format.
+            birth_date = datetime.strptime(self.date_of_birth, '%y%m%d')
 
-            reported_by = self.normalize_msisdn(self.reported_by)
-            msisdn = self.normalize_msisdn(self.msisdn)
+        reported_by = self.normalize_msisdn(self.reported_by)
+        msisdn = self.normalize_msisdn(self.msisdn)
 
-            try:
-                int(self.sa_id_number)  # check if integer
-                sa_id_number = self.sa_id_number
-            except ValueError:
-                sa_id_number = ""
+        try:
+            int(self.sa_id_number)  # check if integer
+            sa_id_number = self.sa_id_number
+        except ValueError:
+            sa_id_number = ""
 
-            return {"first_name": self.first_name,
-                    "last_name": self.last_name,
-                    "gender": self.gender,
-                    "msisdn": msisdn,
-                    "landmark_description": self.landmark_description,
-                    "id_type": self.id_type,
-                    "case_number": self.case_number,
-                    "abroad": self.abroad,
-                    "locality": self.locality,
-                    "reported_by": reported_by,
-                    "date_of_birth": birth_date.strftime("%Y-%m-%d"),
-                    "sa_id_number": sa_id_number,
-                    "create_date_time": self.create_date_time.strftime(
-                        "%Y%m%d%H%M%S"),
-                    "landmark": self.landmark,
-                    "facility_code": self.facility_code}
+        return {"first_name": self.first_name,
+                "last_name": self.last_name,
+                "gender": self.gender,
+                "msisdn": msisdn,
+                "landmark_description": self.landmark_description,
+                "id_type": self.id_type,
+                "case_number": self.case_number,
+                "abroad": self.abroad,
+                "locality": self.locality,
+                "reported_by": reported_by,
+                "date_of_birth": birth_date.strftime("%Y-%m-%d"),
+                "sa_id_number": sa_id_number,
+                "create_date_time": self.create_date_time.strftime(
+                    "%Y%m%d%H%M%S"),
+                "landmark": self.landmark,
+                "facility_code": self.facility_code}
 
     def get_today(self):
         return datetime.today()
@@ -1080,8 +1080,7 @@ def alert_case_mis(reported_case):
         else:
             logging.warning(
                 (f'Unable to Email report for case {reported_case.case_number} '
-                f'to {name} ({role}). '
-                 'Missing email_address.'))
+                 f'to {name} ({role}). Missing email_address.'))
 
 
 post_save.connect(new_case_alert_ehps, sender=ReportedCase)

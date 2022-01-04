@@ -1,8 +1,8 @@
 pytest==4.6.11
-pytest-cov==3.0.0
-pytest-django==3.3.2
-pytest-forked==1.4.0
-pytest-xdist==2.5.0
+pytest-cov
+pytest-django
+pytest-forked
+pytest-xdist
 flake8==4.0.1
 responses
 mock

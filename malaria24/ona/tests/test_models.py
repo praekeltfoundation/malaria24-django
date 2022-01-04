@@ -1,4 +1,3 @@
-from json import loads
 from django.core import mail
 from django.db.models.signals import post_save
 from django.test import override_settings
@@ -47,8 +46,7 @@ class CaseInvestigatorTest(MalariaTestCase):
             log.check(
                 ('root',
                  'WARNING',
-                 'No Case Investigators found for facility code '
-                 'facility_code.'))
+                 'No Case Investigators found for facility code facility_code.'))
 
     @responses.activate
     def test_capture_no_case_investigator_phonenumber(self):
@@ -113,8 +111,7 @@ class MISTest(MalariaTestCase):
             log.check(
                 ('root',
                  'WARNING',
-                 'No MIS found for facility code '
-                 'facility_code.'))
+                 'No MIS found for facility code facility_code.'))
 
     @responses.activate
     def test_capture_no_mis_email_address(self):
@@ -124,9 +121,10 @@ class MISTest(MalariaTestCase):
                 facility_code='code', province=mis.province)
             case = self.mk_case(facility_code=facility.facility_code)
             log.check_present(('root',
-                       'WARNING',
-                       (f"Unable to Email report for case {case.case_number} to {mis.name} ({mis.role}). " 
-                       "Missing email_address.")))
+                               'WARNING',
+                               (f'Unable to Email report for '
+                                f'case {case.case_number} to '
+                                f'{mis.name} ({mis.role}). Missing email_address.')))
 
     @responses.activate
     def test_email_sending(self):
@@ -207,8 +205,8 @@ class EhpReportedCaseTest(MalariaTestCase):
         with LogCapture() as log:
             self.mk_case()
             log.check_present(('root',
-                       'WARNING',
-                       'No EHPs found for facility code facility_code.'))
+                               'WARNING',
+                               'No EHPs found for facility code facility_code.'))
 
     @responses.activate
     def test_capture_no_ehp_phonenumber(self):
@@ -216,10 +214,10 @@ class EhpReportedCaseTest(MalariaTestCase):
             ehp = self.mk_ehp(phone_number='')
             case = self.mk_case(facility_code=ehp.facility_code)
             log.check_present(('root',
-                       'WARNING',
-                       ('Unable to SMS report for case %s to %s. '
-                        'Missing phone_number.') % (
-                            case.case_number, ehp)))
+                               'WARNING',
+                               ('Unable to SMS report for case %s to %s. '
+                                'Missing phone_number.') % (
+                                   case.case_number, ehp)))
 
     @responses.activate
     def test_capture_no_ehp_email_address(self):
@@ -227,10 +225,10 @@ class EhpReportedCaseTest(MalariaTestCase):
             ehp = self.mk_ehp(email_address='')
             case = self.mk_case(facility_code=ehp.facility_code)
             log.check_present(('root',
-                       'WARNING',
-                       ('Unable to Email report for case %s to %s. '
-                        'Missing email_address.') % (
-                            case.case_number, ehp)))
+                               'WARNING',
+                               ('Unable to Email report for case %s to %s. '
+                                'Missing email_address.') % (
+                                   case.case_number, ehp)))
 
     @responses.activate
     def test_capture_no_reported_by(self):
@@ -241,10 +239,10 @@ class EhpReportedCaseTest(MalariaTestCase):
                 case = self.mk_case(facility_code=ehp.facility_code,
                                     reported_by='')
             log.check_present(('root',
-                       'WARNING',
-                       ('Unable to SMS case number for case %s. '
-                        'Missing reported_by.') % (
-                            case.case_number)))
+                               'WARNING',
+                               ('Unable to SMS case number for case %s. '
+                                'Missing reported_by.') % (
+                                   case.case_number)))
 
     @responses.activate
     def test_capture_all_ok(self):
@@ -385,7 +383,7 @@ class EhpReportedCaseTest(MalariaTestCase):
     @responses.activate
     def test_age(self):
         with patch.object(ReportedCase, 'get_today') as patch_today:
-            patch_today.return_value = datetime(2015,1,1)
+            patch_today.return_value = datetime(2015, 1, 1)
             case = self.mk_case(date_of_birth="1982-01-01")
             self.assertEqual(33, case.age)
 

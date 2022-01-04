@@ -21,6 +21,7 @@ class DjangoContainer(ContainerDefinition):
             }
         }
 
+
 postgresql_container = PostgreSQLContainer("postgresql")
 postgresql_fixture, clean_postgresql_fixture = (
     postgresql_container.pytest_clean_fixtures("postgresql_container"))

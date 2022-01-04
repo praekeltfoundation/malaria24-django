@@ -22,12 +22,14 @@ from requests.auth import HTTPBasicAuth
 from onapie.utils import Connection, ConnectionSingleton
 
 
-# This function is needed as Onapie doesn't yet support Python 3, once Python 3 is supported this can be removed.
-# The functions sets the singleton instance of the client such that 
+# This function is needed as Onapie doesn't yet support Python 3,
+# once Python 3 is supported this can be removed.
+# The functions sets the singleton instance of the client such that
 # it does not need to be instantiated by Onapie, which no longer works in Python 3
 def connect_client(api_addr):
     con = Connection(api_addr)
     ConnectionSingleton._instance = con
+
 
 @celery_app.task(ignore_result=True)
 def ona_fetch_forms():
