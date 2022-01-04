@@ -1079,10 +1079,9 @@ def alert_case_mis(reported_case):
 
         else:
             logging.warning(
-                ('Unable to Email report for case %s to %s (%s). '
-                 'Missing email_address.') % (
-                    reported_case.case_number,
-                    name, role))
+                (f'Unable to Email report for case {reported_case.case_number} '
+                f'to {name} ({role}). '
+                 'Missing email_address.'))
 
 
 post_save.connect(new_case_alert_ehps, sender=ReportedCase)

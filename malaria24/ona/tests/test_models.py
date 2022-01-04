@@ -1,3 +1,4 @@
+from json import loads
 from django.core import mail
 from django.db.models.signals import post_save
 from django.test import override_settings
@@ -122,11 +123,10 @@ class MISTest(MalariaTestCase):
             facility = self.mk_facility(
                 facility_code='code', province=mis.province)
             case = self.mk_case(facility_code=facility.facility_code)
-            log.check(('root',
+            log.check_present(('root',
                        'WARNING',
-                       ('Unable to Email report for case %s to %s. '
-                        'Missing email_address.') % (
-                            case.case_number, mis)))
+                       (f"Unable to Email report for case {case.case_number} to {mis.name} ({mis.role}). " 
+                       "Missing email_address.")))
 
     @responses.activate
     def test_email_sending(self):
@@ -206,7 +206,7 @@ class EhpReportedCaseTest(MalariaTestCase):
     def test_capture_no_ehps(self):
         with LogCapture() as log:
             self.mk_case()
-            log.check(('root',
+            log.check_present(('root',
                        'WARNING',
                        'No EHPs found for facility code facility_code.'))
 
@@ -215,7 +215,7 @@ class EhpReportedCaseTest(MalariaTestCase):
         with LogCapture() as log:
             ehp = self.mk_ehp(phone_number='')
             case = self.mk_case(facility_code=ehp.facility_code)
-            log.check(('root',
+            log.check_present(('root',
                        'WARNING',
                        ('Unable to SMS report for case %s to %s. '
                         'Missing phone_number.') % (
@@ -226,7 +226,7 @@ class EhpReportedCaseTest(MalariaTestCase):
         with LogCapture() as log:
             ehp = self.mk_ehp(email_address='')
             case = self.mk_case(facility_code=ehp.facility_code)
-            log.check(('root',
+            log.check_present(('root',
                        'WARNING',
                        ('Unable to Email report for case %s to %s. '
                         'Missing email_address.') % (
@@ -240,7 +240,7 @@ class EhpReportedCaseTest(MalariaTestCase):
                 mock_make_pdf.return_value = 'garbage for testing'
                 case = self.mk_case(facility_code=ehp.facility_code,
                                     reported_by='')
-            log.check(('root',
+            log.check_present(('root',
                        'WARNING',
                        ('Unable to SMS case number for case %s. '
                         'Missing reported_by.') % (
@@ -385,7 +385,7 @@ class EhpReportedCaseTest(MalariaTestCase):
     @responses.activate
     def test_age(self):
         with patch.object(ReportedCase, 'get_today') as patch_today:
-            patch_today.return_value = datetime(2015, 01, 01)
+            patch_today.return_value = datetime(2015,1,1)
             case = self.mk_case(date_of_birth="1982-01-01")
             self.assertEqual(33, case.age)
 

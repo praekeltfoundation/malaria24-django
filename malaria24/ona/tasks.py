@@ -7,7 +7,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from rest_framework.authtoken.models import Token
-from urlparse import urlunparse
+from urllib.parse import urlunparse
 
 from malaria24 import celery_app
 from malaria24.ona.models import (ReportedCase, SMS, Digest, Facility, OnaForm,
@@ -19,9 +19,21 @@ from onapie.client import Client
 from go_http.send import HttpApiSender
 from requests.auth import HTTPBasicAuth
 
+from onapie.utils import Connection, ConnectionSingleton
+
+
+# This function is needed as Onapie doesn't yet support Python 3, once Python 3 is supported this can be removed.
+# The functions sets the singleton instance of the client such that 
+# it does not need to be instantiated by Onapie, which no longer works in Python 3
+def connect_client(api_addr):
+    con = Connection(api_addr)
+    ConnectionSingleton._instance = con
 
 @celery_app.task(ignore_result=True)
 def ona_fetch_forms():
+    client = connect_client(
+        settings.ONA_API_URL
+    )
     client = Client(settings.ONA_API_URL,
                     api_token=settings.ONAPIE_ACCESS_TOKEN,
                     api_entrypoint='/api/v1/')
@@ -42,6 +54,9 @@ def ona_fetch_reported_cases():
 
 @celery_app.task(ignore_result=True)
 def ona_fetch_reported_case_for_form(form_id):
+    client = connect_client(
+        settings.ONA_API_URL
+    )
     client = Client(settings.ONA_API_URL,
                     api_token=settings.ONAPIE_ACCESS_TOKEN,
                     api_entrypoint='/api/v1/')

@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
 from rest_framework import routers
-from ona.views import facilities, localities, InboundSMSViewSet, SMSEventViewSet
+from malaria24.ona.views import InboundSMSViewSet, SMSEventViewSet
 
 
 router = routers.DefaultRouter()

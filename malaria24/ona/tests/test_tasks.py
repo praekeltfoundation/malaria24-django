@@ -510,10 +510,10 @@ class OnaTest(MalariaTestCase):
         )
 
         compile_and_send_jembi(case.pk)
-
-        auth_headers = ('Basic ' +
-                        b64encode("{0}:{1}".format(settings.JEMBI_USERNAME,
-                                                   settings.JEMBI_PASSWORD)))
+        byte_string = b64encode(
+            str.encode(f"{settings.JEMBI_USERNAME}:{settings.JEMBI_PASSWORD}")
+        )
+        auth_headers = ('Basic ' + byte_string.decode('utf-8'))
         self.assertEqual(
             responses.calls[0].request.headers['Authorization'],
             auth_headers)

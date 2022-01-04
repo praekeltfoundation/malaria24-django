@@ -1,12 +1,12 @@
 import json
 from datetime import datetime
-from StringIO import StringIO
+from io import StringIO
 from uuid import UUID
 
 from django.core import mail
 from django.test import TestCase
 from django.test.client import Client
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.models import User
 
 from mock import patch
