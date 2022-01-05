@@ -1,5 +1,4 @@
 Django==1.11.29
-# django-appconf==1.0.3
 django-compressor==3.1
 django-taggit==0.22.2
 celery==5.2.1
@@ -12,3 +11,4 @@ requests==2.26.0
 dj-database-url==0.5.0
 raven==6.10.0
 pdfkit==1.0.0
+django-modelcluster==3.1
