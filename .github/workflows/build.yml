@@ -15,6 +15,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: praekeltfoundation/malaria24-django
+          repository: praekeltfoundation/malariaconnect
           tag_with_ref: true
           tag_with_sha: true
