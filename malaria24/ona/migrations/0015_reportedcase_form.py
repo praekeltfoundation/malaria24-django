@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='reportedcase',
             name='form',
-            field=models.ForeignKey(blank=True, to='ona.OnaForm', null=True),
+            field=models.ForeignKey(blank=True, to='ona.OnaForm', null=True, on_delete=models.CASCADE),
         ),
     ]

@@ -30,7 +30,7 @@ class Digest(models.Model):
             role__in=[MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
-        digest.recipients = recipients
+        digest.recipients.set(recipients)
         digest.save()
         new_cases.update(digest=digest)
         return digest
@@ -111,7 +111,7 @@ class NationalDigest(models.Model, CalculationsMixin):
             role__in=[MANAGER_NATIONAL, MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
-        digest.recipients = recipients
+        digest.recipients.set(recipients)
         digest.save()
         return digest
 
@@ -267,7 +267,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
             role__in=[MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
-        digest.recipients = recipients
+        digest.recipients.set(recipients)
         digest.save()
         return digest
 
@@ -435,7 +435,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
             role__in=[MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
-        digest.recipients = recipients
+        digest.recipients.set(recipients)
         digest.save()
         return digest
 
@@ -651,9 +651,19 @@ class ReportedCase(models.Model):
     _xform_id_string = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    digest = models.ForeignKey('Digest', null=True, blank=True)
+    digest = models.ForeignKey(
+        'Digest',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
     ehps = models.ManyToManyField('Actor', blank=True)
-    form = models.ForeignKey('OnaForm', null=True, blank=True)
+    form = models.ForeignKey(
+        'OnaForm',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
     jembi_alert_sent = models.BooleanField(default=False)
 
     def normalize_msisdn(self, mobile_number):
@@ -913,7 +923,11 @@ class InboundSMS(models.Model):
     content = models.TextField(blank=True)
     timestamp = models.DateTimeField("sent at")
     created_at = models.DateTimeField(auto_now_add=True)
-    reply_to = models.ForeignKey('SMS', null=True)
+    reply_to = models.ForeignKey(
+        'SMS',
+        null=True,
+        on_delete=models.CASCADE,
+    )
 
 
 class SMSEvent(models.Model):
@@ -922,7 +936,10 @@ class SMSEvent(models.Model):
     """
     event_type = models.CharField(max_length=255)
     timestamp = models.DateTimeField()
-    sms = models.ForeignKey('SMS')
+    sms = models.ForeignKey(
+        'SMS',
+        on_delete=models.CASCADE,
+    )
 
 
 def new_case_alert_jembi(sender, instance, created, **kwargs):

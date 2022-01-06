@@ -4,6 +4,6 @@ pytest-django==4.5.2
 pytest-forked==1.4.0
 pytest-xdist==2.5.0
 flake8==4.0.1
-responses
-mock
+responses==0.16.0
+mock==4.0.3
 testfixtures==6.18.3

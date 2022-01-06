@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.core import urlresolvers
+from django.urls import reverse
 from django.db.models.signals import post_save
 from django.test import override_settings
 from mock import patch
@@ -53,7 +53,7 @@ class ReportedCaseAdminTest(MalariaTestCase):
             'action': 'send_jembi_alert',
             '_selected_action': [case.pk]
         }
-        list_url = urlresolvers.reverse('admin:ona_reportedcase_changelist')
+        list_url = reverse('admin:ona_reportedcase_changelist')
         response = self.client.post(list_url, data, follow=True)
         mock_task.not_called()
         self.assertContains(response, "Sending to Jembi currently disabled.")
@@ -81,7 +81,7 @@ class ReportedCaseAdminTest(MalariaTestCase):
             'action': 'send_jembi_alert',
             '_selected_action': [case1.pk, case2.pk]
         }
-        list_url = urlresolvers.reverse('admin:ona_reportedcase_changelist')
+        list_url = reverse('admin:ona_reportedcase_changelist')
         response = self.client.post(list_url, data, follow=True)
         mock_task.assert_called_with(case2.pk)
         self.assertContains(response,
@@ -117,7 +117,7 @@ class ReportedCaseAdminTest(MalariaTestCase):
             'action': 'send_jembi_alert',
             '_selected_action': [case1.pk, case2.pk]
         }
-        list_url = urlresolvers.reverse('admin:ona_reportedcase_changelist')
+        list_url = reverse('admin:ona_reportedcase_changelist')
         response = self.client.post(list_url, data, follow=True)
         mock_task.assert_any_call(case1.pk)
         mock_task.assert_any_call(case2.pk)
