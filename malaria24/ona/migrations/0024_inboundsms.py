@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('content', models.TextField(blank=True)),
                 ('timestamp', models.DateTimeField(verbose_name=b'sent at')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('reply_to', models.ForeignKey(to='ona.SMS', null=True)),
+                ('reply_to', models.ForeignKey(to='ona.SMS', null=True, on_delete=models.CASCADE)),
             ],
         ),
     ]

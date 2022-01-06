@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('event_type', models.CharField(max_length=255)),
                 ('timestamp', models.DateTimeField()),
-                ('sms', models.ForeignKey(to='ona.SMS')),
+                ('sms', models.ForeignKey(to='ona.SMS', on_delete=models.CASCADE)),
             ],
         ),
     ]

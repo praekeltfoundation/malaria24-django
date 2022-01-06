@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='reportedcase',
             name='digest',
-            field=models.ForeignKey(blank=True, to='ona.Digest', null=True),
+            field=models.ForeignKey(blank=True, to='ona.Digest', null=True, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='reportedcase',
