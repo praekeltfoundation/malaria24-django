@@ -1,5 +1,7 @@
 import os
-from django.conf.urls import include, url
+from django.conf.urls import url
+from django.urls import re_path, include
+
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
@@ -12,9 +14,9 @@ router.register(r'inbound', InboundSMSViewSet)
 router.register(r'event', SMSEventViewSet)
 
 urlpatterns = [
-    url(r'', include(router.urls)),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^api/v1/', include('malaria24.ona.urls', namespace='api_v1')),
+    re_path(r'', include(router.urls)),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^api/v1/', 'malaria24.ona.urls', name='api_v1'),
 ]
 
 
