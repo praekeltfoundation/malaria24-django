@@ -1,5 +1,4 @@
 import os
-from django.conf.urls import url
 from django.urls import re_path, include
 
 from django.conf.urls.static import static

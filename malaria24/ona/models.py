@@ -659,8 +659,8 @@ class ReportedCase(models.Model):
     )
     ehps = models.ManyToManyField('Actor', blank=True)
     form = models.ForeignKey(
-        'OnaForm', 
-        null=True, 
+        'OnaForm',
+        null=True,
         blank=True,
         on_delete=models.CASCADE,
     )
