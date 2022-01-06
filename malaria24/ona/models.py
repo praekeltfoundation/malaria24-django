@@ -30,7 +30,7 @@ class Digest(models.Model):
             role__in=[MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
-        digest.recipients = recipients
+        digest.recipients.set(recipients)
         digest.save()
         new_cases.update(digest=digest)
         return digest
@@ -111,7 +111,7 @@ class NationalDigest(models.Model, CalculationsMixin):
             role__in=[MANAGER_NATIONAL, MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
-        digest.recipients = recipients
+        digest.recipients.set(recipients)
         digest.save()
         return digest
 
@@ -267,7 +267,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
             role__in=[MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
-        digest.recipients = recipients
+        digest.recipients.set(recipients)
         digest.save()
         return digest
 
@@ -435,7 +435,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
             role__in=[MIS],
             email_address__isnull=False)
         digest = cls.objects.create()
-        digest.recipients = recipients
+        digest.recipients.set(recipients)
         digest.save()
         return digest
 
