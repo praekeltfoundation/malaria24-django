@@ -16,7 +16,7 @@ router.register(r'event', SMSEventViewSet)
 urlpatterns = [
     re_path(r'', include(router.urls)),
     re_path(r'^admin/', admin.site.urls),
-    re_path(r'^api/v1/', 'malaria24.ona.urls', name='api_v1'),
+    re_path(r'^api/v1/', include(('malaria24.ona.urls', 'api_v1'), namespace='api_v1')),
 ]
 
 
