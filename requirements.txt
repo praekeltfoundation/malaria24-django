@@ -13,3 +13,4 @@ dj-database-url
 raven
 pdfkit
 django-modelcluster
+psycopg2-binary
