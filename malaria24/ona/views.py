@@ -24,6 +24,14 @@ def localities(request, facility_code):
         raise Http404()
 
 
+def health(request):
+    status = 200
+    resp = {
+        "up": True,
+    }
+    return JsonResponse(resp, status=status)
+
+
 class InboundSMSViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = InboundSMSSerializer

@@ -1,7 +1,7 @@
 from django.urls import re_path, include
 from rest_framework import routers
 from malaria24.ona.views import InboundSMSViewSet, SMSEventViewSet
-from malaria24.ona.views import facilities, localities
+from malaria24.ona.views import facilities, localities, health
 
 
 router = routers.DefaultRouter()
@@ -14,5 +14,5 @@ urlpatterns = [
     re_path(r'^localities/(?P<facility_code>.+)\.json$', localities,
             name='localities'),
     re_path(r'', include(router.urls)),
-
+    re_path(r'^health/$', health, name='health'),
 ]

@@ -14,7 +14,7 @@ To get started::
     $ source ve/bin/activate
     $ pip install -e git+git://github.com/onaio/onapie.git#egg=onapie
     $ pip install -e .
-    $ pip install django-modelcluster==3.1
+    $ pip install -r requirements.txt
     $ ./manage.py migrate
     $ ./manage.py createsuperuser
     $ ./manage.py runserver
