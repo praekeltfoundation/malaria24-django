@@ -1,5 +1,4 @@
 from django.http import JsonResponse, Http404
-from django.http.response import HttpResponse
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from .models import Facility, InboundSMS, SMSEvent
@@ -30,7 +29,7 @@ def health(request):
     resp = {
         "up": True,
     }
-    return HttpResponse(resp, status=status)
+    return JsonResponse(resp, status=status)
 
 
 class InboundSMSViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
