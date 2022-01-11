@@ -25,7 +25,7 @@ def localities(request, facility_code):
         raise Http404()
 
 
-def health():
+def health(request):
     status = 200
     resp = {
         "up": True,
