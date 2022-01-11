@@ -5,7 +5,7 @@ COPY . /app
 
 RUN python -m pip install --upgrade pip
 
-RUN pip install https://github.com/onaio/onapie/archive/develop.zip#egg=onapie &&\
+RUN pip install git+https://github.com/onaio/onapie.git#egg=onapie &&\
     pip install -e . &&\
     pip install -r requirements.txt
 
