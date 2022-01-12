@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import admin
 from rest_framework import routers
 from malaria24.ona.views import InboundSMSViewSet, SMSEventViewSet
+from .views import health
 
 
 router = routers.DefaultRouter()
@@ -16,6 +17,7 @@ urlpatterns = [
     re_path(r'', include(router.urls)),
     re_path(r'^admin/', admin.site.urls),
     re_path(r'^api/v1/', include(('malaria24.ona.urls', 'api_v1'), namespace='api_v1')),
+    re_path(r'^health/$', health, name='health'),
 ]
 
 
