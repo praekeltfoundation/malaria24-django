@@ -1,3 +1,6 @@
+import csv
+import io
+import json
 from django import forms
 from django.conf import settings
 from django.contrib import admin, messages
@@ -191,7 +194,14 @@ class DigestAdmin(admin.ModelAdmin):
 
 
 class FacilityUploadForm(forms.Form):
-    upload = forms.FileField(label='File to import', required=True)
+    upload = forms.FileField(
+        label='File to import',
+        required=True,
+        help_text='Files can either be in csv or json format. '
+        'If the file is a csv, the headers must be '
+        '"FacCode,Facility,Province,District,Sub-District (Locality),Phase". '
+        'If the file is a json, the format must be a list of json objects '
+        'with the keys the same as the csv headers')
     wipe = forms.BooleanField(
         help_text=('Check if you want to wipe the existing database before '
                    'importing new data.'), required=False)
@@ -222,8 +232,29 @@ class FacilityAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             form = FacilityUploadForm(request.POST, request.FILES)
             if form.is_valid():
+                file = form.cleaned_data['upload'].read().decode('utf-8')
+
+                if form.cleaned_data['upload'].name.endswith('.csv'):
+                    string_io_file = io.StringIO(file)
+                    next(string_io_file, None)
+                    file_content_json = list(csv.DictReader(
+                        string_io_file,
+                        fieldnames=[
+                            "FacCode",
+                            "Facility",
+                            "Province",
+                            "District",
+                            "Sub-District (Locality)",
+                            "Phase",
+                        ],
+                        delimiter=',',
+                    ))
+
+                if form.cleaned_data['upload'].name.endswith('.json'):
+                    file_content_json = json.loads(file)
+
                 import_facilities.delay(
-                    form.cleaned_data['upload'].read().decode('utf-8'),
+                    file_content_json,
                     form.cleaned_data['wipe'],
                     request.user.email)
                 messages.info(

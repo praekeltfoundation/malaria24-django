@@ -186,8 +186,7 @@ def compile_and_send_digest_email():
 
 
 @celery_app.task(ignore_result=True)
-def import_facilities(json_data, wipe, email_address):
-    data = json.loads(json_data)
+def import_facilities(data, wipe, email_address):
     if wipe:
         Facility.objects.all().delete()
 
