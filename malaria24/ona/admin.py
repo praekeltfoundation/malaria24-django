@@ -238,17 +238,8 @@ class FacilityAdmin(admin.ModelAdmin):
                     file_content_json = json.loads(file)
                 except json.JSONDecodeError:
                     string_io_file = io.StringIO(file)
-                    next(string_io_file, None)
                     file_content_json = list(csv.DictReader(
                         string_io_file,
-                        fieldnames=[
-                            "FacCode",
-                            "Facility",
-                            "Province",
-                            "District",
-                            "Sub-District (Locality)",
-                            "Phase",
-                        ],
                         delimiter=',',
                     ))
 
