@@ -234,7 +234,9 @@ class FacilityAdmin(admin.ModelAdmin):
             if form.is_valid():
                 file = form.cleaned_data['upload'].read().decode('utf-8')
 
-                if form.cleaned_data['upload'].name.endswith('.csv'):
+                try:
+                    file_content_json = json.loads(file)
+                except json.JSONDecodeError:
                     string_io_file = io.StringIO(file)
                     next(string_io_file, None)
                     file_content_json = list(csv.DictReader(
@@ -249,9 +251,6 @@ class FacilityAdmin(admin.ModelAdmin):
                         ],
                         delimiter=',',
                     ))
-
-                if form.cleaned_data['upload'].name.endswith('.json'):
-                    file_content_json = json.loads(file)
 
                 import_facilities.delay(
                     file_content_json,
