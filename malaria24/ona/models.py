@@ -28,7 +28,7 @@ class Digest(models.Model):
 
         recipients = Actor.objects.filter(
             role__in=[MIS],
-            email_address__isnull=False)
+            email_address__isnull=False).exclude(email_address="")
         digest = cls.objects.create()
         digest.recipients.set(recipients)
         digest.save()
@@ -109,7 +109,7 @@ class NationalDigest(models.Model, CalculationsMixin):
     def compile_digest(cls):
         recipients = Actor.objects.filter(
             role__in=[MANAGER_NATIONAL, MIS],
-            email_address__isnull=False)
+            email_address__isnull=False).exclude(email_address="")
         digest = cls.objects.create()
         digest.recipients.set(recipients)
         digest.save()
@@ -265,7 +265,7 @@ class ProvincialDigest(models.Model, CalculationsMixin):
     def compile_digest(cls):
         recipients = Actor.objects.filter(
             role__in=[MIS],
-            email_address__isnull=False)
+            email_address__isnull=False).exclude(email_address="")
         digest = cls.objects.create()
         digest.recipients.set(recipients)
         digest.save()
@@ -433,7 +433,7 @@ class DistrictDigest(models.Model, CalculationsMixin):
     def compile_digest(cls):
         recipients = Actor.objects.filter(
             role__in=[MIS],
-            email_address__isnull=False)
+            email_address__isnull=False).exclude(email_address="")
         digest = cls.objects.create()
         digest.recipients.set(recipients)
         digest.save()
