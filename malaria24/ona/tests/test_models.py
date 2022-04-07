@@ -526,6 +526,57 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(message.to, [mis.email_address])
 
     @responses.activate
+    def test_send_digest_email_with_blank_emails(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        self.mk_actor(role=MANAGER_DISTRICT,
+                      email_address='manager@example.org',
+                      district=u'Example1', facility_code='342315'
+                      )
+        # first MIS
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.com',
+                      facility_code='342315', district=u'Example1'
+                      )
+        # second MIS to show that its collecting more than 1
+        self.mk_actor(role=MIS,
+                      email_address='mis2@example.com',
+                      facility_code='342315', district=u'Example1'
+                      )
+        # None email address must be skipped
+        self.mk_actor(role=MIS,
+                      email_address=None,
+                      facility_code='342315', district=u'Example1'
+                      )
+        # Blank email address must be skipped
+        self.mk_actor(role=MIS,
+                      email_address='',
+                      facility_code='342315', district=u'Example1'
+                      )
+
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for _ in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = Digest.compile_digest()
+        digest.send_digest_email()
+        [message] = mail.outbox
+        self.assertEquals(len(message.to), 2)
+        self.assertEquals(
+            set(message.to),
+            set(['mis2@example.com', 'mis@example.com'])
+        )
+
+    @responses.activate
     def test_district_digest_email_data(self):
         Facility.objects.create(facility_code='342315',
                                 facility_name='Facility 1',
@@ -707,6 +758,57 @@ class DigestTest(MalariaTestCase):
             set(message.to), set(['manager@example.org', 'mis@example.org']))
 
     @responses.activate
+    def test_send_national_digest_email_with_blank_emails(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        self.mk_actor(role=MANAGER_NATIONAL,
+                      email_address='manager@example.org',
+                      district=u'Example1', facility_code='342315'
+                      )
+        # first MIS
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.com',
+                      facility_code='342315', district=u'Example1'
+                      )
+        # second MIS to show that its collecting more than 1
+        self.mk_actor(role=MIS,
+                      email_address='mis2@example.com',
+                      facility_code='342315', district=u'Example1'
+                      )
+        # None email address must be skipped
+        self.mk_actor(role=MIS,
+                      email_address=None,
+                      facility_code='342315', district=u'Example1'
+                      )
+        # Blank email address must be skipped
+        self.mk_actor(role=MIS,
+                      email_address='',
+                      facility_code='342315', district=u'Example1'
+                      )
+
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for _ in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = NationalDigest.compile_digest()
+        digest.send_digest_email()
+        [message] = mail.outbox
+        self.assertEquals(len(message.to), 3)
+        self.assertEquals(
+            set(message.to),
+            set(['manager@example.org', 'mis2@example.com', 'mis@example.com'])
+        )
+
+    @responses.activate
     def test_send_provincial_digest_email(self):
         Facility.objects.create(facility_code='342315',
                                 facility_name='Facility 1',
@@ -781,6 +883,57 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(data, {})
         self.assertEqual(
             set(message.to), set(['manager@example.org', 'mis@example.org']))
+
+    @responses.activate
+    def test_send_provincial_digest_email_with_blank_emails(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        self.mk_actor(role=MANAGER_PROVINCIAL,
+                      email_address='manager@example.org',
+                      district=u'Example1', facility_code='342315'
+                      )
+        # first MIS
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.com',
+                      facility_code='342315', district=u'Example1'
+                      )
+        # second MIS to show that its collecting more than 1
+        self.mk_actor(role=MIS,
+                      email_address='mis2@example.com',
+                      facility_code='342315', district=u'Example1'
+                      )
+        # None email address must be skipped
+        self.mk_actor(role=MIS,
+                      email_address=None,
+                      facility_code='342315', district=u'Example1'
+                      )
+        # Blank email address must be skipped
+        self.mk_actor(role=MIS,
+                      email_address='',
+                      facility_code='342315', district=u'Example1'
+                      )
+
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for _ in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = ProvincialDigest.compile_digest()
+        digest.send_digest_email()
+        [message] = mail.outbox
+        self.assertEquals(len(message.to), 3)
+        self.assertEquals(
+            set(message.to),
+            set(['manager@example.org', 'mis2@example.com', 'mis@example.com'])
+        )
 
     @responses.activate
     def test_send_district_digest_email(self):
@@ -868,6 +1021,57 @@ class DigestTest(MalariaTestCase):
         self.assertEqual(data, {})
         self.assertEqual(
             set(message.to), set(['manager@example.org', 'mis@example.org']))
+
+    @responses.activate
+    def test_send_district_digest_email_with_blank_emails(self):
+        Facility.objects.create(facility_code='342315',
+                                facility_name='Facility 1',
+                                province='Limpopo',
+                                district=u'Example1')
+        self.mk_actor(role=MANAGER_DISTRICT,
+                      email_address='manager@example.org',
+                      district=u'Example1', facility_code='342315'
+                      )
+        # first MIS
+        self.mk_actor(role=MIS,
+                      email_address='mis@example.com',
+                      facility_code='342315', district=u'Example1'
+                      )
+        # second MIS to show that its collecting more than 1
+        self.mk_actor(role=MIS,
+                      email_address='mis2@example.com',
+                      facility_code='342315', district=u'Example1'
+                      )
+        # None email address must be skipped
+        self.mk_actor(role=MIS,
+                      email_address=None,
+                      facility_code='342315', district=u'Example1'
+                      )
+        # Blank email address must be skipped
+        self.mk_actor(role=MIS,
+                      email_address='',
+                      facility_code='342315', district=u'Example1'
+                      )
+
+        ehp1 = self.mk_ehp(name='EHP1', email_address='ehp1@example.org')
+        ehp2 = self.mk_ehp(name='EHP2', email_address='ehp2@example.org')
+
+        for _ in range(10):
+            case = self.mk_case(gender='female', facility_code='342315')
+            case.date_of_birth = datetime.today().strftime("%y%m%d")
+            case.ehps.add(ehp1)
+            case.ehps.add(ehp2)
+            case.save()
+            case.digest = None
+
+        digest = DistrictDigest.compile_digest()
+        digest.send_digest_email()
+        [message] = mail.outbox
+        self.assertEquals(len(message.to), 3)
+        self.assertEquals(
+            set(message.to),
+            set(['manager@example.org', 'mis2@example.com', 'mis@example.com'])
+        )
 
     @responses.activate
     def test_send_with_old_and_new_data_district(self):
