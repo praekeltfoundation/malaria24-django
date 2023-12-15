@@ -444,7 +444,7 @@ class JembiReportedCaseTest(MalariaTestCase):
                             landmark="School", facility_code="123456")
         case.save()
         case.digest = None
-        mock_task.not_called()
+        self.assertFalse(mock_task.called)
 
     @patch('malaria24.ona.tasks.compile_and_send_jembi.delay')
     def test_case_creation_triggers_task(self, mock_task):

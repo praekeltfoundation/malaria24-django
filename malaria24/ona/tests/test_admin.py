@@ -55,7 +55,7 @@ class ReportedCaseAdminTest(MalariaTestCase):
         }
         list_url = reverse('admin:ona_reportedcase_changelist')
         response = self.client.post(list_url, data, follow=True)
-        mock_task.not_called()
+        self.assertFalse(mock_task.called)
         self.assertContains(response, "Sending to Jembi currently disabled.")
 
     @patch('malaria24.ona.tasks.compile_and_send_jembi.delay')
